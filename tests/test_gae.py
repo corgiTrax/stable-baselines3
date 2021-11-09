@@ -11,7 +11,9 @@ from stable_baselines3.common.policies import ActorCriticPolicy
 class CustomEnv(gym.Env):
     def __init__(self, max_steps=8):
         super(CustomEnv, self).__init__()
-        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(
+            low=-1, high=1, shape=(2,), dtype=np.float32
+        )
         self.action_space = gym.spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float32)
         self.max_steps = max_steps
         self.n_steps = 0
@@ -66,7 +68,9 @@ class CheckGAECallback(BaseCallback):
             # Values are constants
             episode_start_mask = 1.0 - episode_starts[n + 1]
             deltas[n] = rewards[n] + gamma * value * episode_start_mask - value
-            advantages[n] = deltas[n] + gamma * gae_lambda * advantages[n + 1] * episode_start_mask
+            advantages[n] = (
+                deltas[n] + gamma * gae_lambda * advantages[n + 1] * episode_start_mask
+            )
 
         # TD(lambda) estimate, see Github PR #375
         lambda_returns = advantages + value

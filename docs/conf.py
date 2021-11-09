@@ -45,7 +45,9 @@ MOCK_MODULES = []
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # Read version from file
-version_file = os.path.join(os.path.dirname(__file__), "../stable_baselines3", "version.txt")
+version_file = os.path.join(
+    os.path.dirname(__file__), "../stable_baselines3", "version.txt"
+)
 with open(version_file, "r") as file_handler:
     __version__ = file_handler.read().strip()
 
@@ -180,7 +182,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "StableBaselines3.tex", "Stable Baselines3 Documentation", "Stable Baselines3 Contributors", "manual"),
+    (
+        master_doc,
+        "StableBaselines3.tex",
+        "Stable Baselines3 Documentation",
+        "Stable Baselines3 Contributors",
+        "manual",
+    ),
 ]
 
 
@@ -188,7 +196,9 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "stablebaselines3", "Stable Baselines3 Documentation", [author], 1)]
+man_pages = [
+    (master_doc, "stablebaselines3", "Stable Baselines3 Documentation", [author], 1)
+]
 
 
 # -- Options for Texinfo output ----------------------------------------------

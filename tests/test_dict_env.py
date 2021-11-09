@@ -58,7 +58,9 @@ class DummyDictEnv(gym.Env):
 
         if nested_dict_obs:
             # Add dictionary observation inside observation space
-            self.observation_space.spaces["nested-dict"] = spaces.Dict({"nested-dict-discrete": spaces.Discrete(4)})
+            self.observation_space.spaces["nested-dict"] = spaces.Dict(
+                {"nested-dict-discrete": spaces.Discrete(4)}
+            )
 
     def seed(self, seed=None):
         if seed is not None:
@@ -148,7 +150,9 @@ def test_dict_spaces(model_class, channel_last):
     with mixed observation.
     """
     use_discrete_actions = model_class not in [SAC, TD3, DDPG]
-    env = DummyDictEnv(use_discrete_actions=use_discrete_actions, channel_last=channel_last)
+    env = DummyDictEnv(
+        use_discrete_actions=use_discrete_actions, channel_last=channel_last
+    )
     env = gym.wrappers.TimeLimit(env, 100)
 
     kwargs = {}
@@ -189,7 +193,9 @@ def test_multiprocessing(model_class):
     use_discrete_actions = model_class not in [SAC, TD3, DDPG]
 
     def make_env():
-        env = DummyDictEnv(use_discrete_actions=use_discrete_actions, channel_last=False)
+        env = DummyDictEnv(
+            use_discrete_actions=use_discrete_actions, channel_last=False
+        )
         env = gym.wrappers.TimeLimit(env, 100)
         return env
 
@@ -222,7 +228,13 @@ def test_dict_vec_framestack(model_class, channel_last):
     use_discrete_actions = model_class not in [SAC, TD3, DDPG]
     channels_order = {"vec": None, "img": "last" if channel_last else "first"}
     env = DummyVecEnv(
-        [lambda: SimpleMultiObsEnv(random_start=True, discrete_actions=use_discrete_actions, channel_last=channel_last)]
+        [
+            lambda: SimpleMultiObsEnv(
+                random_start=True,
+                discrete_actions=use_discrete_actions,
+                channel_last=channel_last,
+            )
+        ]
     )
 
     env = VecFrameStack(env, n_stack=3, channels_order=channels_order)

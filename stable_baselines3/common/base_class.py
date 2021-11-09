@@ -132,10 +132,14 @@ class BaseAlgorithm(ABC):
         self.learning_rate = learning_rate
         self.tensorboard_log = tensorboard_log
         self.lr_schedule = None  # type: Optional[Schedule]
-        self._last_obs = None  # type: Optional[Union[np.ndarray, Dict[str, np.ndarray]]]
+        self._last_obs = (
+            None
+        )  # type: Optional[Union[np.ndarray, Dict[str, np.ndarray]]]
         self._last_episode_starts = None  # type: Optional[np.ndarray]
         # When using VecNormalize:
-        self._last_original_obs = None  # type: Optional[Union[np.ndarray, Dict[str, np.ndarray]]]
+        self._last_original_obs = (
+            None
+        )  # type: Optional[Union[np.ndarray, Dict[str, np.ndarray]]]
         self._episode_num = 0
         # Used for gSDE only
         self.use_sde = use_sde
@@ -175,18 +179,27 @@ class BaseAlgorithm(ABC):
 
             if not support_multi_env and self.n_envs > 1:
                 raise ValueError(
-                    "Error: the model does not support multiple envs; it requires " "a single vectorized environment."
+                    "Error: the model does not support multiple envs; it requires "
+                    "a single vectorized environment."
                 )
 
             # Catch common mistake: using MlpPolicy/CnnPolicy instead of MultiInputPolicy
-            if policy in ["MlpPolicy", "CnnPolicy"] and isinstance(self.observation_space, gym.spaces.Dict):
-                raise ValueError(f"You must use `MultiInputPolicy` when working with dict observation space, not {policy}")
+            if policy in ["MlpPolicy", "CnnPolicy"] and isinstance(
+                self.observation_space, gym.spaces.Dict
+            ):
+                raise ValueError(
+                    f"You must use `MultiInputPolicy` when working with dict observation space, not {policy}"
+                )
 
             if self.use_sde and not isinstance(self.action_space, gym.spaces.Box):
-                raise ValueError("generalized State-Dependent Exploration (gSDE) can only be used with continuous actions.")
+                raise ValueError(
+                    "generalized State-Dependent Exploration (gSDE) can only be used with continuous actions."
+                )
 
     @staticmethod
-    def _wrap_env(env: GymEnv, verbose: int = 0, monitor_wrapper: bool = True) -> VecEnv:
+    def _wrap_env(
+        env: GymEnv, verbose: int = 0, monitor_wrapper: bool = True
+    ) -> VecEnv:
         """ "
         Wrap environment with the appropriate wrappers if needed.
         For instance, to have a vectorized environment
@@ -212,7 +225,9 @@ class BaseAlgorithm(ABC):
         if isinstance(env.observation_space, gym.spaces.Dict):
             for space in env.observation_space.spaces.values():
                 if isinstance(space, gym.spaces.Dict):
-                    raise ValueError("Nested observation spaces are not supported (Dict spaces inside Dict space).")
+                    raise ValueError(
+                        "Nested observation spaces are not supported (Dict spaces inside Dict space)."
+                    )
 
         if not is_vecenv_wrapped(env, VecTransposeImage):
             wrap_with_vectranspose = False
@@ -222,12 +237,13 @@ class BaseAlgorithm(ABC):
                 # the other channel last), VecTransposeImage will throw an error
                 for space in env.observation_space.spaces.values():
                     wrap_with_vectranspose = wrap_with_vectranspose or (
-                        is_image_space(space) and not is_image_space_channels_first(space)
+                        is_image_space(space)
+                        and not is_image_space_channels_first(space)
                     )
             else:
-                wrap_with_vectranspose = is_image_space(env.observation_space) and not is_image_space_channels_first(
+                wrap_with_vectranspose = is_image_space(
                     env.observation_space
-                )
+                ) and not is_image_space_channels_first(env.observation_space)
 
             if wrap_with_vectranspose:
                 if verbose >= 1:
@@ -278,16 +294,22 @@ class BaseAlgorithm(ABC):
         """Transform to callable if needed."""
         self.lr_schedule = get_schedule_fn(self.learning_rate)
 
-    def _update_current_progress_remaining(self, num_timesteps: int, total_timesteps: int) -> None:
+    def _update_current_progress_remaining(
+        self, num_timesteps: int, total_timesteps: int
+    ) -> None:
         """
         Compute current progress remaining (starts from 1 and ends to 0)
 
         :param num_timesteps: current number of timesteps
         :param total_timesteps:
         """
-        self._current_progress_remaining = 1.0 - float(num_timesteps) / float(total_timesteps)
+        self._current_progress_remaining = 1.0 - float(num_timesteps) / float(
+            total_timesteps
+        )
 
-    def _update_learning_rate(self, optimizers: Union[List[th.optim.Optimizer], th.optim.Optimizer]) -> None:
+    def _update_learning_rate(
+        self, optimizers: Union[List[th.optim.Optimizer], th.optim.Optimizer]
+    ) -> None:
         """
         Update the optimizers learning rate using the current learning rate schedule
         and the current progress remaining (from 1 to 0).
@@ -296,12 +318,16 @@ class BaseAlgorithm(ABC):
             An optimizer or a list of optimizers.
         """
         # Log the current learning rate
-        self.logger.record("train/learning_rate", self.lr_schedule(self._current_progress_remaining))
+        self.logger.record(
+            "train/learning_rate", self.lr_schedule(self._current_progress_remaining)
+        )
 
         if not isinstance(optimizers, list):
             optimizers = [optimizers]
         for optimizer in optimizers:
-            update_learning_rate(optimizer, self.lr_schedule(self._current_progress_remaining))
+            update_learning_rate(
+                optimizer, self.lr_schedule(self._current_progress_remaining)
+            )
 
     def _excluded_save_params(self) -> List[str]:
         """
@@ -426,7 +452,9 @@ class BaseAlgorithm(ABC):
 
         # Avoid resetting the environment when calling ``.learn()`` consecutive times
         if reset_num_timesteps or self._last_obs is None:
-            self._last_obs = self.env.reset()  # pytype: disable=annotation-type-mismatch
+            self._last_obs = (
+                self.env.reset()
+            )  # pytype: disable=annotation-type-mismatch
             self._last_episode_starts = np.ones((self.env.num_envs,), dtype=bool)
             # Retrieve unnormalized observation for saving into the buffer
             if self._vec_normalize_env is not None:
@@ -439,14 +467,20 @@ class BaseAlgorithm(ABC):
 
         # Configure logger's outputs if no logger was passed
         if not self._custom_logger:
-            self._logger = utils.configure_logger(self.verbose, self.tensorboard_log, tb_log_name, reset_num_timesteps)
+            self._logger = utils.configure_logger(
+                self.verbose, self.tensorboard_log, tb_log_name, reset_num_timesteps
+            )
 
         # Create eval callback if needed
-        callback = self._init_callback(callback, eval_env, eval_freq, n_eval_episodes, log_path)
+        callback = self._init_callback(
+            callback, eval_env, eval_freq, n_eval_episodes, log_path
+        )
 
         return total_timesteps, callback
 
-    def _update_info_buffer(self, infos: List[Dict[str, Any]], dones: Optional[np.ndarray] = None) -> None:
+    def _update_info_buffer(
+        self, infos: List[Dict[str, Any]], dones: Optional[np.ndarray] = None
+    ) -> None:
         """
         Retrieve reward, episode length, episode success and update the buffer
         if using Monitor wrapper or a GoalEnv.
@@ -679,7 +713,10 @@ class BaseAlgorithm(ABC):
             get_system_info()
 
         data, params, pytorch_variables = load_from_zip_file(
-            path, device=device, custom_objects=custom_objects, print_system_info=print_system_info
+            path,
+            device=device,
+            custom_objects=custom_objects,
+            print_system_info=print_system_info,
         )
 
         # Remove stored device information and replace with ours
@@ -687,20 +724,27 @@ class BaseAlgorithm(ABC):
             if "device" in data["policy_kwargs"]:
                 del data["policy_kwargs"]["device"]
 
-        if "policy_kwargs" in kwargs and kwargs["policy_kwargs"] != data["policy_kwargs"]:
+        if (
+            "policy_kwargs" in kwargs
+            and kwargs["policy_kwargs"] != data["policy_kwargs"]
+        ):
             raise ValueError(
                 f"The specified policy kwargs do not equal the stored policy kwargs."
                 f"Stored kwargs: {data['policy_kwargs']}, specified kwargs: {kwargs['policy_kwargs']}"
             )
 
         if "observation_space" not in data or "action_space" not in data:
-            raise KeyError("The observation_space and action_space were not given, can't verify new environments")
+            raise KeyError(
+                "The observation_space and action_space were not given, can't verify new environments"
+            )
 
         if env is not None:
             # Wrap first if needed
             env = cls._wrap_env(env, data["verbose"])
             # Check if given env is valid
-            check_for_correct_spaces(env, data["observation_space"], data["action_space"])
+            check_for_correct_spaces(
+                env, data["observation_space"], data["action_space"]
+            )
             # Discard `_last_obs`, this will force the env to reset before training
             # See issue https://github.com/DLR-RM/stable-baselines3/issues/597
             if force_reset and data is not None:
@@ -809,4 +853,6 @@ class BaseAlgorithm(ABC):
         # Build dict of state_dicts
         params_to_save = self.get_parameters()
 
-        save_to_zip_file(path, data=data, params=params_to_save, pytorch_variables=pytorch_variables)
+        save_to_zip_file(
+            path, data=data, params=params_to_save, pytorch_variables=pytorch_variables
+        )

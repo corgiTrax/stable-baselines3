@@ -1,5 +1,6 @@
 import io
 import pathlib
+import sys
 import time
 import warnings
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
@@ -11,7 +12,9 @@ import torch as th
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.buffers import DictReplayBuffer, ReplayBuffer
 from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.noise import ActionNoise
+from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.policies import BasePolicy
 from stable_baselines3.common.save_util import load_from_pkl, save_to_pkl
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, RolloutReturn, Schedule, TrainFreq, TrainFrequencyUnit
@@ -102,8 +105,10 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         sde_sample_freq: int = -1,
         use_sde_at_warmup: bool = False,
         sde_support: bool = True,
+        save_every: int = 100,
         remove_time_limit_termination: bool = False,
         supported_action_spaces: Optional[Tuple[gym.spaces.Space, ...]] = None,
+        model_name: str = "off_policy_algorithm",
     ):
 
         super(OffPolicyAlgorithm, self).__init__(
@@ -136,6 +141,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             replay_buffer_kwargs = {}
         self.replay_buffer_kwargs = replay_buffer_kwargs
         self._episode_storage = None
+        self.save_every = save_every
+        self.model_name = model_name
 
         # Remove terminations (dones) that are due to time limit
         # see https://github.com/hill-a/stable-baselines/issues/863
@@ -167,10 +174,14 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             try:
                 train_freq = (train_freq[0], TrainFrequencyUnit(train_freq[1]))
             except ValueError:
-                raise ValueError(f"The unit of the `train_freq` must be either 'step' or 'episode' not '{train_freq[1]}'!")
+                raise ValueError(
+                    f"The unit of the `train_freq` must be either 'step' or 'episode' not '{train_freq[1]}'!"
+                )
 
             if not isinstance(train_freq[0], int):
-                raise ValueError(f"The frequency of `train_freq` must be an integer and not {train_freq[0]}")
+                raise ValueError(
+                    f"The frequency of `train_freq` must be an integer and not {train_freq[0]}"
+                )
 
             self.train_freq = TrainFreq(*train_freq)
 
@@ -186,7 +197,9 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 self.replay_buffer_class = ReplayBuffer
 
         elif self.replay_buffer_class == HerReplayBuffer:
-            assert self.env is not None, "You must pass an environment when using `HerReplayBuffer`"
+            assert (
+                self.env is not None
+            ), "You must pass an environment when using `HerReplayBuffer`"
 
             # If using offline sampling, we need a classic replay buffer too
             if self.replay_buffer_kwargs.get("online_sampling", True):
@@ -229,7 +242,9 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         # Convert train freq parameter to TrainFreq object
         self._convert_train_freq()
 
-    def save_replay_buffer(self, path: Union[str, pathlib.Path, io.BufferedIOBase]) -> None:
+    def save_replay_buffer(
+        self, path: Union[str, pathlib.Path, io.BufferedIOBase]
+    ) -> None:
         """
         Save the replay buffer as a pickle file.
 
@@ -254,16 +269,22 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             If set to ``False``, we assume that we continue the same trajectory (same episode).
         """
         self.replay_buffer = load_from_pkl(path, self.verbose)
-        assert isinstance(self.replay_buffer, ReplayBuffer), "The replay buffer must inherit from ReplayBuffer class"
+        assert isinstance(
+            self.replay_buffer, ReplayBuffer
+        ), "The replay buffer must inherit from ReplayBuffer class"
 
         # Backward compatibility with SB3 < 2.1.0 replay buffer
         # Keep old behavior: do not handle timeout termination separately
-        if not hasattr(self.replay_buffer, "handle_timeout_termination"):  # pragma: no cover
+        if not hasattr(
+            self.replay_buffer, "handle_timeout_termination"
+        ):  # pragma: no cover
             self.replay_buffer.handle_timeout_termination = False
             self.replay_buffer.timeouts = np.zeros_like(self.replay_buffer.dones)
 
         if isinstance(self.replay_buffer, HerReplayBuffer):
-            assert self.env is not None, "You must pass an environment at load time when using `HerReplayBuffer`"
+            assert (
+                self.env is not None
+            ), "You must pass an environment at load time when using `HerReplayBuffer`"
             self.replay_buffer.set_env(self.get_env())
             if truncate_last_traj:
                 self.replay_buffer.truncate_last_trajectory()
@@ -333,6 +354,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         tb_log_name: str = "run",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
+        human_feedback_gui: FeedbackInterface = None,
+        human_feedback: HumanFeedback = None,
     ) -> "OffPolicyAlgorithm":
 
         total_timesteps, callback = self._setup_learn(
@@ -357,6 +380,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 learning_starts=self.learning_starts,
                 replay_buffer=self.replay_buffer,
                 log_interval=log_interval,
+                human_feedback_gui=human_feedback_gui,
+                human_feedback=human_feedback,
             )
 
             if rollout.continue_training is False:
@@ -365,10 +390,21 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             if self.num_timesteps > 0 and self.num_timesteps > self.learning_starts:
                 # If no `gradient_steps` is specified,
                 # do as many gradients steps as steps performed during the rollout
-                gradient_steps = self.gradient_steps if self.gradient_steps >= 0 else rollout.episode_timesteps
+                gradient_steps = (
+                    self.gradient_steps
+                    if self.gradient_steps >= 0
+                    else rollout.episode_timesteps
+                )
                 # Special case when the user passes `gradient_steps=0`
                 if gradient_steps > 0:
-                    self.train(batch_size=self.batch_size, gradient_steps=gradient_steps)
+                    self.train(
+                        batch_size=self.batch_size,
+                        gradient_steps=gradient_steps,
+                        human_feedback_gui=human_feedback_gui,
+                    )
+
+            if self.num_timesteps % self.save_every == 0:
+                self.save(f"models/{self.model_name}_{self.num_timesteps}.pt")
 
         callback.on_training_end()
 
@@ -399,7 +435,9 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             The two differs when the action space is not normalized (bounds are not [-1, 1]).
         """
         # Select action randomly or according to policy
-        if self.num_timesteps < learning_starts and not (self.use_sde and self.use_sde_at_warmup):
+        if self.num_timesteps < learning_starts and not (
+            self.use_sde and self.use_sde_at_warmup
+        ):
             # Warmup phase
             unscaled_action = np.array([self.action_space.sample()])
         else:
@@ -430,19 +468,33 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         Write log.
         """
         time_elapsed = time.time() - self.start_time
-        fps = int((self.num_timesteps - self._num_timesteps_at_start) / (time_elapsed + 1e-8))
+        fps = int(
+            (self.num_timesteps - self._num_timesteps_at_start) / (time_elapsed + 1e-8)
+        )
         self.logger.record("time/episodes", self._episode_num, exclude="tensorboard")
         if len(self.ep_info_buffer) > 0 and len(self.ep_info_buffer[0]) > 0:
-            self.logger.record("rollout/ep_rew_mean", safe_mean([ep_info["r"] for ep_info in self.ep_info_buffer]))
-            self.logger.record("rollout/ep_len_mean", safe_mean([ep_info["l"] for ep_info in self.ep_info_buffer]))
+            self.logger.record(
+                "rollout/ep_rew_mean",
+                safe_mean([ep_info["r"] for ep_info in self.ep_info_buffer]),
+            )
+            self.logger.record(
+                "rollout/ep_len_mean",
+                safe_mean([ep_info["l"] for ep_info in self.ep_info_buffer]),
+            )
         self.logger.record("time/fps", fps)
-        self.logger.record("time/time_elapsed", int(time_elapsed), exclude="tensorboard")
-        self.logger.record("time/total_timesteps", self.num_timesteps, exclude="tensorboard")
+        self.logger.record(
+            "time/time_elapsed", int(time_elapsed), exclude="tensorboard"
+        )
+        self.logger.record(
+            "time/total_timesteps", self.num_timesteps, exclude="tensorboard"
+        )
         if self.use_sde:
             self.logger.record("train/std", (self.actor.get_std()).mean().item())
 
         if len(self.ep_success_buffer) > 0:
-            self.logger.record("rollout/success_rate", safe_mean(self.ep_success_buffer))
+            self.logger.record(
+                "rollout/success_rate", safe_mean(self.ep_success_buffer)
+            )
         # Pass the number of timesteps for tensorboard
         self.logger.dump(step=self.num_timesteps)
 
@@ -509,6 +561,19 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         if self._vec_normalize_env is not None:
             self._last_original_obs = new_obs_
 
+    def apply_uniform_credit_assignment(
+        self, replay_buffer: ReplayBuffer, reward: float, start_iter: int, end_iter: int
+    ):
+        end_iter = (
+            end_iter
+            if (replay_buffer.full or replay_buffer.pos > end_iter)
+            else replay_buffer.pos
+        )
+        update_indies = (
+            replay_buffer.pos - np.arange(start_iter, end_iter)
+        ) % replay_buffer.buffer_size
+        replay_buffer.rewards[update_indies, 0] += reward / (end_iter - start_iter)
+
     def collect_rollouts(
         self,
         env: VecEnv,
@@ -518,6 +583,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         action_noise: Optional[ActionNoise] = None,
         learning_starts: int = 0,
         log_interval: Optional[int] = None,
+        human_feedback: HumanFeedback = None,
+        human_feedback_gui: FeedbackInterface = None,
     ) -> RolloutReturn:
         """
         Collect experiences and store them into a ``ReplayBuffer``.
@@ -554,21 +621,35 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         callback.on_rollout_start()
         continue_training = True
 
-        while should_collect_more_steps(train_freq, num_collected_steps, num_collected_episodes):
+        while should_collect_more_steps(
+            train_freq, num_collected_steps, num_collected_episodes
+        ):
             done = False
             episode_reward, episode_timesteps = 0.0, 0
 
             while not done:
 
-                if self.use_sde and self.sde_sample_freq > 0 and num_collected_steps % self.sde_sample_freq == 0:
+                if (
+                    self.use_sde
+                    and self.sde_sample_freq > 0
+                    and num_collected_steps % self.sde_sample_freq == 0
+                ):
                     # Sample a new noise matrix
                     self.actor.reset_noise()
 
                 # Select action randomly or according to policy
-                action, buffer_action = self._sample_action(learning_starts, action_noise)
+                action, buffer_action = self._sample_action(
+                    learning_starts, action_noise
+                )
 
                 # Rescale and perform action
                 new_obs, reward, done, infos = env.step(action)
+                curr_keyboard_feedback = (
+                    human_feedback and human_feedback.return_human_keyboard_feedback()
+                )
+                human_feedback_received = (
+                    curr_keyboard_feedback and type(curr_keyboard_feedback) == int
+                )
 
                 self.num_timesteps += 1
                 episode_timesteps += 1
@@ -578,7 +659,12 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 callback.update_locals(locals())
                 # Only stop training if return value is False, not when it is None.
                 if callback.on_step() is False:
-                    return RolloutReturn(0.0, num_collected_steps, num_collected_episodes, continue_training=False)
+                    return RolloutReturn(
+                        0.0,
+                        num_collected_steps,
+                        num_collected_episodes,
+                        continue_training=False,
+                    )
 
                 episode_reward += reward
 
@@ -586,9 +672,22 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 self._update_info_buffer(infos, done)
 
                 # Store data in replay buffer (normalized action and unnormalized observation)
-                self._store_transition(replay_buffer, buffer_action, new_obs, reward, done, infos)
+                self._store_transition(
+                    replay_buffer, buffer_action, new_obs, reward, done, infos
+                )
 
-                self._update_current_progress_remaining(self.num_timesteps, self._total_timesteps)
+                if human_feedback_received:
+                    self.apply_uniform_credit_assignment(
+                        replay_buffer, float(curr_keyboard_feedback), 0, 40
+                    )
+                    episode_reward += curr_keyboard_feedback
+
+                if human_feedback_gui:
+                    human_feedback_gui.updateReward(episode_reward)
+
+                self._update_current_progress_remaining(
+                    self.num_timesteps, self._total_timesteps
+                )
 
                 # For DQN, check if the target network should be updated
                 # and update the exploration schedule
@@ -596,7 +695,9 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 # see https://github.com/hill-a/stable-baselines/issues/900
                 self._on_step()
 
-                if not should_collect_more_steps(train_freq, num_collected_steps, num_collected_episodes):
+                if not should_collect_more_steps(
+                    train_freq, num_collected_steps, num_collected_episodes
+                ):
                     break
 
             if done:
@@ -616,4 +717,6 @@ class OffPolicyAlgorithm(BaseAlgorithm):
 
         callback.on_rollout_end()
 
-        return RolloutReturn(mean_reward, num_collected_steps, num_collected_episodes, continue_training)
+        return RolloutReturn(
+            mean_reward, num_collected_steps, num_collected_episodes, continue_training
+        )

@@ -55,7 +55,9 @@ class Actor(BasePolicy):
         self.activation_fn = activation_fn
 
         action_dim = get_action_dim(self.action_space)
-        actor_net = create_mlp(features_dim, action_dim, net_arch, activation_fn, squash_output=True)
+        actor_net = create_mlp(
+            features_dim, action_dim, net_arch, activation_fn, squash_output=True
+        )
         # Deterministic action
         self.mu = nn.Sequential(*actor_net)
 
@@ -77,7 +79,9 @@ class Actor(BasePolicy):
         features = self.extract_features(obs)
         return self.mu(features)
 
-    def _predict(self, observation: th.Tensor, deterministic: bool = False) -> th.Tensor:
+    def _predict(
+        self, observation: th.Tensor, deterministic: bool = False
+    ) -> th.Tensor:
         # Note: the deterministic deterministic parameter is ignored in the case of TD3.
         #   Predictions are always deterministic.
         return self.forward(observation)
@@ -173,23 +177,31 @@ class TD3Policy(BasePolicy):
         # Initialize the target to have the same weights as the actor
         self.actor_target.load_state_dict(self.actor.state_dict())
 
-        self.actor.optimizer = self.optimizer_class(self.actor.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
+        self.actor.optimizer = self.optimizer_class(
+            self.actor.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
+        )
 
         if self.share_features_extractor:
-            self.critic = self.make_critic(features_extractor=self.actor.features_extractor)
+            self.critic = self.make_critic(
+                features_extractor=self.actor.features_extractor
+            )
             # Critic target should not share the features extactor with critic
             # but it can share it with the actor target as actor and critic are sharing
             # the same features_extractor too
             # NOTE: as a result the effective poliak (soft-copy) coefficient for the features extractor
             # will be 2 * tau instead of tau (updated one time with the actor, a second time with the critic)
-            self.critic_target = self.make_critic(features_extractor=self.actor_target.features_extractor)
+            self.critic_target = self.make_critic(
+                features_extractor=self.actor_target.features_extractor
+            )
         else:
             # Create new features extractor for each network
             self.critic = self.make_critic(features_extractor=None)
             self.critic_target = self.make_critic(features_extractor=None)
 
         self.critic_target.load_state_dict(self.critic.state_dict())
-        self.critic.optimizer = self.optimizer_class(self.critic.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
+        self.critic.optimizer = self.optimizer_class(
+            self.critic.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
+        )
 
         # Target networks should always be in eval mode
         self.actor_target.set_training_mode(False)
@@ -213,18 +225,28 @@ class TD3Policy(BasePolicy):
         )
         return data
 
-    def make_actor(self, features_extractor: Optional[BaseFeaturesExtractor] = None) -> Actor:
-        actor_kwargs = self._update_features_extractor(self.actor_kwargs, features_extractor)
+    def make_actor(
+        self, features_extractor: Optional[BaseFeaturesExtractor] = None
+    ) -> Actor:
+        actor_kwargs = self._update_features_extractor(
+            self.actor_kwargs, features_extractor
+        )
         return Actor(**actor_kwargs).to(self.device)
 
-    def make_critic(self, features_extractor: Optional[BaseFeaturesExtractor] = None) -> ContinuousCritic:
-        critic_kwargs = self._update_features_extractor(self.critic_kwargs, features_extractor)
+    def make_critic(
+        self, features_extractor: Optional[BaseFeaturesExtractor] = None
+    ) -> ContinuousCritic:
+        critic_kwargs = self._update_features_extractor(
+            self.critic_kwargs, features_extractor
+        )
         return ContinuousCritic(**critic_kwargs).to(self.device)
 
     def forward(self, observation: th.Tensor, deterministic: bool = False) -> th.Tensor:
         return self._predict(observation, deterministic=deterministic)
 
-    def _predict(self, observation: th.Tensor, deterministic: bool = False) -> th.Tensor:
+    def _predict(
+        self, observation: th.Tensor, deterministic: bool = False
+    ) -> th.Tensor:
         # Note: the deterministic deterministic parameter is ignored in the case of TD3.
         #   Predictions are always deterministic.
         return self.actor(observation)

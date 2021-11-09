@@ -91,7 +91,9 @@ class SimpleMultiObsEnv(gym.Env):
 
         for i in range(num_col):
             for j in range(num_row):
-                self.state_mapping.append({"vec": col_vecs[i], "img": row_imgs[j].reshape(self.img_size)})
+                self.state_mapping.append(
+                    {"vec": col_vecs[i], "img": row_imgs[j].reshape(self.img_size)}
+                )
 
     def get_state_mapping(self) -> Dict[str, np.ndarray]:
         """

@@ -82,11 +82,15 @@ class HerReplayBuffer(DictReplayBuffer):
         handle_timeout_termination: bool = True,
     ):
 
-        super(HerReplayBuffer, self).__init__(buffer_size, env.observation_space, env.action_space, device, env.num_envs)
+        super(HerReplayBuffer, self).__init__(
+            buffer_size, env.observation_space, env.action_space, device, env.num_envs
+        )
 
         # convert goal_selection_strategy into GoalSelectionStrategy if string
         if isinstance(goal_selection_strategy, str):
-            self.goal_selection_strategy = KEY_TO_GOAL_STRATEGY[goal_selection_strategy.lower()]
+            self.goal_selection_strategy = KEY_TO_GOAL_STRATEGY[
+                goal_selection_strategy.lower()
+            ]
         else:
             self.goal_selection_strategy = goal_selection_strategy
 
@@ -127,7 +131,9 @@ class HerReplayBuffer(DictReplayBuffer):
 
         # Get shape of observation and goal (usually the same)
         self.obs_shape = get_obs_shape(self.env.observation_space.spaces["observation"])
-        self.goal_shape = get_obs_shape(self.env.observation_space.spaces["achieved_goal"])
+        self.goal_shape = get_obs_shape(
+            self.env.observation_space.spaces["achieved_goal"]
+        )
 
         # input dimensions for buffer initialization
         input_shape = {
@@ -143,11 +149,17 @@ class HerReplayBuffer(DictReplayBuffer):
         }
         self._observation_keys = ["observation", "achieved_goal", "desired_goal"]
         self._buffer = {
-            key: np.zeros((self.max_episode_stored, self.max_episode_length, *dim), dtype=np.float32)
+            key: np.zeros(
+                (self.max_episode_stored, self.max_episode_length, *dim),
+                dtype=np.float32,
+            )
             for key, dim in input_shape.items()
         }
         # Store info dicts are it can be used to compute the reward (e.g. continuity cost)
-        self.info_buffer = [deque(maxlen=self.max_episode_length) for _ in range(self.max_episode_stored)]
+        self.info_buffer = [
+            deque(maxlen=self.max_episode_length)
+            for _ in range(self.max_episode_stored)
+        ]
         # episode length storage, needed for episodes which has less steps than the maximum length
         self.episode_lengths = np.zeros(self.max_episode_stored, dtype=np.int64)
 
@@ -186,7 +198,9 @@ class HerReplayBuffer(DictReplayBuffer):
 
         self.env = env
 
-    def _get_samples(self, batch_inds: np.ndarray, env: Optional[VecNormalize] = None) -> DictReplayBufferSamples:
+    def _get_samples(
+        self, batch_inds: np.ndarray, env: Optional[VecNormalize] = None
+    ) -> DictReplayBufferSamples:
         """
         Abstract method from base class.
         """
@@ -209,7 +223,9 @@ class HerReplayBuffer(DictReplayBuffer):
         """
         if self.replay_buffer is not None:
             return self.replay_buffer.sample(batch_size, env)
-        return self._sample_transitions(batch_size, maybe_vec_env=env, online_sampling=True)  # pytype: disable=bad-return-type
+        return self._sample_transitions(
+            batch_size, maybe_vec_env=env, online_sampling=True
+        )  # pytype: disable=bad-return-type
 
     def _sample_offline(
         self,
@@ -256,15 +272,20 @@ class HerReplayBuffer(DictReplayBuffer):
         elif self.goal_selection_strategy == GoalSelectionStrategy.FUTURE:
             # replay with random state which comes from the same episode and was observed after current transition
             transitions_indices = np.random.randint(
-                transitions_indices[her_indices] + 1, self.episode_lengths[her_episode_indices]
+                transitions_indices[her_indices] + 1,
+                self.episode_lengths[her_episode_indices],
             )
 
         elif self.goal_selection_strategy == GoalSelectionStrategy.EPISODE:
             # replay with random state which comes from the same episode as current transition
-            transitions_indices = np.random.randint(self.episode_lengths[her_episode_indices])
+            transitions_indices = np.random.randint(
+                self.episode_lengths[her_episode_indices]
+            )
 
         else:
-            raise ValueError(f"Strategy {self.goal_selection_strategy} for sampling goals not supported!")
+            raise ValueError(
+                f"Strategy {self.goal_selection_strategy} for sampling goals not supported!"
+            )
 
         return self._buffer["achieved_goal"][her_episode_indices, transitions_indices]
 
@@ -274,7 +295,10 @@ class HerReplayBuffer(DictReplayBuffer):
         maybe_vec_env: Optional[VecNormalize],
         online_sampling: bool,
         n_sampled_goal: Optional[int] = None,
-    ) -> Union[DictReplayBufferSamples, Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray], np.ndarray, np.ndarray]]:
+    ) -> Union[
+        DictReplayBufferSamples,
+        Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray], np.ndarray, np.ndarray],
+    ]:
         """
         :param batch_size: Number of element to sample (only used for online sampling)
         :param env: associated gym VecEnv to normalize the observations/rewards
@@ -285,19 +309,27 @@ class HerReplayBuffer(DictReplayBuffer):
         """
         # Select which episodes to use
         if online_sampling:
-            assert batch_size is not None, "No batch_size specified for online sampling of HER transitions"
+            assert (
+                batch_size is not None
+            ), "No batch_size specified for online sampling of HER transitions"
             # Do not sample the episode with index `self.pos` as the episode is invalid
             if self.full:
                 episode_indices = (
                     np.random.randint(1, self.n_episodes_stored, batch_size) + self.pos
                 ) % self.n_episodes_stored
             else:
-                episode_indices = np.random.randint(0, self.n_episodes_stored, batch_size)
+                episode_indices = np.random.randint(
+                    0, self.n_episodes_stored, batch_size
+                )
             # A subset of the transitions will be relabeled using HER algorithm
             her_indices = np.arange(batch_size)[: int(self.her_ratio * batch_size)]
         else:
-            assert maybe_vec_env is None, "Transitions must be stored unnormalized in the replay buffer"
-            assert n_sampled_goal is not None, "No n_sampled_goal specified for offline sampling of HER transitions"
+            assert (
+                maybe_vec_env is None
+            ), "Transitions must be stored unnormalized in the replay buffer"
+            assert (
+                n_sampled_goal is not None
+            ), "No n_sampled_goal specified for offline sampling of HER transitions"
             # Offline sampling: there is only one episode stored
             episode_length = self.episode_lengths[0]
             # we sample n_sampled_goal per timestep in the episode (only one is stored).
@@ -333,7 +365,10 @@ class HerReplayBuffer(DictReplayBuffer):
                 her_indices = np.arange(len(episode_indices))
 
         # get selected transitions
-        transitions = {key: self._buffer[key][episode_indices, transitions_indices].copy() for key in self._buffer.keys()}
+        transitions = {
+            key: self._buffer[key][episode_indices, transitions_indices].copy()
+            for key in self._buffer.keys()
+        }
 
         # sample new desired goals and relabel the transitions
         new_goals = self.sample_goals(episode_indices, her_indices, transitions_indices)
@@ -343,7 +378,9 @@ class HerReplayBuffer(DictReplayBuffer):
         transitions["info"] = np.array(
             [
                 self.info_buffer[episode_idx][transition_idx]
-                for episode_idx, transition_idx in zip(episode_indices, transitions_indices)
+                for episode_idx, transition_idx in zip(
+                    episode_indices, transitions_indices
+                )
             ]
         )
 
@@ -378,19 +415,32 @@ class HerReplayBuffer(DictReplayBuffer):
         next_observations = self._normalize_obs(next_observations, maybe_vec_env)
 
         if online_sampling:
-            next_obs = {key: self.to_torch(next_observations[key][:, 0, :]) for key in self._observation_keys}
+            next_obs = {
+                key: self.to_torch(next_observations[key][:, 0, :])
+                for key in self._observation_keys
+            }
 
-            normalized_obs = {key: self.to_torch(observations[key][:, 0, :]) for key in self._observation_keys}
+            normalized_obs = {
+                key: self.to_torch(observations[key][:, 0, :])
+                for key in self._observation_keys
+            }
 
             return DictReplayBufferSamples(
                 observations=normalized_obs,
                 actions=self.to_torch(transitions["action"]),
                 next_observations=next_obs,
                 dones=self.to_torch(transitions["done"]),
-                rewards=self.to_torch(self._normalize_reward(transitions["reward"], maybe_vec_env)),
+                rewards=self.to_torch(
+                    self._normalize_reward(transitions["reward"], maybe_vec_env)
+                ),
             )
         else:
-            return observations, next_observations, transitions["action"], transitions["reward"]
+            return (
+                observations,
+                next_observations,
+                transitions["action"],
+                transitions["reward"],
+            )
 
     def add(
         self,
@@ -408,7 +458,9 @@ class HerReplayBuffer(DictReplayBuffer):
 
         # Remove termination signals due to timeout
         if self.handle_timeout_termination:
-            done_ = done * (1 - np.array([info.get("TimeLimit.truncated", False) for info in infos]))
+            done_ = done * (
+                1 - np.array([info.get("TimeLimit.truncated", False) for info in infos])
+            )
         else:
             done_ = done
 
@@ -419,8 +471,12 @@ class HerReplayBuffer(DictReplayBuffer):
         self._buffer["done"][self.pos][self.current_idx] = done_
         self._buffer["reward"][self.pos][self.current_idx] = reward
         self._buffer["next_obs"][self.pos][self.current_idx] = next_obs["observation"]
-        self._buffer["next_achieved_goal"][self.pos][self.current_idx] = next_obs["achieved_goal"]
-        self._buffer["next_desired_goal"][self.pos][self.current_idx] = next_obs["desired_goal"]
+        self._buffer["next_achieved_goal"][self.pos][self.current_idx] = next_obs[
+            "achieved_goal"
+        ]
+        self._buffer["next_desired_goal"][self.pos][self.current_idx] = next_obs[
+            "desired_goal"
+        ]
 
         # When doing offline sampling
         # Add real transition to normal replay buffer
@@ -477,7 +533,9 @@ class HerReplayBuffer(DictReplayBuffer):
         """
 
         # Sample goals to create virtual transitions for the last episode.
-        observations, next_observations, actions, rewards = self._sample_offline(n_sampled_goal=self.n_sampled_goal)
+        observations, next_observations, actions, rewards = self._sample_offline(
+            n_sampled_goal=self.n_sampled_goal
+        )
 
         # Store virtual transitions in the replay buffer, if available
         if len(observations) > 0:
@@ -536,7 +594,9 @@ class HerReplayBuffer(DictReplayBuffer):
             self.episode_lengths[pos] = current_idx
             # set done = True for current episode
             # current_idx was already incremented
-            self._buffer["done"][pos][current_idx - 1] = np.array([True], dtype=np.float32)
+            self._buffer["done"][pos][current_idx - 1] = np.array(
+                [True], dtype=np.float32
+            )
             # reset current transition index
             self.current_idx = 0
             # increment episode counter

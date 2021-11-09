@@ -64,7 +64,14 @@ class RMSpropTFLike(Optimizer):
         if not 0.0 <= alpha:
             raise ValueError("Invalid alpha value: {}".format(alpha))
 
-        defaults = dict(lr=lr, momentum=momentum, alpha=alpha, eps=eps, centered=centered, weight_decay=weight_decay)
+        defaults = dict(
+            lr=lr,
+            momentum=momentum,
+            alpha=alpha,
+            eps=eps,
+            centered=centered,
+            weight_decay=weight_decay,
+        )
         super(RMSpropTFLike, self).__init__(params, defaults)
 
     def __setstate__(self, state: Dict[str, Any]) -> None:
@@ -74,7 +81,9 @@ class RMSpropTFLike(Optimizer):
             group.setdefault("centered", False)
 
     @torch.no_grad()
-    def step(self, closure: Optional[Callable[[], None]] = None) -> Optional[torch.Tensor]:
+    def step(
+        self, closure: Optional[Callable[[], None]] = None
+    ) -> Optional[torch.Tensor]:
         """Performs a single optimization step.
 
         :param closure: A closure that reevaluates the model
@@ -99,11 +108,17 @@ class RMSpropTFLike(Optimizer):
                 if len(state) == 0:
                     state["step"] = 0
                     # PyTorch initialized to zeros here
-                    state["square_avg"] = torch.ones_like(p, memory_format=torch.preserve_format)
+                    state["square_avg"] = torch.ones_like(
+                        p, memory_format=torch.preserve_format
+                    )
                     if group["momentum"] > 0:
-                        state["momentum_buffer"] = torch.zeros_like(p, memory_format=torch.preserve_format)
+                        state["momentum_buffer"] = torch.zeros_like(
+                            p, memory_format=torch.preserve_format
+                        )
                     if group["centered"]:
-                        state["grad_avg"] = torch.zeros_like(p, memory_format=torch.preserve_format)
+                        state["grad_avg"] = torch.zeros_like(
+                            p, memory_format=torch.preserve_format
+                        )
 
                 square_avg = state["square_avg"]
                 alpha = group["alpha"]
@@ -120,7 +135,11 @@ class RMSpropTFLike(Optimizer):
                     grad_avg.mul_(alpha).add_(grad, alpha=1 - alpha)
                     # PyTorch added epsilon after square root
                     # avg = square_avg.addcmul(grad_avg, grad_avg, value=-1).sqrt_().add_(group['eps'])
-                    avg = square_avg.addcmul(grad_avg, grad_avg, value=-1).add_(group["eps"]).sqrt_()
+                    avg = (
+                        square_avg.addcmul(grad_avg, grad_avg, value=-1)
+                        .add_(group["eps"])
+                        .sqrt_()
+                    )
                 else:
                     # PyTorch added epsilon after square root
                     # avg = square_avg.sqrt().add_(group['eps'])

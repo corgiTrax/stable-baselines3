@@ -5,17 +5,19 @@ import numpy as np
 import torch as th
 from torch.nn import functional as F
 
+from stable_baselines3.active_tamer.policies import SACPolicy
 from stable_baselines3.common.buffers import ReplayBuffer
+from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
+from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
 from stable_baselines3.common.utils import polyak_update
-from stable_baselines3.sac.policies import SACPolicy
 
 
-class SAC(OffPolicyAlgorithm):
+class TamerSAC(OffPolicyAlgorithm):
     """
-    Soft Actor-Critic (SAC)
+    TAMER + Soft Actor-Critic (SAC)
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo
@@ -23,10 +25,8 @@ class SAC(OffPolicyAlgorithm):
     and from Stable Baselines (https://github.com/hill-a/stable-baselines)
     Paper: https://arxiv.org/abs/1801.01290
     Introduction to SAC: https://spinningup.openai.com/en/latest/algorithms/sac.html
-
     Note: we use double q target and not value target as discussed
     in https://github.com/hill-a/stable-baselines/issues/270
-
     :param policy: The policy model to use (MlpPolicy, CnnPolicy, ...)
     :param env: The environment to learn from (if registered in Gym, can be str)
     :param learning_rate: learning rate for adam optimizer,
@@ -78,8 +78,8 @@ class SAC(OffPolicyAlgorithm):
         env: Union[GymEnv, str],
         learning_rate: Union[float, Schedule] = 3e-4,
         buffer_size: int = 1_000_000,  # 1e6
-        learning_starts: int = 100,
-        batch_size: int = 256,
+        learning_starts: int = 5,
+        batch_size: int = 2,
         tau: float = 0.005,
         gamma: float = 0.99,
         train_freq: Union[int, Tuple[int, str]] = 1,
@@ -100,10 +100,12 @@ class SAC(OffPolicyAlgorithm):
         verbose: int = 0,
         seed: Optional[int] = None,
         device: Union[th.device, str] = "auto",
+        save_every: int = 100,
         _init_setup_model: bool = True,
+        model_name: str = "TamerSAC",
     ):
 
-        super(SAC, self).__init__(
+        super(TamerSAC, self).__init__(
             policy,
             env,
             SACPolicy,
@@ -128,7 +130,9 @@ class SAC(OffPolicyAlgorithm):
             sde_sample_freq=sde_sample_freq,
             use_sde_at_warmup=use_sde_at_warmup,
             optimize_memory_usage=optimize_memory_usage,
+            save_every=save_every,
             supported_action_spaces=(gym.spaces.Box),
+            model_name=model_name,
         )
 
         self.target_entropy = target_entropy
@@ -143,7 +147,7 @@ class SAC(OffPolicyAlgorithm):
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(SAC, self)._setup_model()
+        super(TamerSAC, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -187,7 +191,12 @@ class SAC(OffPolicyAlgorithm):
         self.critic = self.policy.critic
         self.critic_target = self.policy.critic_target
 
-    def train(self, gradient_steps: int, batch_size: int = 64) -> None:
+    def train(
+        self,
+        gradient_steps: int,
+        human_feedback_gui: HumanFeedback,
+        batch_size: int = 64,
+    ) -> None:
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizers learning rate
@@ -285,6 +294,7 @@ class SAC(OffPolicyAlgorithm):
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
             actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
             actor_losses.append(actor_loss.item())
+            human_feedback_gui.updateLoss(actor_loss.item())
 
             # Optimize the actor
             self.actor.optimizer.zero_grad()
@@ -309,18 +319,22 @@ class SAC(OffPolicyAlgorithm):
     def learn(
         self,
         total_timesteps: int,
+        human_feedback_gui: FeedbackInterface,
+        human_feedback: HumanFeedback,
         callback: MaybeCallback = None,
         log_interval: int = 4,
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
-        tb_log_name: str = "SAC",
+        tb_log_name: str = "TamerSAC",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
 
-        return super(SAC, self).learn(
+        return super(TamerSAC, self).learn(
             total_timesteps=total_timesteps,
+            human_feedback_gui=human_feedback_gui,
+            human_feedback=human_feedback,
             callback=callback,
             log_interval=log_interval,
             eval_env=eval_env,
@@ -332,7 +346,7 @@ class SAC(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(SAC, self)._excluded_save_params() + [
+        return super(TamerSAC, self)._excluded_save_params() + [
             "actor",
             "critic",
             "critic_target",

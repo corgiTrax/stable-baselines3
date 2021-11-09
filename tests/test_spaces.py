@@ -46,7 +46,9 @@ def test_identity_spaces(model_class, env):
 
     env = gym.wrappers.TimeLimit(env, max_episode_steps=100)
 
-    model = model_class("MlpPolicy", env, gamma=0.5, seed=1, policy_kwargs=dict(net_arch=[64]))
+    model = model_class(
+        "MlpPolicy", env, gamma=0.5, seed=1, policy_kwargs=dict(net_arch=[64])
+    )
     model.learn(total_timesteps=500)
 
     evaluate_policy(model, env, n_eval_episodes=5, warn=False)

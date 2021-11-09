@@ -53,7 +53,9 @@ class QNetwork(BasePolicy):
         self.features_dim = features_dim
         self.normalize_images = normalize_images
         action_dim = self.action_space.n  # number of actions
-        q_net = create_mlp(self.features_dim, action_dim, self.net_arch, self.activation_fn)
+        q_net = create_mlp(
+            self.features_dim, action_dim, self.net_arch, self.activation_fn
+        )
         self.q_net = nn.Sequential(*q_net)
 
     def forward(self, obs: th.Tensor) -> th.Tensor:
@@ -164,11 +166,15 @@ class DQNPolicy(BasePolicy):
         self.q_net_target.set_training_mode(False)
 
         # Setup optimizer with initial learning rate
-        self.optimizer = self.optimizer_class(self.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
+        self.optimizer = self.optimizer_class(
+            self.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
+        )
 
     def make_q_net(self) -> QNetwork:
         # Make sure we always have separate networks for features extractors etc
-        net_args = self._update_features_extractor(self.net_args, features_extractor=None)
+        net_args = self._update_features_extractor(
+            self.net_args, features_extractor=None
+        )
         return QNetwork(**net_args).to(self.device)
 
     def forward(self, obs: th.Tensor, deterministic: bool = True) -> th.Tensor:

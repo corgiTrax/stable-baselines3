@@ -146,9 +146,13 @@ class DQN(OffPolicyAlgorithm):
         This method is called in ``collect_rollouts()`` after each step in the environment.
         """
         if self.num_timesteps % self.target_update_interval == 0:
-            polyak_update(self.q_net.parameters(), self.q_net_target.parameters(), self.tau)
+            polyak_update(
+                self.q_net.parameters(), self.q_net_target.parameters(), self.tau
+            )
 
-        self.exploration_rate = self.exploration_schedule(self._current_progress_remaining)
+        self.exploration_rate = self.exploration_schedule(
+            self._current_progress_remaining
+        )
         self.logger.record("rollout/exploration_rate", self.exploration_rate)
 
     def train(self, gradient_steps: int, batch_size: int = 100) -> None:
@@ -160,7 +164,9 @@ class DQN(OffPolicyAlgorithm):
         losses = []
         for _ in range(gradient_steps):
             # Sample replay buffer
-            replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
+            replay_data = self.replay_buffer.sample(
+                batch_size, env=self._vec_normalize_env
+            )
 
             with th.no_grad():
                 # Compute the next Q-values using the target network
@@ -170,13 +176,18 @@ class DQN(OffPolicyAlgorithm):
                 # Avoid potential broadcast issue
                 next_q_values = next_q_values.reshape(-1, 1)
                 # 1-step TD target
-                target_q_values = replay_data.rewards + (1 - replay_data.dones) * self.gamma * next_q_values
+                target_q_values = (
+                    replay_data.rewards
+                    + (1 - replay_data.dones) * self.gamma * next_q_values
+                )
 
             # Get current Q-values estimates
             current_q_values = self.q_net(replay_data.observations)
 
             # Retrieve the q-values for the actions from the replay buffer
-            current_q_values = th.gather(current_q_values, dim=1, index=replay_data.actions.long())
+            current_q_values = th.gather(
+                current_q_values, dim=1, index=replay_data.actions.long()
+            )
 
             # Compute Huber loss (less sensitive to outliers)
             loss = F.smooth_l1_loss(current_q_values, target_q_values)
@@ -213,7 +224,10 @@ class DQN(OffPolicyAlgorithm):
             (used in recurrent policies)
         """
         if not deterministic and np.random.rand() < self.exploration_rate:
-            if is_vectorized_observation(maybe_transpose(observation, self.observation_space), self.observation_space):
+            if is_vectorized_observation(
+                maybe_transpose(observation, self.observation_space),
+                self.observation_space,
+            ):
                 if isinstance(self.observation_space, gym.spaces.Dict):
                     n_batch = observation[list(observation.keys())[0]].shape[0]
                 else:

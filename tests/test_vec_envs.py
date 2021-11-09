@@ -85,7 +85,9 @@ def test_vecenv_custom_calls(vec_env_class, vec_env_wrapper):
     setattr_results = []
     # Set current_step to an arbitrary value
     for env_idx in range(N_ENVS):
-        setattr_results.append(vec_env.set_attr("current_step", env_idx, indices=env_idx))
+        setattr_results.append(
+            vec_env.set_attr("current_step", env_idx, indices=env_idx)
+        )
     # Retrieve the value for each environment
     getattr_results = vec_env.get_attr("current_step")
 
@@ -136,7 +138,9 @@ class StepEnv(gym.Env):
         """Gym environment for testing that terminal observation is inserted
         correctly."""
         self.action_space = gym.spaces.Discrete(2)
-        self.observation_space = gym.spaces.Box(np.array([0]), np.array([999]), dtype="int")
+        self.observation_space = gym.spaces.Box(
+            np.array([0]), np.array([999]), dtype="int"
+        )
         self.max_steps = max_steps
         self.current_step = 0
 
@@ -232,7 +236,9 @@ def check_vecenv_obs(obs, space):
         assert space.contains(value)
 
 
-@pytest.mark.parametrize("vec_env_class,space", itertools.product(VEC_ENV_CLASSES, SPACES.values()))
+@pytest.mark.parametrize(
+    "vec_env_class,space", itertools.product(VEC_ENV_CLASSES, SPACES.values())
+)
 def test_vecenv_single_space(vec_env_class, space):
     def obs_assert(obs):
         return check_vecenv_obs(obs, space)

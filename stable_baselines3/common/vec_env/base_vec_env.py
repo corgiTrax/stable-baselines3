@@ -34,7 +34,10 @@ def tile_images(img_nhwc: Sequence[np.ndarray]) -> np.ndarray:  # pragma: no cov
     new_height = int(np.ceil(np.sqrt(n_images)))
     # new_width was named W before
     new_width = int(np.ceil(float(n_images) / new_height))
-    img_nhwc = np.array(list(img_nhwc) + [img_nhwc[0] * 0 for _ in range(n_images, new_height * new_width)])
+    img_nhwc = np.array(
+        list(img_nhwc)
+        + [img_nhwc[0] * 0 for _ in range(n_images, new_height * new_width)]
+    )
     # img_HWhwc
     out_image = img_nhwc.reshape((new_height, new_width, height, width, n_channels))
     # img_HhWwc
@@ -55,7 +58,12 @@ class VecEnv(ABC):
 
     metadata = {"render.modes": ["human", "rgb_array"]}
 
-    def __init__(self, num_envs: int, observation_space: gym.spaces.Space, action_space: gym.spaces.Space):
+    def __init__(
+        self,
+        num_envs: int,
+        observation_space: gym.spaces.Space,
+        action_space: gym.spaces.Space,
+    ):
         self.num_envs = num_envs
         self.observation_space = observation_space
         self.action_space = action_space
@@ -114,7 +122,9 @@ class VecEnv(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def set_attr(self, attr_name: str, value: Any, indices: VecEnvIndices = None) -> None:
+    def set_attr(
+        self, attr_name: str, value: Any, indices: VecEnvIndices = None
+    ) -> None:
         """
         Set attribute inside vectorized environments.
 
@@ -126,7 +136,13 @@ class VecEnv(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def env_method(self, method_name: str, *method_args, indices: VecEnvIndices = None, **method_kwargs) -> List[Any]:
+    def env_method(
+        self,
+        method_name: str,
+        *method_args,
+        indices: VecEnvIndices = None,
+        **method_kwargs,
+    ) -> List[Any]:
         """
         Call instance methods of vectorized environments.
 
@@ -139,7 +155,9 @@ class VecEnv(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def env_is_wrapped(self, wrapper_class: Type[gym.Wrapper], indices: VecEnvIndices = None) -> List[bool]:
+    def env_is_wrapped(
+        self, wrapper_class: Type[gym.Wrapper], indices: VecEnvIndices = None
+    ) -> List[bool]:
         """
         Check if environments are wrapped with a given wrapper.
 
@@ -286,13 +304,25 @@ class VecEnvWrapper(VecEnv):
     def get_attr(self, attr_name: str, indices: VecEnvIndices = None) -> List[Any]:
         return self.venv.get_attr(attr_name, indices)
 
-    def set_attr(self, attr_name: str, value: Any, indices: VecEnvIndices = None) -> None:
+    def set_attr(
+        self, attr_name: str, value: Any, indices: VecEnvIndices = None
+    ) -> None:
         return self.venv.set_attr(attr_name, value, indices)
 
-    def env_method(self, method_name: str, *method_args, indices: VecEnvIndices = None, **method_kwargs) -> List[Any]:
-        return self.venv.env_method(method_name, *method_args, indices=indices, **method_kwargs)
+    def env_method(
+        self,
+        method_name: str,
+        *method_args,
+        indices: VecEnvIndices = None,
+        **method_kwargs,
+    ) -> List[Any]:
+        return self.venv.env_method(
+            method_name, *method_args, indices=indices, **method_kwargs
+        )
 
-    def env_is_wrapped(self, wrapper_class: Type[gym.Wrapper], indices: VecEnvIndices = None) -> List[bool]:
+    def env_is_wrapped(
+        self, wrapper_class: Type[gym.Wrapper], indices: VecEnvIndices = None
+    ) -> List[bool]:
         return self.venv.env_is_wrapped(wrapper_class, indices=indices)
 
     def __getattr__(self, name: str) -> Any:
