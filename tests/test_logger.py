@@ -81,7 +81,9 @@ def read_log(tmp_path, capsys):
         elif _format == "log":
             return LogContent(_format, (tmp_path / "log.txt").read_text().splitlines())
         elif _format == "tensorboard":
-            from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+            from tensorboard.backend.event_processing.event_accumulator import (
+                EventAccumulator,
+            )
 
             acc = EventAccumulator(str(tmp_path))
             acc.Reload()

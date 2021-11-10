@@ -9,7 +9,10 @@ from stable_baselines3.common.buffers import DictReplayBuffer
 from stable_baselines3.common.preprocessing import get_obs_shape
 from stable_baselines3.common.type_aliases import DictReplayBufferSamples
 from stable_baselines3.common.vec_env import VecEnv, VecNormalize
-from stable_baselines3.her.goal_selection_strategy import KEY_TO_GOAL_STRATEGY, GoalSelectionStrategy
+from stable_baselines3.her.goal_selection_strategy import (
+    KEY_TO_GOAL_STRATEGY,
+    GoalSelectionStrategy,
+)
 
 
 def get_time_limit(env: VecEnv, current_max_episode_length: Optional[int]) -> int:
