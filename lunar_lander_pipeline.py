@@ -1,53 +1,56 @@
 from __future__ import print_function
 
-import gym
-import numpy as np
 import itertools
 import os
+import random
 import sys
+from typing import Callable
+
+import gym
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from typing import Callable
-import random
 import yaml
 from PyQt5.QtWidgets import *
 
 from stable_baselines3.active_tamer.tamer_sac import TamerSAC
-from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+
 
 class LunarLanderExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space: gym.spaces.Dict):
         super(LunarLanderExtractor, self).__init__(observation_space, features_dim=1)
-        
+
         self.input_features = observation_space._shape[0]
         self.hidden_dim = 64
         self.extractor = nn.Sequential(
-                        nn.Linear(self.input_features, 32),
-                        nn.ReLU(),
-                        nn.Linear(32, 128),
-                        nn.ReLU(),
-                        nn.Linear(128, 128),
-                        nn.ReLU(),
-                        nn.Linear(128, self.hidden_dim),
-                        nn.ReLU(),
-                    )
+            nn.Linear(self.input_features, 32),
+            nn.ReLU(),
+            nn.Linear(32, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, self.hidden_dim),
+            nn.ReLU(),
+        )
         self._features_dim = self.hidden_dim
-    
+
     def forward(self, observations: torch.Tensor) -> torch.Tensor:
         return self.extractor(observations)
+
 
 def main():
     with open("configs/tamer_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
-    env = gym.make('LunarLanderContinuous-v2')
-    
+    env = gym.make("LunarLanderContinuous-v2")
+
     human_feedback = HumanFeedback()
     # app = QApplication(sys.argv)
     # feedback_gui = FeedbackInterface()
@@ -77,10 +80,15 @@ def main():
         render=True,
     )
 
-    model.learn(config_data["steps"], human_feedback_gui=feedback_gui, human_feedback=human_feedback)
+    model.learn(
+        config_data["steps"],
+        human_feedback_gui=feedback_gui,
+        human_feedback=human_feedback,
+    )
 
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20)
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
+
 
 if __name__ == "__main__":
     main()

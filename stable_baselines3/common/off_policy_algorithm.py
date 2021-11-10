@@ -109,7 +109,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         remove_time_limit_termination: bool = False,
         supported_action_spaces: Optional[Tuple[gym.spaces.Space, ...]] = None,
         model_name: str = "off_policy_algorithm",
-        render: bool = False
+        render: bool = False,
     ):
 
         super(OffPolicyAlgorithm, self).__init__(
@@ -654,10 +654,12 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 if self.render:
                     env.render()
                 new_obs, reward, done, infos = env.step(action)
-                
+
                 curr_keyboard_feedback = None
                 if human_feedback:
-                    curr_keyboard_feedback = human_feedback.return_human_keyboard_feedback()
+                    curr_keyboard_feedback = (
+                        human_feedback.return_human_keyboard_feedback()
+                    )
 
                 human_feedback_received = (
                     curr_keyboard_feedback and type(curr_keyboard_feedback) == int
@@ -693,7 +695,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                         replay_buffer, float(curr_keyboard_feedback), 0, 40
                     )
                     episode_reward += curr_keyboard_feedback
-                
+
                 if human_feedback_gui:
                     human_feedback_gui.updateReward(episode_reward)
 

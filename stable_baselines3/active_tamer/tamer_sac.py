@@ -103,7 +103,7 @@ class TamerSAC(OffPolicyAlgorithm):
         save_every: int = 100,
         _init_setup_model: bool = True,
         model_name: str = "TamerSAC",
-        render: bool = False
+        render: bool = False,
     ):
 
         super(TamerSAC, self).__init__(
