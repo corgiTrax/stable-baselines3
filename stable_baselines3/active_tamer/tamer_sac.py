@@ -103,6 +103,7 @@ class TamerSAC(OffPolicyAlgorithm):
         save_every: int = 100,
         _init_setup_model: bool = True,
         model_name: str = "TamerSAC",
+        render: bool = False
     ):
 
         super(TamerSAC, self).__init__(
@@ -133,6 +134,7 @@ class TamerSAC(OffPolicyAlgorithm):
             save_every=save_every,
             supported_action_spaces=(gym.spaces.Box),
             model_name=model_name,
+            render=render,
         )
 
         self.target_entropy = target_entropy
@@ -194,7 +196,7 @@ class TamerSAC(OffPolicyAlgorithm):
     def train(
         self,
         gradient_steps: int,
-        human_feedback_gui: HumanFeedback,
+        human_feedback_gui: HumanFeedback = None,
         batch_size: int = 64,
     ) -> None:
         # Switch to train mode (this affects batch norm / dropout)
@@ -294,7 +296,9 @@ class TamerSAC(OffPolicyAlgorithm):
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
             actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
             actor_losses.append(actor_loss.item())
-            human_feedback_gui.updateLoss(actor_loss.item())
+
+            if human_feedback_gui:
+                human_feedback_gui.updateLoss(actor_loss.item())
 
             # Optimize the actor
             self.actor.optimizer.zero_grad()

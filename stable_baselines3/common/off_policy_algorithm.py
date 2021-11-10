@@ -109,6 +109,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         remove_time_limit_termination: bool = False,
         supported_action_spaces: Optional[Tuple[gym.spaces.Space, ...]] = None,
         model_name: str = "off_policy_algorithm",
+        render: bool = False
     ):
 
         super(OffPolicyAlgorithm, self).__init__(
@@ -143,6 +144,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         self._episode_storage = None
         self.save_every = save_every
         self.model_name = model_name
+        self.render = render
 
         # Remove terminations (dones) that are due to time limit
         # see https://github.com/hill-a/stable-baselines/issues/863
@@ -397,11 +399,17 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 )
                 # Special case when the user passes `gradient_steps=0`
                 if gradient_steps > 0:
-                    self.train(
-                        batch_size=self.batch_size,
-                        gradient_steps=gradient_steps,
-                        human_feedback_gui=human_feedback_gui,
-                    )
+                    if human_feedback_gui:
+                        self.train(
+                            batch_size=self.batch_size,
+                            gradient_steps=gradient_steps,
+                            human_feedback_gui=human_feedback_gui,
+                        )
+                    else:
+                        self.train(
+                            batch_size=self.batch_size,
+                            gradient_steps=gradient_steps,
+                        )
 
             if self.num_timesteps % self.save_every == 0:
                 self.save(f"models/{self.model_name}_{self.num_timesteps}.pt")
@@ -643,10 +651,14 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 )
 
                 # Rescale and perform action
+                if self.render:
+                    env.render()
                 new_obs, reward, done, infos = env.step(action)
-                curr_keyboard_feedback = (
-                    human_feedback and human_feedback.return_human_keyboard_feedback()
-                )
+                
+                curr_keyboard_feedback = None
+                if human_feedback:
+                    curr_keyboard_feedback = human_feedback.return_human_keyboard_feedback()
+
                 human_feedback_received = (
                     curr_keyboard_feedback and type(curr_keyboard_feedback) == int
                 )
@@ -681,7 +693,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                         replay_buffer, float(curr_keyboard_feedback), 0, 40
                     )
                     episode_reward += curr_keyboard_feedback
-
+                
                 if human_feedback_gui:
                     human_feedback_gui.updateReward(episode_reward)
 
