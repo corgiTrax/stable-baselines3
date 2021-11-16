@@ -21,6 +21,51 @@ from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
+class LunarLanderEncoder(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(LunarLanderEncoder, self).__init__()
+
+        self.lin_1 = nn.Linear(input_dim, 32)
+        self.lin_2 = nn.Linear(32, 128)
+        self.lin_3 = nn.Linear(128, 128)
+        self.lin_4 = nn.Linear(128, output_dim)
+    
+    def forward(self, observations: torch.Tensor) -> torch.Tensor:
+
+        out = F.relu(self.lin_1(observations))
+        out = F.relu(self.lin_2(out))
+        out = F.relu(self.lin_3(out))
+        out = F.relu(self.lin_4(out))
+        return out
+
+class LunarLanderDecoder(nn.Module):
+    def __init__(self, input_dim, action_dim, output_dim):
+        super(LunarLanderEncoder, self).__init__()
+
+        self.lin_1 = nn.Linear(input_dim + action_dim, 32)
+        self.lin_2 = nn.Linear(32, 128)
+        self.lin_3 = nn.Linear(128, 128)
+        self.lin_4 = nn.Linear(128, output_dim)
+    
+    def forward(self, observations: torch.Tensor, actions: torch.Tensor) -> torch.Tensor:
+        observations = torch.cat(observations, actions, dim=1)
+        out = F.relu(self.lin_1(observations))
+        out = F.relu(self.lin_2(out))
+        out = F.relu(self.lin_3(out))
+        out = F.relu(self.lin_4(out))
+        return out
+
+class LunarLanderStatePredictor(nn.Module):
+    def __init__(self, state_dim, action_dim, hidden_dim):
+        super(LunarLanderStatePredictor, self).__init__()
+        self.encoder = LunarLanderEncoder(state_dim, hidden_dim)
+        self.decoder = LunarLanderDecoder(hidden_dim + action_dim, state_dim)
+
+    def forward(self, curr_state: torch.Tensor, curr_action: torch.Tensor) -> torch.Tensor:
+        hidden_state = self.encoder(curr_state)
+        next_state = self.decoder(hidden_state, curr_action)
+        return next_state
+
 
 class LunarLanderExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space: gym.spaces.Dict):
@@ -28,16 +73,17 @@ class LunarLanderExtractor(BaseFeaturesExtractor):
 
         self.input_features = observation_space._shape[0]
         self.hidden_dim = 64
-        self.extractor = nn.Sequential(
-            nn.Linear(self.input_features, 32),
-            nn.ReLU(),
-            nn.Linear(32, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, self.hidden_dim),
-            nn.ReLU(),
-        )
+        # self.extractor = nn.Sequential(
+        #     nn.Linear(self.input_features, 32),
+        #     nn.ReLU(),
+        #     nn.Linear(32, 128),
+        #     nn.ReLU(),
+        #     nn.Linear(128, 128),
+        #     nn.ReLU(),
+        #     nn.Linear(128, self.hidden_dim),
+        #     nn.ReLU(),
+        # )
+        self.extractor = LunarLanderEncoder(self.input_features, self.hidden_dim)
         self._features_dim = self.hidden_dim
 
     def forward(self, observations: torch.Tensor) -> torch.Tensor:
@@ -77,16 +123,22 @@ def main():
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
-        render=True,
+        render=False,
     )
 
-    model.learn(
-        config_data["steps"],
-        human_feedback_gui=feedback_gui,
-        human_feedback=human_feedback,
-    )
+    if not config_data['load_model']:
+        model.learn(
+            config_data["steps"],
+            human_feedback_gui=feedback_gui,
+            human_feedback=human_feedback,
+        )
+    else:
+        print("LOADED PRETRAINED MODEL MODEL")
+        model_num = config_data['load_model']
+        model.load(f'models/TamerSAC_{model_num}.pt')
 
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20)
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20, render=True)
+    model.save('model/TAMER_SAC_10001.pt')
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
