@@ -417,7 +417,6 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                             batch_size=self.batch_size,
                             gradient_steps=gradient_steps,
                         )
-
             if self.num_timesteps % self.save_every == 0:
                 self.save(f"models/{self.model_name}_{self.num_timesteps}.pt")
 
