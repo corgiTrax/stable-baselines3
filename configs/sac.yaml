@@ -8,7 +8,7 @@ policy_name: "MultiInputPolicy"
 verbose: 1
 steps: 1000000
 load_model: 0  
-save_every_steps: 1000
+save_every_steps: 10000
 learning_rate: 0.0003
 
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
