@@ -9,6 +9,7 @@ from typing import Callable
 import gym
 import numpy as np
 import torch
+import threading as thread
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -24,6 +25,15 @@ from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 
+def train_model(model, config_data, feedback_gui, human_feedback):
+    model.learn(
+        config_data["steps"], 
+        human_feedback_gui=feedback_gui,
+        human_feedback=human_feedback,
+    )
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20, render=False)
+    print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
+
 def main():
     with open("configs/tamer_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
@@ -32,9 +42,9 @@ def main():
     env = gym.make("LunarLanderContinuous-v2")
 
     human_feedback = HumanFeedback()
-    # app = QApplication(sys.argv)
-    # feedback_gui = FeedbackInterface()
-    feedback_gui = None
+    app = QApplication(sys.argv)
+    feedback_gui = FeedbackInterface()
+    # feedback_gui = None
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
@@ -57,7 +67,7 @@ def main():
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
-        render=False,
+        render=True,
     )
 
     # model = SAC(
@@ -78,19 +88,21 @@ def main():
     # )
 
     if not config_data['load_model']:
-        model.learn(
-            config_data["steps"], 
-            human_feedback_gui=feedback_gui,
-            human_feedback=human_feedback,
-        )
+        thread.Thread(
+            target=train_model,
+            args=[model, config_data, feedback_gui, human_feedback],
+            name="render_environment",
+            daemon=True,
+        ).start()
+        sys.exit(app.exec_())
     else:
         del model
         model_num = config_data['load_model']
         model = TamerSAC.load(f'models/TamerSAC_{model_num}.pt', env=env)
         print("LOADED PRETRAINED MODEL MODEL")
 
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20, render=False)
-    print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
+    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20, render=False)
+    # print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
 if __name__ == "__main__":

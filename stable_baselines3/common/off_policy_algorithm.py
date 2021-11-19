@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import gym
 import numpy as np
 import torch as th
+import threading as thread
 
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.buffers import DictReplayBuffer, ReplayBuffer
@@ -659,6 +660,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 # Rescale and perform action
                 if self.render:
                     env.render()
+
                 new_obs, reward, done, infos = env.step(action)
 
                 curr_keyboard_feedback = None
