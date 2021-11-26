@@ -1,6 +1,7 @@
 import random
 import sys
 
+from PyQt5 import QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -41,23 +42,39 @@ class FeedbackInterface(QWidget):
             " to the robot. Please use the following keys on your keyboard to guide the robot in the appropriate direction.",
             self,
         )
-        self.advice_label = QLabel(
-            "Corrective Advice",
+        self.corrective_label = QLabel(
+            "Corrective",
             self,
         )
-        self.evaluative_feedback = QLabel(
-            "Evaluative Feedback",
+        self.advice_label = QLabel(
+            "Advice",
+            self,
+        )
+        self.evaluative_label = QLabel(
+            "Evaluative",
+            self,
+        )
+        self.feedback_label = QLabel(
+            "Feedback",
             self,
         )
 
         self.intro_text.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.intro_text.setWordWrap(True)
 
+        self.corrective_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.corrective_label.setWordWrap(True)
+        self.corrective_label.setAlignment(QtCore.Qt.AlignRight)
         self.advice_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.advice_label.setWordWrap(True)
+        self.advice_label.setAlignment(QtCore.Qt.AlignLeft)
 
-        self.evaluative_feedback.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.evaluative_feedback.setWordWrap(True)
+        self.evaluative_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.evaluative_label.setWordWrap(True)
+        self.evaluative_label.setAlignment(QtCore.Qt.AlignRight)
+        self.feedback_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.feedback_label.setWordWrap(True)
+        self.feedback_label.setAlignment(QtCore.Qt.AlignLeft)
 
         self.loss_label = QLabel("0", self)
         self.reward_label = QLabel("0", self)
@@ -66,6 +83,7 @@ class FeedbackInterface(QWidget):
         self.horizontalGroupBox = QGroupBox()
         layout = QGridLayout()
         layout.addWidget(self.intro_text, 0, 0, 1, 6)
+        layout.addWidget(self.corrective_label, 1, 2)
         layout.addWidget(self.advice_label, 1, 3)
 
         layout.addWidget(QPushButton("W = +Y"), 2, 1)
@@ -79,7 +97,8 @@ class FeedbackInterface(QWidget):
         layout.addWidget(QPushButton("Z = -Z"), 4, 0)
         layout.addWidget(QPushButton("X = -Y"), 4, 1)
 
-        layout.addWidget(self.evaluative_feedback, 5, 3)
+        layout.addWidget(self.evaluative_label, 5, 2)
+        layout.addWidget(self.feedback_label, 5, 3)
 
         layout.addWidget(QPushButton("1 = -3"), 6, 0)
         layout.addWidget(QPushButton("2 = -2"), 6, 1)
@@ -119,10 +138,10 @@ class FeedbackInterface(QWidget):
         self.horizontalGroupBox.setLayout(layout)
 
     def updateLoss(self, loss_val):
-        self.loss_label.setText(str(loss_val))
+        self.loss_label.setText("{:.3}".format(loss_val))
 
     def updateReward(self, reward_val):
-        self.reward_label.setText(str(reward_val))
+        self.reward_label.setText("{:.3}".format(reward_val))
 
     def updateBDDL(self, bddl_val):
         self.bddl_goal_state.setText(str(bddl_val))

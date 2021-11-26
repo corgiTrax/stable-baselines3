@@ -1,3 +1,4 @@
+env_config_file: behavior_full_observability_fetch.yaml
 hidden_dim: 256
 num_layers: 2
 gamma: 0.99
@@ -6,15 +7,15 @@ epochs: 50
 tensorboard_log_dir: "log_dir"
 policy_name: "MultiInputPolicy"
 verbose: 1
-steps: 1000000
-load_model: 0  
-save_every_steps: 10000
+steps: 3000
+load_model: 0
+save_every_steps: 100
 learning_rate: 0.0003
 
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 buffer_size: 3072
-learning_starts: 100
-batch_size: 64
+learning_starts: 128
+batch_size: 32
 tau: 0.005
-train_freq: 4
-gradient_steps: 2
+train_freq: 8
+gradient_steps: 1

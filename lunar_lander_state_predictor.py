@@ -13,16 +13,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import yaml
+from lunar_lander_models import LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from lunar_lander_models import LunarLanderStatePredictor
 
 def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     env = gym.make("LunarLanderContinuous-v2")
     obs = env.reset()
 
-    state_predictor = LunarLanderStatePredictor(state_dim=len(obs), action_dim=2, hidden_dim=16).to(device)
+    state_predictor = LunarLanderStatePredictor(
+        state_dim=len(obs), action_dim=2, hidden_dim=16
+    ).to(device)
     observed_states = None
     actions = None
 
@@ -33,7 +35,7 @@ def main():
     curr_cumulative_loss = 0
 
     for epoch in range(epochs * batch_size):
-        
+
         curr_action_random = np.array(env.action_space.sample())
         if observed_states is not None:
             observed_states = np.append(observed_states, obs[np.newaxis], axis=0)
@@ -48,7 +50,9 @@ def main():
             tensor_state = torch.tensor(observed_states, dtype=torch.float32).to(device)
             tensor_state_x = tensor_state[:batch_size]
             tensor_state_y = tensor_state[1:]
-            tensor_action = torch.tensor(actions[:batch_size], dtype=torch.float32).to(device)
+            tensor_action = torch.tensor(actions[:batch_size], dtype=torch.float32).to(
+                device
+            )
 
             predictions = state_predictor(tensor_state_x, tensor_action)
             curr_loss = loss(predictions, tensor_state_y)
@@ -62,7 +66,7 @@ def main():
             if epoch % 1000 == 0:
                 print(curr_cumulative_loss / 1000)
                 curr_cumulative_loss = 0
-        
+
         obs, _, done, _ = env.step(curr_action_random)
         if done:
             obs = env.reset()

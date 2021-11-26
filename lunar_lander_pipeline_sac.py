@@ -4,26 +4,26 @@ import itertools
 import os
 import random
 import sys
+import threading as thread
 from typing import Callable
 
 import gym
 import numpy as np
 import torch
-import threading as thread
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import yaml
+from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
 from stable_baselines3.active_tamer.tamer_sac import TamerSAC
-from stable_baselines3.sac.sac import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+from stable_baselines3.sac.sac import SAC
 
-from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 
 def main():
     with open("configs/sac.yaml", "r") as f:
@@ -56,18 +56,19 @@ def main():
         seed=config_data["seed"],
     )
 
-    if not config_data['load_model']:
-        model.learn(
-        config_data["steps"]
-    )
+    if not config_data["load_model"]:
+        model.learn(config_data["steps"])
     else:
         del model
-        model_num = config_data['load_model']
-        model = SAC.load(f'models/TamerSAC_{model_num}.pt', env=env)
+        model_num = config_data["load_model"]
+        model = SAC.load(f"models/TamerSAC_{model_num}.pt", env=env)
         print("Pretrained model loaded.")
 
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20, render=False)
+    mean_reward, std_reward = evaluate_policy(
+        model, env, n_eval_episodes=20, render=False
+    )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
+
 
 if __name__ == "__main__":
     main()

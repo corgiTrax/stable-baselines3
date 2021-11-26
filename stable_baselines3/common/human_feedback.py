@@ -2,184 +2,13 @@ import threading as th
 
 from pynput import keyboard, mouse
 
+from stable_baselines3.common.corrective_feedback import behavior_robot, fetch_robot
 
-# order: torso - x, y, z, roll, pitch, yaw
-#        head
-#        left hand
-#        right hand
-#        gripper
+
 class HumanFeedback:
-    def __init__(self):
+    def __init__(self, robot=None):
         super(HumanFeedback, self).__init__()
         self.keyboard_feedback_dictionary = {
-            keyboard.KeyCode.from_char("w"): [
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],  # +y
-            keyboard.KeyCode.from_char("a"): [
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],  # -x
-            keyboard.KeyCode.from_char("s"): [
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],  # +z
-            keyboard.KeyCode.from_char("d"): [
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],  # +x
-            keyboard.KeyCode.from_char("z"): [
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],  # -z
-            keyboard.KeyCode.from_char("x"): [
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],  # -y
             keyboard.KeyCode.from_char("1"): -50,
             keyboard.KeyCode.from_char("2"): -25,
             keyboard.KeyCode.from_char("3"): -10,
@@ -187,6 +16,15 @@ class HumanFeedback:
             keyboard.KeyCode.from_char("5"): 25,
             keyboard.KeyCode.from_char("6"): 50,
         }
+
+        if robot:
+            if "FetchGripper" in robot:
+                for key in fetch_robot:
+                    self.keyboard_feedback_dictionary[key] = fetch_robot[key]
+            if "BehaviorRobot" in robot:
+                for key in behavior_robot:
+                    self.keyboard_feedback_dictionary[key] = behavior_robot[key]
+
         self.keyboard_control_dictionary = {
             keyboard.KeyCode.from_char("p"): "Pause",
             keyboard.KeyCode.from_char("r"): "Reset",

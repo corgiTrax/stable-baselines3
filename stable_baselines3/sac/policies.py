@@ -275,7 +275,7 @@ class SACPolicy(BasePolicy):
             if features_extractor_class == NatureCNN:
                 net_arch = []
             else:
-                net_arch = [256, 256]
+                net_arch = [256, 512, 1024, 512, 256]
 
         actor_arch, critic_arch = get_actor_critic_arch(net_arch)
 

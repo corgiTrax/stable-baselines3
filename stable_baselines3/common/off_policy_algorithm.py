@@ -1,6 +1,7 @@
 import io
 import pathlib
 import sys
+import threading as thread
 import time
 import warnings
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
@@ -8,7 +9,6 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import gym
 import numpy as np
 import torch as th
-import threading as thread
 
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.buffers import DictReplayBuffer, ReplayBuffer
@@ -688,7 +688,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                         continue_training=False,
                     )
 
-                episode_reward += reward
+                episode_reward += reward[0]
 
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
