@@ -6,15 +6,11 @@ from stable_baselines3.common.corrective_feedback import behavior_robot, fetch_r
 
 
 class HumanFeedback:
-    def __init__(self, robot=None):
+    def __init__(self, robot=None, feedback_gui=None):
         super(HumanFeedback, self).__init__()
         self.keyboard_feedback_dictionary = {
-            keyboard.KeyCode.from_char("1"): -50,
-            keyboard.KeyCode.from_char("2"): -25,
-            keyboard.KeyCode.from_char("3"): -10,
-            keyboard.KeyCode.from_char("4"): 10,
-            keyboard.KeyCode.from_char("5"): 25,
-            keyboard.KeyCode.from_char("6"): 50,
+            keyboard.KeyCode.from_char("1"): -10,
+            keyboard.KeyCode.from_char("2"): 10,
         }
 
         if robot:
@@ -35,6 +31,8 @@ class HumanFeedback:
         self.human_mouse_feedback = None
         self.start_mouse_thread = False
         self.run_mouse_capture_thread()
+
+        self.feedback_gui = feedback_gui
 
     def keyboard_capture_thread(self):
         with keyboard.Events() as events:
@@ -62,6 +60,8 @@ class HumanFeedback:
                     feedback = self.keyboard_feedback_dictionary[
                         self.human_keyboard_feedback.key
                     ]
+                    if self.feedback_gui:
+                        self.feedback_gui.update_font(self.human_keyboard_feedback.key)
                 elif (
                     self.human_keyboard_feedback.key in self.keyboard_control_dictionary
                 ):  # use 'p' for pausing:

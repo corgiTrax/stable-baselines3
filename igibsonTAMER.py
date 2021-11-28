@@ -144,15 +144,16 @@ def main():
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
-        model_name=config_data["model_name"]
+        model_name=config_data["model_name"],
     )
 
     if config_data["load_model"] != 0:
         model = TamerSAC.load(
-            f"models/{config_data['model_name']}_{config_data['load_model']}.pt", env=env
+            f"models/{config_data['model_name']}_{config_data['load_model']}.pt",
+            env=env,
         )
         print("Loaded Model")
-    
+
     model.learn(
         config_data["steps"],
         human_feedback_gui=feedback_gui,
@@ -165,7 +166,9 @@ def main():
     model.save(f"models/{config_data['model_name']}_{config_data['steps']}.pt")
     del model
 
-    model = TamerSAC.load(f"models/{config_data['model_name']}_{config_data['steps']}.pt")
+    model = TamerSAC.load(
+        f"models/{config_data['model_name']}_{config_data['steps']}.pt"
+    )
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=20)
     print(f"After Loading: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 

@@ -176,9 +176,9 @@ def train_ol_model(
     batch_size=16,
 ):
     optimizer = None
-    human_feedback = HumanFeedback(robot)
     app = QApplication(sys.argv)
     feedback_gui = FeedbackInterface()
+    human_feedback = HumanFeedback(robot, feedback_gui)
     replay_buffer = []
     obs = env.reset()
     for iteration in range(iterations):
@@ -199,7 +199,7 @@ def train_ol_model(
             )
             if not ol_agent:
                 ol_agent = CustomCombinedExtractor(
-                    env.observation_space, device, 26
+                    env.observation_space, device, 11
                 ).to(device)
                 ol_agent.train()
                 optimizer = optim.Adam(ol_agent.parameters())

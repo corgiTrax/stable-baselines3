@@ -1,6 +1,6 @@
+import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
-import sys
 import gym
 import numpy as np
 import torch as th
@@ -335,7 +335,7 @@ class TamerSAC(OffPolicyAlgorithm):
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
-    
+
         return super(TamerSAC, self).learn(
             total_timesteps=total_timesteps,
             human_feedback_gui=human_feedback_gui,

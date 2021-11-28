@@ -11,7 +11,7 @@ texture_randomization_freq: null
 object_randomization_freq: null
 
 # robot
-robot: BehaviorRobot
+robot: FetchGripper
 use_ag: true
 ag_strict_mode: true
 default_arm_pose: diagonal30

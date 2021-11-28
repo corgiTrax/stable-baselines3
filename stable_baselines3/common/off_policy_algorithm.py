@@ -688,7 +688,6 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                         continue_training=False,
                     )
 
-
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
 
