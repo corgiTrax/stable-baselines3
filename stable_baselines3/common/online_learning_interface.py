@@ -321,7 +321,7 @@ def main():
     ex.updateBDDL("not (open ?window.n.01_1)")
     ex.updateMouseX("156")
     ex.updateMouseY("612")
-    ex.updateSelectedObject("Ceiling")
+    ex.updateSelectedObject("Chair")
     ex.updateStateEstimation(random.random() * 100)
     ex.updateHumanSignal(random.random() * 100)
     sys.exit(app.exec_())

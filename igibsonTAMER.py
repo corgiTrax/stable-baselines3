@@ -120,9 +120,9 @@ def main():
         action_filter="all",
     )
 
-    human_feedback = HumanFeedback()
     app = QApplication(sys.argv)
     feedback_gui = FeedbackInterface()
+    human_feedback = HumanFeedback(feedback_gui=feedback_gui)
 
     policy_kwargs = dict(
         features_extractor_class=CustomCombinedExtractor,
