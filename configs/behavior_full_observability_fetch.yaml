@@ -11,7 +11,7 @@ texture_randomization_freq: null
 object_randomization_freq: null
 
 # robot
-robot: FetchGripper
+robot: BehaviorRobot
 use_ag: true
 ag_strict_mode: true
 default_arm_pose: diagonal30
@@ -29,7 +29,7 @@ controller:
   height_limits: [0.2, 1.5]       # min, max height limits
 
 # task
-task: locking_every_door
+task: locking_every_window
 task_id: 0
 online_sampling: false
 target_dist_min: 1.0

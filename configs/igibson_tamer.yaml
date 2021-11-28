@@ -7,15 +7,16 @@ epochs: 50
 tensorboard_log_dir: "log_dir"
 policy_name: "MultiInputPolicy"
 verbose: 1
-steps: 3000
+steps: 10000
 load_model: 0
-save_every_steps: 100
-learning_rate: 0.0003
+save_every_steps: 1000
+learning_rate: 0.0006
+model_name: "igibson-tamer"
 
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 buffer_size: 3072
 learning_starts: 128
-batch_size: 32
-tau: 0.005
+batch_size: 64
+tau: 0.01
 train_freq: 8
 gradient_steps: 1

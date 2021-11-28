@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
+import sys
 import gym
 import numpy as np
 import torch as th
@@ -100,7 +101,7 @@ class TamerSAC(OffPolicyAlgorithm):
         verbose: int = 0,
         seed: Optional[int] = None,
         device: Union[th.device, str] = "auto",
-        save_every: int = 100,
+        save_every: int = 2500,
         _init_setup_model: bool = True,
         model_name: str = "TamerSAC",
         render: bool = False,
@@ -334,7 +335,7 @@ class TamerSAC(OffPolicyAlgorithm):
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
-
+    
         return super(TamerSAC, self).learn(
             total_timesteps=total_timesteps,
             human_feedback_gui=human_feedback_gui,

@@ -26,98 +26,112 @@ class FeedbackInterface(QWidget):
         palette.setColor(QPalette.WindowText, Qt.white)
         self.setPalette(palette)
 
-        # call the gridlayout function
-        self.createGridLayout()
-        self.loss_label.text = ""
-        self.reward_label.text = ""
-        self.bddl_goal_state.text = ""
-        windowLayout = QVBoxLayout()
-        windowLayout.addWidget(self.horizontalGroupBox)
-        self.setLayout(windowLayout)
-        self.show()  # this sets the main window to the screen size
+        self.choice1 = QRadioButton("Trajectory 1")
+        self.choice1.setChecked(False)
+        # self.choice1.toggled.connect(lambda:self.btnstate(self.choice1))
 
-    def createGridLayout(self):
+        self.choice2 = QRadioButton("Trajectory 2")
+        self.choice2.setChecked(False)
+        # self.choice2.toggled.connect(lambda:self.btnstate(self.choice2))
+
+        self.choice3 = QRadioButton("No Preference")
+        self.choice3.setChecked(True)
+        # self.choice3.toggled.connect(lambda:self.btnstate(self.choice3))
+
         self.intro_text = QLabel(
-            "Welcome to the feedback system for online learning. Using this system, you can give directional feedback"
-            " to the robot. Please use the following keys on your keyboard to guide the robot in the appropriate direction.",
+            "Welcome to the feedback system for online learning. Using this system, you can give feedback"
+            " to the robot. Please use the following keys on your keyboard to guide the robot using the appropriate method.",
             self,
         )
-        self.corrective_label = QLabel(
-            "Corrective",
+        self.navigation_label = QLabel(
+            "   Navigation",
             self,
         )
-        self.advice_label = QLabel(
-            "Advice",
+        self.manipulation = QLabel(
+            "                             Manipulation",
             self,
         )
-        self.evaluative_label = QLabel(
-            "Evaluative",
+        self.evaluative_feedback_label = QLabel(
+            "Evaluative Feedback",
             self,
         )
-        self.feedback_label = QLabel(
-            "Feedback",
+        self.hierarchical_label = QLabel(
+            "Hierarchical Imitation",
             self,
         )
+
+        self.attention_feedback = QLabel(
+            "Attention",
+            self,
+        )
+
+        self.preference_feedback = QLabel(
+            "Trajectory Preference",
+            self,
+        )
+
+        self.robot_feedback = QLabel(
+            "Robot Feedback",
+            self,
+        )
+
+        self.corrective_advice_label = QLabel("Corrective Advice", self)
 
         self.intro_text.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.intro_text.setWordWrap(True)
 
-        self.corrective_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.corrective_label.setWordWrap(True)
-        self.corrective_label.setAlignment(QtCore.Qt.AlignRight)
-        self.advice_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.advice_label.setWordWrap(True)
-        self.advice_label.setAlignment(QtCore.Qt.AlignLeft)
+        self.corrective_advice_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.corrective_advice_label.setWordWrap(True)
+        self.corrective_advice_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.evaluative_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.evaluative_label.setWordWrap(True)
-        self.evaluative_label.setAlignment(QtCore.Qt.AlignRight)
-        self.feedback_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.feedback_label.setWordWrap(True)
-        self.feedback_label.setAlignment(QtCore.Qt.AlignLeft)
+        self.navigation_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.navigation_label.setWordWrap(True)
+        self.navigation_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.manipulation.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.manipulation.setWordWrap(True)
+        self.manipulation.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.evaluative_feedback_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.evaluative_feedback_label.setWordWrap(True)
+        self.evaluative_feedback_label.setAlignment(QtCore.Qt.AlignCenter)
+        
+        self.attention_feedback.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.attention_feedback.setWordWrap(True)
+        self.attention_feedback.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.preference_feedback.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.preference_feedback.setWordWrap(True)
+        self.preference_feedback.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.robot_feedback.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.robot_feedback.setWordWrap(True)
+        self.robot_feedback.setAlignment(QtCore.Qt.AlignCenter)
 
         self.loss_label = QLabel("0", self)
         self.reward_label = QLabel("0", self)
         self.bddl_goal_state = QLabel("0", self)
-        self.robot_feedback = QLabel("0", self)
+        self.mouse_x = QLabel("0", self)
+        self.mouse_y = QLabel("0", self)
+        self.selected_object = QLabel("0", self)
+        self.state_estimation = QLabel("0", self)
+        self.human_signal = QLabel("0", self)
         self.horizontalGroupBox = QGroupBox()
+
+        self.createGridLayout()
+
+        # call the gridlayout function
+        self.loss_label.text = ""
+        self.reward_label.text = ""
+        # self.bddl_goal_state.text = ""
+        windowLayout = QVBoxLayout()
+        windowLayout.addWidget(self.horizontalGroupBox)
+        self.setLayout(windowLayout)
+        self.show()  # this sets the main window to the screen size
+    
+    def createGridLayout(self):
         layout = QGridLayout()
         layout.addWidget(self.intro_text, 0, 0, 1, 6)
-        layout.addWidget(self.corrective_label, 1, 2)
-        layout.addWidget(self.advice_label, 1, 3)
-
-        layout.addWidget(QPushButton("W = +Y"), 2, 1)
-        layout.addWidget(QPushButton("R = Reset"), 2, 4)
-        layout.addWidget(QPushButton("P = Pause"), 2, 5)
-
-        layout.addWidget(QPushButton("A = -X"), 3, 0)
-        layout.addWidget(QPushButton("S = +Z"), 3, 1)
-        layout.addWidget(QPushButton("D = +X"), 3, 2)
-
-        layout.addWidget(QPushButton("Z = -Z"), 4, 0)
-        layout.addWidget(QPushButton("X = -Y"), 4, 1)
-
-        layout.addWidget(self.evaluative_label, 5, 2)
-        layout.addWidget(self.feedback_label, 5, 3)
-
-        layout.addWidget(QPushButton("1 = -3"), 6, 0)
-        layout.addWidget(QPushButton("2 = -2"), 6, 1)
-        layout.addWidget(QPushButton("3 = -1"), 6, 2)
-        layout.addWidget(QPushButton("4 = +1"), 6, 3)
-        layout.addWidget(QPushButton("5 = +2"), 6, 4)
-        layout.addWidget(QPushButton("6 = +3"), 6, 5)
-
-        layout.addWidget(QPushButton("Loss: "), 7, 0)
-        layout.addWidget(self.loss_label, 7, 1)
-
-        layout.addWidget(QPushButton("Reward: "), 7, 2)
-        layout.addWidget(self.reward_label, 7, 3)
-
-        layout.addWidget(QPushButton("BDDL Goal State: "), 7, 4)
-        layout.addWidget(self.bddl_goal_state, 7, 5)
-
-        layout.addWidget(QPushButton("Robot Feedback: "), 8, 2)
-        layout.addWidget(self.robot_feedback, 8, 3)
 
         rand_init_x = QLineEdit()
         rand_init_x.textChanged.connect(self.textchangedX)
@@ -128,20 +142,126 @@ class FeedbackInterface(QWidget):
         rand_init_z = QLineEdit()
         rand_init_z.textChanged.connect(self.textchangedZ)
 
-        layout.addWidget(QPushButton("Random Init X: "), 9, 0)
-        layout.addWidget(rand_init_x, 9, 1)
-        layout.addWidget(QPushButton("Random Init Y: "), 9, 2)
-        layout.addWidget(rand_init_y, 9, 3)
-        layout.addWidget(QPushButton("Random Init Z: "), 9, 4)
-        layout.addWidget(rand_init_z, 9, 5)
+        load_model_num = QLineEdit()
+        load_model_num.textChanged.connect(self.textChangedLoadModel)
+
+        save_model_num = QLineEdit()
+        save_model_num.textChanged.connect(self.textChangedLoadModel)
+        
+        layout.addWidget(QPushButton("R = Reset"), 1, 0)
+        layout.addWidget(QPushButton("P = Pause"), 1, 1)
+        layout.addWidget(QPushButton("Loss: "), 1, 2)
+        layout.addWidget(self.loss_label, 1, 3)
+        layout.addWidget(QPushButton("Reward: "), 1, 4)
+        layout.addWidget(self.reward_label, 1, 5)
+        
+        layout.addWidget(QPushButton("Random Init X: "), 2, 0)
+        layout.addWidget(rand_init_x, 2, 1)
+        layout.addWidget(QPushButton("Random Init Y: "), 2, 2)
+        layout.addWidget(rand_init_y, 2, 3)
+        layout.addWidget(QPushButton("Random Init Z: "), 2, 4)
+        layout.addWidget(rand_init_z, 2, 5)
+        
+        layout.addWidget(QPushButton("Load Model: "), 3, 1)
+        layout.addWidget(load_model_num, 3, 2)
+        layout.addWidget(QPushButton("Save Model: "), 3, 3)
+        layout.addWidget(save_model_num, 3, 4)
+
+        layout.addWidget(self.corrective_advice_label, 4, 3)
+        layout.addWidget(self.navigation_label, 4, 1)
+        layout.addWidget(QPushButton("E = Clockwise"), 6, 2) 
+        layout.addWidget(QPushButton("W = +X"), 6, 1)
+        layout.addWidget(QPushButton("Q = Anti-Clockwise"), 6, 0)
+        layout.addWidget(QPushButton("A = +Y"), 7, 0)
+        layout.addWidget(QPushButton("S = -X"), 7, 1)
+        layout.addWidget(QPushButton("D = -Y"), 7, 2)
+
+        layout.addWidget(QPushButton("Z = Z"), 8, 0)
+        layout.addWidget(QPushButton("X = -Z"), 8, 1)
+
+        layout.addWidget(self.manipulation, 4, 4)
+        layout.addWidget(QPushButton("O = Release Grip"), 6, 4)
+        layout.addWidget(QPushButton("P = Contract Grip"), 6, 5)
+        layout.addWidget(QPushButton("K = Extend Hand"), 7, 4)
+        layout.addWidget(QPushButton("L = Retract Hand"), 7, 5)
+
+
+        layout.addWidget(self.evaluative_feedback_label, 10, 0)
+
+        layout.addWidget(QPushButton("1 = -1"), 10, 1)
+        layout.addWidget(QPushButton("2 = +1"), 10, 2)
+        layout.addWidget(QPushButton("I = Interrupt"), 10, 3)
+
+        layout.addWidget(self.hierarchical_label, 12, 0)
+
+        layout.addWidget(QPushButton("Current State: "), 12, 1)
+        layout.addWidget(self.bddl_goal_state, 12, 2)
+
+        bddl_options = QComboBox(self)
+        bddl_options.addItem("not (open ?window.n.01_1)")
+        bddl_options.addItem("not (open ?window.n.01_2)")
+        bddl_options.addItem("not (open ?window.n.01_3)")
+        bddl_options.addItem("not (open ?window.n.01_4)")
+
+        layout.addWidget(QPushButton("Choose next BDDL: "), 12, 3)
+        layout.addWidget(bddl_options, 12, 4)
+
+        layout.addWidget(self.attention_feedback, 15, 0)
+
+        layout.addWidget(QPushButton("Mouse X: "), 15, 1)
+        layout.addWidget(self.mouse_x, 15, 2, Qt.AlignCenter)
+        layout.addWidget(QPushButton("Mouse Y: "), 15, 3)
+        layout.addWidget(self.mouse_y, 15, 4, Qt.AlignCenter)
+        layout.addWidget(QPushButton("Selected Object: "), 15, 5)
+        layout.addWidget(self.selected_object, 15, 6)
+
+        layout.addWidget(self.preference_feedback, 18, 0)
+
+        layout.addWidget(QPushButton("I prefer: "), 18, 1)
+        layout.addWidget(self.choice1, 18, 2)
+        layout.addWidget(self.choice2, 18, 3)
+        layout.addWidget(self.choice3, 18, 4)
+
+        layout.addWidget(self.robot_feedback, 21, 0)
+        layout.addWidget(QPushButton("Uncertainty in state estimation: "), 21, 1)
+        layout.addWidget(self.state_estimation, 21, 2, Qt.AlignCenter)
+        layout.addWidget(QPushButton("Uncertainty in predicting human signal: "), 21, 4)
+        layout.addWidget(self.human_signal, 21, 5, Qt.AlignCenter)
+        
+
+        # layout.addWidget(QPushButton("3 = -1"), 6, 2)
+        # layout.addWidget(QPushButton("4 = +1"), 6, 3)
+        # layout.addWidget(QPushButton("5 = +2"), 6, 4)
+        # layout.addWidget(QPushButton("6 = +3"), 6, 5)
+
+
+        # layout.addWidget(QPushButton("BDDL Goal State: "), 7, 4)
+        # layout.addWidget(self.bddl_goal_state, 7, 5)
+
+        # layout.addWidget(QPushButton("Robot Feedback: "), 8, 2)
+        # layout.addWidget(self.robot_feedback, 8, 3)
+
+
 
         self.horizontalGroupBox.setLayout(layout)
 
+    def btnstate(self, btn):
+        btn.setChecked(not btn.isChecked())
+
     def updateLoss(self, loss_val):
-        self.loss_label.setText("{:.3}".format(loss_val))
+        self.loss_label.setText("{:.3}".format(str(loss_val)))
+    
+    def updateMouseX(self, mouseX):
+        self.mouse_x.setText(str(mouseX))
+    
+    def updateMouseY(self, mouseY):
+        self.loss_label.setText(str(mouseY))
+
+    def updateSelectedObject(self, selected_object):
+        self.loss_label.setText(selected_object)
 
     def updateReward(self, reward_val):
-        self.reward_label.setText("{:.3}".format(reward_val))
+        self.reward_label.setText("{:.3}".format(str(reward_val)))
 
     def updateBDDL(self, bddl_val):
         self.bddl_goal_state.setText(str(bddl_val))
@@ -154,6 +274,9 @@ class FeedbackInterface(QWidget):
 
     def textchangedZ(self, text):
         self.Z = text
+    
+    def textChangedLoadModel(self, text):
+        self.LoadModel = text
 
 
 def main():
@@ -161,7 +284,7 @@ def main():
     ex = FeedbackInterface()
     ex.updateLoss(random.randint(0, 1000) * 10000)
     ex.updateReward(random.randint(0, 1000) * 10000)
-    ex.updateBDDL(random.randint(0, 1000) * 10000)
+    ex.updateBDDL("not (open ?window.n.01_1)")
     sys.exit(app.exec_())
 
 

@@ -688,21 +688,22 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                         continue_training=False,
                     )
 
-                episode_reward += reward[0]
 
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
+
+                if human_feedback_received:
+                    # self.apply_uniform_credit_assignment(
+                    #     replay_buffer, float(curr_keyboard_feedback), 0, 40
+                    # )
+                    reward[0] += curr_keyboard_feedback
+
+                episode_reward += reward[0]
 
                 # Store data in replay buffer (normalized action and unnormalized observation)
                 self._store_transition(
                     replay_buffer, buffer_action, new_obs, reward, done, infos
                 )
-
-                if human_feedback_received:
-                    self.apply_uniform_credit_assignment(
-                        replay_buffer, float(curr_keyboard_feedback), 0, 40
-                    )
-                    episode_reward += curr_keyboard_feedback
 
                 if human_feedback_gui:
                     human_feedback_gui.updateReward(episode_reward)

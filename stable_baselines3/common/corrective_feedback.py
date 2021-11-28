@@ -7,7 +7,7 @@ from pynput import keyboard, mouse
 #        right hand
 #        gripper
 behavior_robot = {
-    keyboard.KeyCode.from_char("w"): [
+    keyboard.KeyCode.from_char("a"): [
         0,
         1,
         0,
@@ -35,7 +35,7 @@ behavior_robot = {
         0,
         0,
     ],  # +y
-    keyboard.KeyCode.from_char("a"): [
+    keyboard.KeyCode.from_char("s"): [
         -1,
         0,
         0,
@@ -63,7 +63,7 @@ behavior_robot = {
         0,
         0,
     ],  # -x
-    keyboard.KeyCode.from_char("s"): [
+    keyboard.KeyCode.from_char("z"): [
         0,
         0,
         1,
@@ -91,7 +91,7 @@ behavior_robot = {
         0,
         0,
     ],  # +z
-    keyboard.KeyCode.from_char("d"): [
+    keyboard.KeyCode.from_char("w"): [
         1,
         0,
         0,
@@ -119,7 +119,7 @@ behavior_robot = {
         0,
         0,
     ],  # +x
-    keyboard.KeyCode.from_char("z"): [
+    keyboard.KeyCode.from_char("x"): [
         0,
         0,
         -1,
@@ -147,7 +147,7 @@ behavior_robot = {
         0,
         0,
     ],  # -z
-    keyboard.KeyCode.from_char("x"): [
+    keyboard.KeyCode.from_char("d"): [
         0,
         -1,
         0,
