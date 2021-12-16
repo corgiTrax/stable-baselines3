@@ -205,7 +205,7 @@ class VecEnv(ABC):
             cv2.imshow("vecenv", bigimg[:, :, ::-1])
             cv2.waitKey(1)
         elif mode == "rgb_array":
-            return bigimg
+            return bigimg[:, :, ::-1]
         else:
             raise NotImplementedError(f"Render mode {mode} is not supported by VecEnvs")
 

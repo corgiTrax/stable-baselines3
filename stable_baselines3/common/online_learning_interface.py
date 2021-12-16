@@ -139,7 +139,7 @@ class FeedbackInterface(QWidget):
         self.z_button = QPushButton("Z = Z")
         self.x_button = QPushButton("X = -Z")
         self.one_button = QPushButton("1 = -1")
-        self.two_button = QPushButton("2 = -2")
+        self.two_button = QPushButton("2 = +1")
         self.prev_press = None
 
         self.createGridLayout()
