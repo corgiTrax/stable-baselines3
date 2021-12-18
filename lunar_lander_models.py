@@ -70,7 +70,7 @@ class LunarLanderExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space: gym.spaces.Dict):
         super(LunarLanderExtractor, self).__init__(observation_space, features_dim=1)
 
-        self.input_features = observation_space._shape[0]
+        self.input_features = observation_space.shape[0]
         self.hidden_dim = 32
         self.extractor = LunarLanderEncoder(self.input_features, self.hidden_dim)
         self._features_dim = self.hidden_dim

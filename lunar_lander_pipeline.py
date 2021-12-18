@@ -17,7 +17,7 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.tamer_sac import TamerSAC
+from stable_baselines3.active_tamer.tamer_sac_optim import TamerSACOptim
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
@@ -55,7 +55,18 @@ def main():
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
-    model = TamerSAC(
+    newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
+
+    custom_objects = {}
+    if newer_python_version:
+        custom_objects = {
+            "learning_rate": 0.0,
+            "lr_schedule": lambda _: 0.0,
+            "clip_range": lambda _: 0.0,
+        }
+    trained_model = SAC.load(config_data['trained_model'], env, custom_object=custom_objects)
+    
+    model = TamerSACOptim(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -72,6 +83,7 @@ def main():
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
         render=True,
+        trained_model=trained_model
     )
 
     if not config_data["load_model"]:
