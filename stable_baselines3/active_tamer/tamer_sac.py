@@ -18,7 +18,7 @@ from stable_baselines3.common.utils import polyak_update
 
 class TamerSAC(OffPolicyAlgorithm):
     """
-    TAMER + Soft Actor-Critic (SAC)
+    TAMER + Soft Actor-Critic (SAC): Vanilla TAMER + SAC with Human feedback interface
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo

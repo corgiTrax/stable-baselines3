@@ -56,6 +56,8 @@ def main():
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
     newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
+    kwargs = dict(seed=0)
+    kwargs.update(dict(buffer_size=1))
 
     custom_objects = {}
     if newer_python_version:
@@ -64,7 +66,7 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
-    trained_model = SAC.load(config_data['trained_model'], env, custom_object=custom_objects)
+    trained_model = SAC.load(config_data['trained_model'], env, custom_objects=custom_objects, **kwargs)
     
     model = TamerSACOptim(
         config_data["policy_name"],
@@ -97,7 +99,7 @@ def main():
     else:
         del model
         model_num = config_data["load_model"]
-        model = TamerSAC.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = TamerSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
         print("Loaded pretrained model")
 
 

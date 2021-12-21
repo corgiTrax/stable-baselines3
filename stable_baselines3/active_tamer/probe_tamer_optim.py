@@ -1,5 +1,6 @@
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+import time
 
 import gym
 import numpy as np
@@ -20,9 +21,9 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 
-class TamerSACOptim(OffPolicyAlgorithm):
+class ProbeTamerOptim(OffPolicyAlgorithm):
     """
-    TAMER + Soft Actor-Critic (SAC): Use trained SAC model to give feedback.
+    TAMER + Soft Actor-Critic (SAC): Probe the user everytime abstract state changes for feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo
@@ -81,6 +82,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self,
         policy: Union[str, Type[SACPolicy]],
         env: Union[GymEnv, str],
+        abstract_state,
         trained_model,
         learning_rate: Union[float, Schedule] = 3e-4,
         buffer_size: int = 1_000_000,  # 1e6
@@ -108,11 +110,11 @@ class TamerSACOptim(OffPolicyAlgorithm):
         device: Union[th.device, str] = "auto",
         save_every: int = 2500,
         _init_setup_model: bool = True,
-        model_name: str = "TamerSACOptim",
+        model_name: str = "ProbeTamerOptim",
         render: bool = False,
     ):
 
-        super(TamerSACOptim, self).__init__(
+        super(ProbeTamerOptim, self).__init__(
             policy,
             env,
             SACPolicy,
@@ -150,13 +152,15 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self.ent_coef = ent_coef
         self.target_update_interval = target_update_interval
         self.ent_coef_optimizer = None
+        self.abstract_state = abstract_state
+        self.curr_abstract_state = 0
         self.trained_model = trained_model
 
         if _init_setup_model:
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(TamerSACOptim, self)._setup_model()
+        super(ProbeTamerOptim, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -337,12 +341,12 @@ class TamerSACOptim(OffPolicyAlgorithm):
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
-        tb_log_name: str = "TamerSACOptim",
+        tb_log_name: str = "ProbeTamerOptim",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
 
-        return super(TamerSACOptim, self).learn(
+        return super(ProbeTamerOptim, self).learn(
             total_timesteps=total_timesteps,
             human_feedback_gui=human_feedback_gui,
             human_feedback=human_feedback,
@@ -357,7 +361,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(TamerSACOptim, self)._excluded_save_params() + [
+        return super(ProbeTamerOptim, self)._excluded_save_params() + [
             "actor",
             "critic",
             "critic_target",
@@ -371,7 +375,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         else:
             saved_pytorch_variables = ["ent_coef_tensor"]
         return state_dicts, saved_pytorch_variables
-    
+
     def collect_rollouts(
         self,
         env: VecEnv,
@@ -410,7 +414,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         num_collected_steps, num_collected_episodes = 0, 0
 
         assert isinstance(env, VecEnv), "You must pass a VecEnv"
-        assert env.num_envs == 1, "OffPolicyAlgorithm only support single environment"
+        assert env.num_envs == 1, "ProbeTamerOptim only support single environment"
         assert train_freq.frequency > 0, "Should at least collect one step or episode."
 
         if self.use_sde:
@@ -443,21 +447,19 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 # Rescale and perform action
                 if self.render:
                     env.render()
-                
-                critic_rewards = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
-                simulated_human_reward, _ = th.min(th.cat(critic_rewards, dim=1), dim=1, keepdim=True)
-                simulated_human_reward = simulated_human_reward.cpu()[0][0]
+
                 new_obs, reward, done, infos = env.step(action)
+                next_abstract_state = self.abstract_state(new_obs)
 
-                # curr_keyboard_feedback = None
-                # if human_feedback:
-                #     curr_keyboard_feedback = (
-                #         human_feedback.return_human_keyboard_feedback()
-                #     )
-
-                # human_feedback_received = (
-                #     curr_keyboard_feedback and type(curr_keyboard_feedback) == int
-                # )
+                simulated_human_reward = 0
+                human_feedback_received = False
+                if self.curr_abstract_state != next_abstract_state:
+                    self.curr_abstract_state = next_abstract_state
+                    
+                    critic_rewards = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
+                    simulated_human_reward, _ = th.min(th.cat(critic_rewards, dim=1), dim=1, keepdim=True)
+                    simulated_human_reward = simulated_human_reward.cpu()[0][0]
+                    human_feedback_received = True
 
                 self.num_timesteps += 1
                 episode_timesteps += 1
@@ -477,11 +479,11 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
 
-                # self.apply_uniform_credit_assignment(
-                #     replay_buffer, float(simulated_human_reward), 40, 0
-                # )
-                
-                reward[0] += simulated_human_reward
+                if human_feedback_received:
+                    self.apply_uniform_credit_assignment(
+                        replay_buffer, float(simulated_human_reward), 40, 0
+                    )
+                    # reward[0] += simulated_human_reward
 
                 episode_reward += reward[0]
 

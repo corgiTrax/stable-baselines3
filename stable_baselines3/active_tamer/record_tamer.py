@@ -24,7 +24,7 @@ from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 class RecordTAMER(OffPolicyAlgorithm):
     """
-    TAMER + Soft Actor-Critic (SAC)
+    TAMER + Soft Actor-Critic (SAC): Record human data as human is giiving feedback. 
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo
