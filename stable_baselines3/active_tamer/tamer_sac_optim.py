@@ -330,8 +330,8 @@ class TamerSACOptim(OffPolicyAlgorithm):
     def learn(
         self,
         total_timesteps: int,
-        human_feedback_gui: FeedbackInterface,
-        human_feedback: HumanFeedback,
+        human_feedback_gui: FeedbackInterface = None,
+        human_feedback: HumanFeedback = None,
         callback: MaybeCallback = None,
         log_interval: int = 4,
         eval_env: Optional[GymEnv] = None,
@@ -477,17 +477,17 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
 
-                # self.apply_uniform_credit_assignment(
-                #     replay_buffer, float(simulated_human_reward), 40, 0
-                # )
                 
-                reward[0] += simulated_human_reward
+                # reward[0] += simulated_human_reward
 
                 episode_reward += reward[0]
 
                 # Store data in replay buffer (normalized action and unnormalized observation)
                 self._store_transition(
                     replay_buffer, buffer_action, new_obs, reward, done, infos
+                )
+                self.apply_uniform_credit_assignment(
+                    replay_buffer, float(simulated_human_reward), 0, 40
                 )
 
                 if human_feedback_gui:
