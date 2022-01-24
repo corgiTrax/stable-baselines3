@@ -20,7 +20,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 
-class TamerSACOptim(OffPolicyAlgorithm):
+class TamerSACBC(OffPolicyAlgorithm):
     """
     TAMER + Soft Actor-Critic (SAC): Use trained SAC model to give feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
@@ -108,12 +108,12 @@ class TamerSACOptim(OffPolicyAlgorithm):
         device: Union[th.device, str] = "auto",
         save_every: int = 2500,
         _init_setup_model: bool = True,
-        model_name: str = "TamerSACOptim",
+        model_name: str = "TamerSACBC",
         render: bool = False,
         q_val_threshold: float = 0.05
     ):
 
-        super(TamerSACOptim, self).__init__(
+        super(TamerSACBC, self).__init__(
             policy,
             env,
             SACPolicy,
@@ -160,7 +160,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(TamerSACOptim, self)._setup_model()
+        super(TamerSACBC, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -305,7 +305,8 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 self.critic.forward(replay_data.observations, actions_pi), dim=1
             )
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
-            actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
+            teacher_actions, _ =  self.trained_model.actor.action_log_prob(replay_data.observations)
+            actor_loss = (ent_coef * log_prob - min_qf_pi).mean() + F.mse_loss(actions_pi, teacher_actions)
             actor_losses.append(actor_loss.item())
 
             if human_feedback_gui:
@@ -341,12 +342,12 @@ class TamerSACOptim(OffPolicyAlgorithm):
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
-        tb_log_name: str = "TamerSACOptim",
+        tb_log_name: str = "TamerSACBC",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
 
-        return super(TamerSACOptim, self).learn(
+        return super(TamerSACBC, self).learn(
             total_timesteps=total_timesteps,
             human_feedback_gui=human_feedback_gui,
             human_feedback=human_feedback,
@@ -361,7 +362,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(TamerSACOptim, self)._excluded_save_params() + [
+        return super(TamerSACBC, self)._excluded_save_params() + [
             "actor",
             "critic",
             "critic_target",
@@ -456,16 +457,9 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 student_q_val, _ = th.min(th.cat(student_q_val, dim=1), dim=1, keepdim=True)
                 student_q_val = student_q_val.cpu()[0][0]
 
-                self.logger.record("train/teacher_q_value", teacher_q_val.item())
-                self.logger.record("train/student_q_value", student_q_val.item())
-                self.logger.record("train/teacher-student_q_value", teacher_q_val.item() - student_q_val.item())
-                self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 # print(f"Teacher q val = {str(teacher_q_val)} and Student q val = {str(student_q_val)}")
                 
-                simulated_human_reward = 1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
-                # simulated_human_reward = 1 if teacher_q_val - student_q_val < self.q_val_threshold else -1
-                self.q_val_threshold += 0.00000001
-                # self.q_val_threshold = max(self.q_val_threshold, 0.045)
+                simulated_human_reward = 1 if teacher_q_val - student_q_val < self.q_val_threshold else -1
                 new_obs, reward, done, infos = env.step(action)
 
                 # curr_keyboard_feedback = None
