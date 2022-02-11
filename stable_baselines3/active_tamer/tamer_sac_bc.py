@@ -110,7 +110,7 @@ class TamerSACBC(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         model_name: str = "TamerSACBC",
         render: bool = False,
-        q_val_threshold: float = 0.05
+        q_val_threshold: float = 0.05,
     ):
 
         super(TamerSACBC, self).__init__(
@@ -154,7 +154,6 @@ class TamerSACBC(OffPolicyAlgorithm):
         self.trained_model = trained_model
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
-
 
         if _init_setup_model:
             self._setup_model()
@@ -305,8 +304,12 @@ class TamerSACBC(OffPolicyAlgorithm):
                 self.critic.forward(replay_data.observations, actions_pi), dim=1
             )
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
-            teacher_actions, _ =  self.trained_model.actor.action_log_prob(replay_data.observations)
-            actor_loss = (ent_coef * log_prob - min_qf_pi).mean() + F.mse_loss(actions_pi, teacher_actions)
+            teacher_actions, _ = self.trained_model.actor.action_log_prob(
+                replay_data.observations
+            )
+            actor_loss = (ent_coef * log_prob - min_qf_pi).mean() + F.mse_loss(
+                actions_pi, teacher_actions
+            )
             actor_losses.append(actor_loss.item())
 
             if human_feedback_gui:
@@ -376,7 +379,7 @@ class TamerSACBC(OffPolicyAlgorithm):
         else:
             saved_pytorch_variables = ["ent_coef_tensor"]
         return state_dicts, saved_pytorch_variables
-    
+
     def collect_rollouts(
         self,
         env: VecEnv,
@@ -447,19 +450,31 @@ class TamerSACBC(OffPolicyAlgorithm):
                 # Rescale and perform action
                 if self.render:
                     env.render()
-                
+
                 teacher_action, _ = self.trained_model.predict(self._last_obs)
-                teacher_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(teacher_action).to(self.device))
-                teacher_q_val, _ = th.min(th.cat(teacher_q_val, dim=1), dim=1, keepdim=True)
+                teacher_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(teacher_action).to(self.device),
+                )
+                teacher_q_val, _ = th.min(
+                    th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
+                )
                 teacher_q_val = teacher_q_val.cpu()[0][0]
-                
-                student_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
-                student_q_val, _ = th.min(th.cat(student_q_val, dim=1), dim=1, keepdim=True)
+
+                student_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(action).to(self.device),
+                )
+                student_q_val, _ = th.min(
+                    th.cat(student_q_val, dim=1), dim=1, keepdim=True
+                )
                 student_q_val = student_q_val.cpu()[0][0]
 
                 # print(f"Teacher q val = {str(teacher_q_val)} and Student q val = {str(student_q_val)}")
-                
-                simulated_human_reward = 1 if teacher_q_val - student_q_val < self.q_val_threshold else -1
+
+                simulated_human_reward = (
+                    1 if teacher_q_val - student_q_val < self.q_val_threshold else -1
+                )
                 new_obs, reward, done, infos = env.step(action)
 
                 # curr_keyboard_feedback = None
@@ -491,7 +506,6 @@ class TamerSACBC(OffPolicyAlgorithm):
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
 
-                
                 reward[0] = simulated_human_reward
 
                 episode_reward += reward[0]

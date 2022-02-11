@@ -455,9 +455,14 @@ class ProbeTamerOptim(OffPolicyAlgorithm):
                 human_feedback_received = False
                 if self.curr_abstract_state != next_abstract_state:
                     self.curr_abstract_state = next_abstract_state
-                    
-                    critic_rewards = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
-                    simulated_human_reward, _ = th.min(th.cat(critic_rewards, dim=1), dim=1, keepdim=True)
+
+                    critic_rewards = self.trained_model.critic.forward(
+                        th.from_numpy(self._last_obs).to(self.device),
+                        th.from_numpy(action).to(self.device),
+                    )
+                    simulated_human_reward, _ = th.min(
+                        th.cat(critic_rewards, dim=1), dim=1, keepdim=True
+                    )
                     simulated_human_reward = simulated_human_reward.cpu()[0][0]
                     human_feedback_received = True
 

@@ -25,7 +25,6 @@ from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.sac.sac import SAC
 
 
-
 def get_abstract_state(curr_state_vec):
     # print(str(float(curr_state_vec[0][0])) + " " + str(float(curr_state_vec[0][1])))
     y_state = -1
@@ -40,16 +39,16 @@ def get_abstract_state(curr_state_vec):
     else:
         y_state = 1
 
-
     if x_obs < -0.3:
         x_state = 0
     elif x_obs > 0.3:
         x_state = 2
     else:
         x_state = 1
-    
+
     # return x_state * 3 + y_state
     return x_state
+
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(
@@ -78,7 +77,7 @@ def main():
 
     policy_kwargs = dict(
         features_extractor_class=LunarLanderExtractor,
-        net_arch=[400,300],
+        net_arch=[400, 300],
     )
 
     newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
@@ -92,7 +91,9 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
-    trained_model = SAC.load(config_data['trained_model'], env, custom_objects=custom_objects, **kwargs)
+    trained_model = SAC.load(
+        config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
+    )
 
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -117,7 +118,7 @@ def main():
         experiment_save_dir=config_data["human_data_save_path"],
         trained_model=trained_model,
         sleep_time=config_data["sleep_time_in_seconds"],
-        assign_credit=config_data["assign_credit"]
+        assign_credit=config_data["assign_credit"],
     )
 
     if not config_data["load_model"]:

@@ -640,7 +640,7 @@ class SACHPolicy(BasePolicy):
         self, observation: th.Tensor, deterministic: bool = False
     ) -> th.Tensor:
         return self.actor(observation, deterministic)
-    
+
     def set_training_mode(self, mode: bool) -> None:
         """
         Put the policy in either training or evaluation mode.

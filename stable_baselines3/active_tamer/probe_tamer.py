@@ -453,16 +453,20 @@ class ProbeTamer(OffPolicyAlgorithm):
                 human_feedback_received = False
                 if self.curr_abstract_state != next_abstract_state:
                     self.curr_abstract_state = next_abstract_state
-                    
+
                     if human_feedback:
                         curr_keyboard_feedback = (
                             human_feedback.return_human_keyboard_feedback()
                         )
 
-                    while not (curr_keyboard_feedback and type(curr_keyboard_feedback) == int):
+                    while not (
+                        curr_keyboard_feedback and type(curr_keyboard_feedback) == int
+                    ):
                         print(curr_keyboard_feedback)
-                        curr_keyboard_feedback = human_feedback.return_human_keyboard_feedback()
-                    
+                        curr_keyboard_feedback = (
+                            human_feedback.return_human_keyboard_feedback()
+                        )
+
                     human_feedback_received = True
 
                 self.num_timesteps += 1

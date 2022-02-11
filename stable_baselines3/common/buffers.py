@@ -322,6 +322,7 @@ class ReplayBuffer(BaseBuffer):
         )
         return ReplayBufferSamples(*tuple(map(self.to_torch, data)))
 
+
 class HumanReplayBuffer(ReplayBuffer):
     """
     Replay buffer used in off-policy algorithms like SAC/TD3.
@@ -352,12 +353,17 @@ class HumanReplayBuffer(ReplayBuffer):
         handle_timeout_termination: bool = True,
     ):
         super(HumanReplayBuffer, self).__init__(
-            buffer_size, observation_space, action_space, device, n_envs=n_envs, optimize_memory_usage=optimize_memory_usage,
-            handle_timeout_termination=handle_timeout_termination
+            buffer_size,
+            observation_space,
+            action_space,
+            device,
+            n_envs=n_envs,
+            optimize_memory_usage=optimize_memory_usage,
+            handle_timeout_termination=handle_timeout_termination,
         )
 
         self.humanRewards = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
-        
+
         if psutil is not None:
             mem_available = psutil.virtual_memory().available
             total_memory_usage = (

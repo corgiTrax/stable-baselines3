@@ -274,7 +274,7 @@ class FeedbackInterface(QWidget):
 
     def updateReward(self, reward_val):
         self.reward_label.setText("{:.5}".format(str(reward_val)))
-    
+
     def updateHumanReward(self, reward_val):
         self.human_reward_label.setText("{:.5}".format(str(reward_val)))
 
@@ -309,7 +309,7 @@ class FeedbackInterface(QWidget):
             "'z'": self.z_button,
             "'x'": self.x_button,
             "'1'": self.one_button,
-            "'2'": self.two_button
+            "'2'": self.two_button,
         }
         if str(key) in button_map:
             if self.prev_press:

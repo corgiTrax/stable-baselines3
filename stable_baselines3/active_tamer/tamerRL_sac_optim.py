@@ -158,7 +158,6 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
 
-
         if _init_setup_model:
             self._setup_model()
 
@@ -218,7 +217,11 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizers learning rate
-        optimizers = [self.actor.optimizer, self.critic.optimizer, self.human_critic.optimizer]
+        optimizers = [
+            self.actor.optimizer,
+            self.critic.optimizer,
+            self.human_critic.optimizer,
+        ]
         if self.ent_coef_optimizer is not None:
             optimizers += [self.ent_coef_optimizer]
 
@@ -283,10 +286,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                     + (1 - replay_data.dones) * self.gamma * next_q_values
                 )
 
-                target_human_q_values = (
-                    replay_data.humanRewards
-                )
-
+                target_human_q_values = replay_data.humanRewards
 
             # Get current Q-values estimates for each critic network
             # using action from the replay buffer
@@ -335,11 +335,14 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                 self.critic.forward(replay_data.observations, actions_pi), dim=1
             )
 
-            q_values_pi_human = th.cat (
+            q_values_pi_human = th.cat(
                 self.human_critic.forward(replay_data.observations, actions_pi), dim=1
             )
 
-            q_values_pi = self.rl_threshold * q_values_pi_critic + (1 - self.rl_threshold) * q_values_pi_human
+            q_values_pi = (
+                self.rl_threshold * q_values_pi_critic
+                + (1 - self.rl_threshold) * q_values_pi_human
+            )
 
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
             actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
@@ -359,8 +362,9 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                     self.critic.parameters(), self.critic_target.parameters(), self.tau
                 )
                 polyak_update(
-                    self.human_critic.parameters(), self.human_critic_target
-                    .parameters(), self.tau
+                    self.human_critic.parameters(),
+                    self.human_critic_target.parameters(),
+                    self.tau,
                 )
 
         self._n_updates += gradient_steps
@@ -409,7 +413,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
             "critic",
             "critic_target",
             "human_critic",
-            "human_critic_target"
+            "human_critic_target",
         ]
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
@@ -420,7 +424,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         else:
             saved_pytorch_variables = ["ent_coef_tensor"]
         return state_dicts, saved_pytorch_variables
-    
+
     def collect_rollouts(
         self,
         env: VecEnv,
@@ -488,27 +492,44 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
-                # Rescale and perform action 
+                # Rescale and perform action
                 if self.render:
                     env.render()
-                
+
                 teacher_action, _ = self.trained_model.predict(self._last_obs)
-                teacher_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(teacher_action).to(self.device))
-                teacher_q_val, _ = th.min(th.cat(teacher_q_val, dim=1), dim=1, keepdim=True)
+                teacher_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(teacher_action).to(self.device),
+                )
+                teacher_q_val, _ = th.min(
+                    th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
+                )
                 teacher_q_val = teacher_q_val.cpu()[0][0]
-                
-                student_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
-                student_q_val, _ = th.min(th.cat(student_q_val, dim=1), dim=1, keepdim=True)
+
+                student_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(action).to(self.device),
+                )
+                student_q_val, _ = th.min(
+                    th.cat(student_q_val, dim=1), dim=1, keepdim=True
+                )
                 student_q_val = student_q_val.cpu()[0][0]
 
                 self.logger.record("train/teacher_q_value", teacher_q_val.item())
                 self.logger.record("train/student_q_value", student_q_val.item())
-                self.logger.record("train/teacher-student_q_value", teacher_q_val.item() - student_q_val.item())
+                self.logger.record(
+                    "train/teacher-student_q_value",
+                    teacher_q_val.item() - student_q_val.item(),
+                )
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
-                simulated_human_reward = 1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
-                simulated_human_reward = simulated_human_reward if random.random() < 0.05 else 0
+                simulated_human_reward = (
+                    1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
+                )
+                simulated_human_reward = (
+                    simulated_human_reward if random.random() < 0.05 else 0
+                )
                 self.q_val_threshold += 0.00000001
-                self.rl_threshold += 1/500000
+                self.rl_threshold += 1 / 500000
                 new_obs, reward, done, infos = env.step(action)
 
                 self.num_timesteps += 1
@@ -533,7 +554,13 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
 
                 # Store data in replay buffer (normalized action and unnormalized observation)
                 self._store_transition(
-                    replay_buffer, buffer_action, new_obs, reward, simulated_human_reward, done, infos
+                    replay_buffer,
+                    buffer_action,
+                    new_obs,
+                    reward,
+                    simulated_human_reward,
+                    done,
+                    infos,
                 )
 
                 # Can only do credit assignment for reward received from the environment
@@ -580,7 +607,6 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         return RolloutReturn(
             mean_reward, num_collected_steps, num_collected_episodes, continue_training
         )
-    
 
     def _store_transition(
         self,

@@ -52,7 +52,7 @@ def main():
 
     policy_kwargs = dict(
         # features_extractor_class=LunarLanderExtractor,
-        net_arch=[400,300],
+        net_arch=[400, 300],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -67,8 +67,10 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
-    trained_model = SAC.load(config_data['trained_model'], env, custom_objects=custom_objects, **kwargs)
-    
+    trained_model = SAC.load(
+        config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
+    )
+
     print(trained_model.policy)
 
     model = TamerSACOptim(
@@ -88,7 +90,7 @@ def main():
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
         render=True,
-        trained_model=trained_model
+        trained_model=trained_model,
     )
 
     print(model.policy)

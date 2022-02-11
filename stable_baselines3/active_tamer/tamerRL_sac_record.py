@@ -168,7 +168,6 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         self.curr_abstract_state = 0
         self.assign_credit = assign_credit
 
-
         if _init_setup_model:
             self._setup_model()
 
@@ -228,7 +227,11 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizers learning rate
-        optimizers = [self.actor.optimizer, self.critic.optimizer, self.human_critic.optimizer]
+        optimizers = [
+            self.actor.optimizer,
+            self.critic.optimizer,
+            self.human_critic.optimizer,
+        ]
         if self.ent_coef_optimizer is not None:
             optimizers += [self.ent_coef_optimizer]
 
@@ -293,10 +296,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     + (1 - replay_data.dones) * self.gamma * next_q_values
                 )
 
-                target_human_q_values = (
-                    replay_data.humanRewards
-                )
-
+                target_human_q_values = replay_data.humanRewards
 
             # Get current Q-values estimates for each critic network
             # using action from the replay buffer
@@ -345,11 +345,14 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                 self.critic.forward(replay_data.observations, actions_pi), dim=1
             )
 
-            q_values_pi_human = th.cat (
+            q_values_pi_human = th.cat(
                 self.human_critic.forward(replay_data.observations, actions_pi), dim=1
             )
 
-            q_values_pi = self.rl_threshold * q_values_pi_critic + (1 - self.rl_threshold) * q_values_pi_human
+            q_values_pi = (
+                self.rl_threshold * q_values_pi_critic
+                + (1 - self.rl_threshold) * q_values_pi_human
+            )
 
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
             actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
@@ -369,8 +372,9 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     self.critic.parameters(), self.critic_target.parameters(), self.tau
                 )
                 polyak_update(
-                    self.human_critic.parameters(), self.human_critic_target
-                    .parameters(), self.tau
+                    self.human_critic.parameters(),
+                    self.human_critic_target.parameters(),
+                    self.tau,
                 )
 
         self._n_updates += gradient_steps
@@ -419,7 +423,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
             "critic",
             "critic_target",
             "human_critic",
-            "human_critic_target"
+            "human_critic_target",
         ]
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
@@ -430,7 +434,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         else:
             saved_pytorch_variables = ["ent_coef_tensor"]
         return state_dicts, saved_pytorch_variables
-    
+
     def collect_rollouts(
         self,
         env: VecEnv,
@@ -478,8 +482,9 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         callback.on_rollout_start()
         continue_training = True
         os.makedirs(self.experiment_save_dir, exist_ok=True)
-        feedback_file = open(os.path.join(self.experiment_save_dir, "feedback_file.txt"), "a")
-
+        feedback_file = open(
+            os.path.join(self.experiment_save_dir, "feedback_file.txt"), "a"
+        )
 
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
@@ -501,23 +506,27 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
-                # Rescale and perform action 
+                # Rescale and perform action
                 if self.render:
                     env.render()
-                
+
                 new_obs, reward, done, infos = env.step(action)
 
                 self.num_timesteps += 1
                 episode_timesteps += 1
                 num_collected_steps += 1
                 self.curr_episode_timesteps += 1
-                feedback_file.write(f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n")
+                feedback_file.write(
+                    f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
+                )
 
                 next_abstract_state = self.abstract_state(new_obs)
                 if self.curr_abstract_state != next_abstract_state:
                     self.curr_abstract_state = next_abstract_state
-                    feedback_file.write(f"Abstract state changed at {str(self.num_timesteps)} to {str(self.curr_abstract_state)}\n")
-                
+                    feedback_file.write(
+                        f"Abstract state changed at {str(self.num_timesteps)} to {str(self.curr_abstract_state)}\n"
+                    )
+
                 time.sleep(self.sleep_time)
                 curr_keyboard_feedback = None
                 if human_feedback:
@@ -526,7 +535,9 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     )
 
                 if curr_keyboard_feedback and type(curr_keyboard_feedback) == int:
-                    feedback_file.write(f"Human Feedback received at {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n")
+                    feedback_file.write(
+                        f"Human Feedback received at {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                    )
                 else:
                     curr_keyboard_feedback = 0
 
@@ -547,13 +558,22 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
 
                 # Store data in replay buffer (normalized action and unnormalized observation)
                 self._store_transition(
-                    replay_buffer, buffer_action, new_obs, reward, curr_keyboard_feedback, done, infos
+                    replay_buffer,
+                    buffer_action,
+                    new_obs,
+                    reward,
+                    curr_keyboard_feedback,
+                    done,
+                    infos,
                 )
 
                 # Can only do credit assignment for reward received from the environment
                 if self.assign_credit:
                     self.apply_uniform_credit_assignment(
-                        replay_buffer, float(curr_keyboard_feedback), 0, min(35, self.curr_episode_timesteps)
+                        replay_buffer,
+                        float(curr_keyboard_feedback),
+                        0,
+                        min(35, self.curr_episode_timesteps),
                     )
 
                 if human_feedback_gui:
@@ -596,9 +616,13 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         return RolloutReturn(
             mean_reward, num_collected_steps, num_collected_episodes, continue_training
         )
-    
+
     def apply_uniform_credit_assignment(
-        self, replay_buffer: HumanReplayBuffer, reward: float, start_iter: int, end_iter: int
+        self,
+        replay_buffer: HumanReplayBuffer,
+        reward: float,
+        start_iter: int,
+        end_iter: int,
     ):
         end_iter = (
             end_iter
@@ -608,7 +632,9 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         update_indies = (
             replay_buffer.pos - np.arange(start_iter, end_iter)
         ) % replay_buffer.buffer_size
-        replay_buffer.humanRewards[update_indies, 0] += reward / (end_iter - start_iter + 1)
+        replay_buffer.humanRewards[update_indies, 0] += reward / (
+            end_iter - start_iter + 1
+        )
 
     def _store_transition(
         self,

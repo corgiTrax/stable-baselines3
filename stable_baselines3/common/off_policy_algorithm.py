@@ -11,7 +11,11 @@ import numpy as np
 import torch as th
 
 from stable_baselines3.common.base_class import BaseAlgorithm
-from stable_baselines3.common.buffers import DictReplayBuffer, ReplayBuffer, HumanReplayBuffer
+from stable_baselines3.common.buffers import (
+    DictReplayBuffer,
+    ReplayBuffer,
+    HumanReplayBuffer,
+)
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.noise import ActionNoise

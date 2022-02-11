@@ -38,16 +38,16 @@ def get_abstract_state(curr_state_vec):
     else:
         y_state = 1
 
-
     if x_obs < -0.3:
         x_state = 0
     elif x_obs > 0.3:
         x_state = 2
     else:
         x_state = 1
-    
+
     # return x_state * 3 + y_state
     return x_state
+
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(
@@ -97,7 +97,7 @@ def main():
         seed=config_data["seed"],
         render=True,
         abstract_state=get_abstract_state,
-        experiment_save_dir=config_data["human_data_save_path"]
+        experiment_save_dir=config_data["human_data_save_path"],
     )
 
     if not config_data["load_model"]:

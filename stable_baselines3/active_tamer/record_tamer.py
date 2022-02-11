@@ -24,7 +24,7 @@ from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 class RecordTAMER(OffPolicyAlgorithm):
     """
-    TAMER + Soft Actor-Critic (SAC): Record human data as human is giiving feedback. 
+    TAMER + Soft Actor-Critic (SAC): Record human data as human is giiving feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo
@@ -112,7 +112,7 @@ class RecordTAMER(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         model_name: str = "RecordTAMER",
         render: bool = False,
-        experiment_save_dir: str = "human_study/participant_999"
+        experiment_save_dir: str = "human_study/participant_999",
     ):
 
         super(RecordTAMER, self).__init__(
@@ -424,7 +424,9 @@ class RecordTAMER(OffPolicyAlgorithm):
         callback.on_rollout_start()
         continue_training = True
         os.makedirs(self.experiment_save_dir, exist_ok=True)
-        feedback_file = open(os.path.join(self.experiment_save_dir, "feedback_file.txt"), "a")
+        feedback_file = open(
+            os.path.join(self.experiment_save_dir, "feedback_file.txt"), "a"
+        )
 
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
@@ -451,17 +453,22 @@ class RecordTAMER(OffPolicyAlgorithm):
                 # Rescale and perform action
                 if self.render:
                     from PIL import Image
-                    curr_env = env.render(mode='rgb_array')
+
+                    curr_env = env.render(mode="rgb_array")
 
                 new_obs, reward, done, infos = env.step(action)
                 next_abstract_state = self.abstract_state(new_obs)
-                feedback_file.write(f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n")
+                feedback_file.write(
+                    f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
+                )
                 curr_keyboard_feedback = None
                 human_feedback_received = False
                 if self.curr_abstract_state != next_abstract_state:
                     self.curr_abstract_state = next_abstract_state
-                    feedback_file.write(f"Abstract state changed at {str(self.num_timesteps)} to {str(self.curr_abstract_state)}\n")
-                    
+                    feedback_file.write(
+                        f"Abstract state changed at {str(self.num_timesteps)} to {str(self.curr_abstract_state)}\n"
+                    )
+
                 if human_feedback:
                     curr_keyboard_feedback = (
                         human_feedback.return_human_keyboard_feedback()
@@ -469,8 +476,15 @@ class RecordTAMER(OffPolicyAlgorithm):
 
                 if curr_keyboard_feedback and type(curr_keyboard_feedback) == int:
                     human_feedback_received = True
-                    feedback_file.write(f"Human Feedback received at {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n")
-                    Image.fromarray(curr_env).save(os.path.join(self.experiment_save_dir, str(self.num_timesteps) + "_environment.png"))
+                    feedback_file.write(
+                        f"Human Feedback received at {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                    )
+                    Image.fromarray(curr_env).save(
+                        os.path.join(
+                            self.experiment_save_dir,
+                            str(self.num_timesteps) + "_environment.png",
+                        )
+                    )
 
                 self.num_timesteps += 1
                 episode_timesteps += 1

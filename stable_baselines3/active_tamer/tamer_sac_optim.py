@@ -111,7 +111,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         model_name: str = "TamerSACOptim",
         render: bool = False,
-        q_val_threshold: float = 0.99
+        q_val_threshold: float = 0.99,
     ):
 
         super(TamerSACOptim, self).__init__(
@@ -155,7 +155,6 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self.trained_model = trained_model
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
-
 
         if _init_setup_model:
             self._setup_model()
@@ -376,7 +375,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         else:
             saved_pytorch_variables = ["ent_coef_tensor"]
         return state_dicts, saved_pytorch_variables
-    
+
     def collect_rollouts(
         self,
         env: VecEnv,
@@ -447,23 +446,38 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 # Rescale and perform action
                 if self.render:
                     env.render()
-                
+
                 teacher_action, _ = self.trained_model.predict(self._last_obs)
-                teacher_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(teacher_action).to(self.device))
-                teacher_q_val, _ = th.min(th.cat(teacher_q_val, dim=1), dim=1, keepdim=True)
+                teacher_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(teacher_action).to(self.device),
+                )
+                teacher_q_val, _ = th.min(
+                    th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
+                )
                 teacher_q_val = teacher_q_val.cpu()[0][0]
-                
-                student_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
-                student_q_val, _ = th.min(th.cat(student_q_val, dim=1), dim=1, keepdim=True)
+
+                student_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(action).to(self.device),
+                )
+                student_q_val, _ = th.min(
+                    th.cat(student_q_val, dim=1), dim=1, keepdim=True
+                )
                 student_q_val = student_q_val.cpu()[0][0]
 
                 self.logger.record("train/teacher_q_value", teacher_q_val.item())
                 self.logger.record("train/student_q_value", student_q_val.item())
-                self.logger.record("train/teacher-student_q_value", teacher_q_val.item() - student_q_val.item())
+                self.logger.record(
+                    "train/teacher-student_q_value",
+                    teacher_q_val.item() - student_q_val.item(),
+                )
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 # print(f"Teacher q val = {str(teacher_q_val)} and Student q val = {str(student_q_val)}")
                 # curr_q_threshold = 2 - self.q_val_threshold if teacher_q_val < 0 else self.q_val_threshold
-                simulated_human_reward = 1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
+                simulated_human_reward = (
+                    1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
+                )
                 # simulated_human_reward = 1 if teacher_q_val - student_q_val < self.q_val_threshold else -1
                 self.q_val_threshold += 0.000000009
                 # simulated_human_reward = teacher_q_val
@@ -499,7 +513,6 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
 
-                
                 reward[0] = simulated_human_reward if random.random() < 0.01 else 0
 
                 episode_reward += reward[0]
