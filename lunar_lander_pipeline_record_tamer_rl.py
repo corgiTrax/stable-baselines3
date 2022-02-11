@@ -116,7 +116,8 @@ def main():
         abstract_state=get_abstract_state,
         experiment_save_dir=config_data["human_data_save_path"],
         trained_model=trained_model,
-        sleep_time=0.1
+        sleep_time=config_data["sleep_time_in_seconds"],
+        assign_credit=config_data["assign_credit"]
     )
 
     if not config_data["load_model"]:

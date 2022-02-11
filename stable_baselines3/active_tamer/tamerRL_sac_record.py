@@ -117,6 +117,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         rl_threshold: float = 0,
         experiment_save_dir: str = "human_study/participant_999",
         sleep_time: int = 1,
+        assign_credit: bool = False,
     ):
 
         super(TamerRLSACRecord, self).__init__(
@@ -165,6 +166,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         self.sleep_time = sleep_time
         self.abstract_state = abstract_state
         self.curr_abstract_state = 0
+        self.assign_credit = assign_credit
 
 
         if _init_setup_model:
@@ -549,9 +551,10 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                 )
 
                 # Can only do credit assignment for reward received from the environment
-                # self.apply_uniform_credit_assignment(
-                #     replay_buffer, float(simulated_human_reward), 0, min(35, self.curr_episode_timesteps)
-                # )
+                if self.assign_credit:
+                    self.apply_uniform_credit_assignment(
+                        replay_buffer, float(curr_keyboard_feedback), 0, min(35, self.curr_episode_timesteps)
+                    )
 
                 if human_feedback_gui:
                     human_feedback_gui.updateReward(episode_reward)
@@ -594,6 +597,18 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
             mean_reward, num_collected_steps, num_collected_episodes, continue_training
         )
     
+    def apply_uniform_credit_assignment(
+        self, replay_buffer: HumanReplayBuffer, reward: float, start_iter: int, end_iter: int
+    ):
+        end_iter = (
+            end_iter
+            if (replay_buffer.full or replay_buffer.pos > end_iter)
+            else replay_buffer.pos
+        )
+        update_indies = (
+            replay_buffer.pos - np.arange(start_iter, end_iter)
+        ) % replay_buffer.buffer_size
+        replay_buffer.humanRewards[update_indies, 0] += reward / (end_iter - start_iter + 1)
 
     def _store_transition(
         self,
