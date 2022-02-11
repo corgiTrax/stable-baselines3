@@ -124,6 +124,7 @@ class FeedbackInterface(QWidget):
 
         self.loss_label = QLabel("0", self)
         self.reward_label = QLabel("0", self)
+        self.human_reward_label = QLabel("0", self)
         self.bddl_goal_state = QLabel("0", self)
         self.mouse_x = QLabel("0", self)
         self.mouse_y = QLabel("0", self)
@@ -147,6 +148,7 @@ class FeedbackInterface(QWidget):
         # call the gridlayout function
         self.loss_label.text = ""
         self.reward_label.text = ""
+        self.human_reward_label.text = 0
         # self.bddl_goal_state.text = ""
         windowLayout = QVBoxLayout()
         windowLayout.addWidget(self.horizontalGroupBox)
@@ -178,6 +180,8 @@ class FeedbackInterface(QWidget):
         layout.addWidget(self.loss_label, 1, 3)
         layout.addWidget(QPushButton("Reward: "), 1, 4)
         layout.addWidget(self.reward_label, 1, 5)
+        layout.addWidget(QPushButton("Human Reward: "), 1, 6)
+        layout.addWidget(self.human_reward_label, 1, 7)
 
         layout.addWidget(QPushButton("Random Init X: "), 2, 0)
         layout.addWidget(rand_init_x, 2, 1)
@@ -270,6 +274,9 @@ class FeedbackInterface(QWidget):
 
     def updateReward(self, reward_val):
         self.reward_label.setText("{:.5}".format(str(reward_val)))
+    
+    def updateHumanReward(self, reward_val):
+        self.human_reward_label.setText("{:.5}".format(str(reward_val)))
 
     def updateStateEstimation(self, state):
         self.state_estimation.setText("{:.5}".format(str(state)))

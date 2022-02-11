@@ -6,6 +6,7 @@ import warnings
 from abc import ABC, abstractmethod
 from functools import partial
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from git import base
 
 import gym
 import numpy as np
@@ -980,6 +981,10 @@ def get_policy_from_name(
     :param name: the policy name
     :return: the policy
     """
+    print(_policy_registry)
+    print(base_policy_type)
+    print(_policy_registry[base_policy_type])
+    print(name)
     if base_policy_type not in _policy_registry:
         raise KeyError(f"Error: the policy type {base_policy_type} is not registered!")
     if name not in _policy_registry[base_policy_type]:

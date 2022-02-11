@@ -1,14 +1,15 @@
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import random
-
+import os
+import time
 import gym
 import numpy as np
 import torch as th
 from torch.nn import functional as F
 
-from stable_baselines3.active_tamer.policies import SACPolicy
-from stable_baselines3.common.buffers import ReplayBuffer
+from stable_baselines3.active_tamer.policies import SACHPolicy
+from stable_baselines3.common.buffers import HumanReplayBuffer
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
@@ -21,7 +22,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 
-class TamerSACOptim(OffPolicyAlgorithm):
+class TamerRLSACRecord(OffPolicyAlgorithm):
     """
     TAMER + Soft Actor-Critic (SAC): Use trained SAC model to give feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
@@ -80,9 +81,10 @@ class TamerSACOptim(OffPolicyAlgorithm):
 
     def __init__(
         self,
-        policy: Union[str, Type[SACPolicy]],
+        policy: Union[str, Type[SACHPolicy]],
         env: Union[GymEnv, str],
         trained_model,
+        abstract_state,
         learning_rate: Union[float, Schedule] = 3e-4,
         buffer_size: int = 1_000_000,  # 1e6
         learning_starts: int = 5,
@@ -92,7 +94,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         train_freq: Union[int, Tuple[int, str]] = 1,
         gradient_steps: int = 1,
         action_noise: Optional[ActionNoise] = None,
-        replay_buffer_class: Optional[ReplayBuffer] = None,
+        replay_buffer_class: Optional[HumanReplayBuffer] = HumanReplayBuffer,
         replay_buffer_kwargs: Optional[Dict[str, Any]] = None,
         optimize_memory_usage: bool = False,
         ent_coef: Union[str, float] = "auto",
@@ -109,15 +111,18 @@ class TamerSACOptim(OffPolicyAlgorithm):
         device: Union[th.device, str] = "auto",
         save_every: int = 2500,
         _init_setup_model: bool = True,
-        model_name: str = "TamerSACOptim",
+        model_name: str = "TamerRLSACRecord",
         render: bool = False,
-        q_val_threshold: float = 0.99
+        q_val_threshold: float = 0.99,
+        rl_threshold: float = 0,
+        experiment_save_dir: str = "human_study/participant_999",
+        sleep_time: int = 1,
     ):
 
-        super(TamerSACOptim, self).__init__(
+        super(TamerRLSACRecord, self).__init__(
             policy,
             env,
-            SACPolicy,
+            SACHPolicy,
             learning_rate,
             buffer_size,
             learning_starts,
@@ -155,13 +160,18 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self.trained_model = trained_model
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
+        self.rl_threshold = rl_threshold
+        self.experiment_save_dir = experiment_save_dir
+        self.sleep_time = sleep_time
+        self.abstract_state = abstract_state
+        self.curr_abstract_state = 0
 
 
         if _init_setup_model:
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(TamerSACOptim, self)._setup_model()
+        super(TamerRLSACRecord, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -204,6 +214,8 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self.actor = self.policy.actor
         self.critic = self.policy.critic
         self.critic_target = self.policy.critic_target
+        self.human_critic = self.policy.human_critic
+        self.human_critic_target = self.policy.human_critic_target
 
     def train(
         self,
@@ -214,7 +226,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizers learning rate
-        optimizers = [self.actor.optimizer, self.critic.optimizer]
+        optimizers = [self.actor.optimizer, self.critic.optimizer, self.human_critic.optimizer]
         if self.ent_coef_optimizer is not None:
             optimizers += [self.ent_coef_optimizer]
 
@@ -222,7 +234,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self._update_learning_rate(optimizers)
 
         ent_coef_losses, ent_coefs = [], []
-        actor_losses, critic_losses = [], []
+        actor_losses, critic_losses, human_critic_losses = [], [], []
 
         for gradient_step in range(gradient_steps):
             # Sample replay buffer
@@ -276,8 +288,13 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 # td error + entropy term
                 target_q_values = (
                     replay_data.rewards
-                    # + (1 - replay_data.dones) * self.gamma * next_q_values
+                    + (1 - replay_data.dones) * self.gamma * next_q_values
                 )
+
+                target_human_q_values = (
+                    replay_data.humanRewards
+                )
+
 
             # Get current Q-values estimates for each critic network
             # using action from the replay buffer
@@ -299,12 +316,39 @@ class TamerSACOptim(OffPolicyAlgorithm):
             critic_loss.backward()
             self.critic.optimizer.step()
 
+            # Get current Q-values estimates for human critic network
+            # using action from the replay buffer
+            current_human_q_values = self.human_critic(
+                replay_data.observations, replay_data.actions
+            )
+
+            # Compute critic loss
+            human_critic_loss = 0.5 * sum(
+                [
+                    F.mse_loss(current_q, target_human_q_values)
+                    for current_q in current_human_q_values
+                ]
+            )
+            human_critic_losses.append(human_critic_loss.item())
+
+            # Optimize the critic
+            self.human_critic.optimizer.zero_grad()
+            human_critic_loss.backward()
+            self.human_critic.optimizer.step()
+
             # Compute actor loss
             # Alternative: actor_loss = th.mean(log_prob - qf1_pi)
             # Mean over all critic networks
-            q_values_pi = th.cat(
+            q_values_pi_critic = th.cat(
                 self.critic.forward(replay_data.observations, actions_pi), dim=1
             )
+
+            q_values_pi_human = th.cat (
+                self.human_critic.forward(replay_data.observations, actions_pi), dim=1
+            )
+
+            q_values_pi = self.rl_threshold * q_values_pi_critic + (1 - self.rl_threshold) * q_values_pi_human
+
             min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
             actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
             actor_losses.append(actor_loss.item())
@@ -322,6 +366,10 @@ class TamerSACOptim(OffPolicyAlgorithm):
                 polyak_update(
                     self.critic.parameters(), self.critic_target.parameters(), self.tau
                 )
+                polyak_update(
+                    self.human_critic.parameters(), self.human_critic_target
+                    .parameters(), self.tau
+                )
 
         self._n_updates += gradient_steps
 
@@ -329,6 +377,8 @@ class TamerSACOptim(OffPolicyAlgorithm):
         self.logger.record("train/ent_coef", np.mean(ent_coefs))
         self.logger.record("train/actor_loss", np.mean(actor_losses))
         self.logger.record("train/critic_loss", np.mean(critic_losses))
+        self.logger.record("train/human_critic_loss", np.mean(human_critic_losses))
+        self.logger.record("train/rl_threshold", self.rl_threshold)
         if len(ent_coef_losses) > 0:
             self.logger.record("train/ent_coef_loss", np.mean(ent_coef_losses))
 
@@ -342,12 +392,12 @@ class TamerSACOptim(OffPolicyAlgorithm):
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
-        tb_log_name: str = "TamerSACOptim",
+        tb_log_name: str = "TamerRLSACRecord",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
 
-        return super(TamerSACOptim, self).learn(
+        return super(TamerRLSACRecord, self).learn(
             total_timesteps=total_timesteps,
             human_feedback_gui=human_feedback_gui,
             human_feedback=human_feedback,
@@ -362,10 +412,12 @@ class TamerSACOptim(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(TamerSACOptim, self)._excluded_save_params() + [
+        return super(TamerRLSACRecord, self)._excluded_save_params() + [
             "actor",
             "critic",
             "critic_target",
+            "human_critic",
+            "human_critic_target"
         ]
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
@@ -382,7 +434,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
         env: VecEnv,
         callback: BaseCallback,
         train_freq: TrainFreq,
-        replay_buffer: ReplayBuffer,
+        replay_buffer: HumanReplayBuffer,
         action_noise: Optional[ActionNoise] = None,
         learning_starts: int = 0,
         log_interval: Optional[int] = None,
@@ -423,6 +475,9 @@ class TamerSACOptim(OffPolicyAlgorithm):
 
         callback.on_rollout_start()
         continue_training = True
+        os.makedirs(self.experiment_save_dir, exist_ok=True)
+        feedback_file = open(os.path.join(self.experiment_save_dir, "feedback_file.txt"), "a")
+
 
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
@@ -444,46 +499,34 @@ class TamerSACOptim(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
-                # Rescale and perform action
+                # Rescale and perform action 
                 if self.render:
                     env.render()
                 
-                teacher_action, _ = self.trained_model.predict(self._last_obs)
-                teacher_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(teacher_action).to(self.device))
-                teacher_q_val, _ = th.min(th.cat(teacher_q_val, dim=1), dim=1, keepdim=True)
-                teacher_q_val = teacher_q_val.cpu()[0][0]
-                
-                student_q_val = self.trained_model.critic.forward(th.from_numpy(self._last_obs).to(self.device), th.from_numpy(action).to(self.device))
-                student_q_val, _ = th.min(th.cat(student_q_val, dim=1), dim=1, keepdim=True)
-                student_q_val = student_q_val.cpu()[0][0]
-
-                self.logger.record("train/teacher_q_value", teacher_q_val.item())
-                self.logger.record("train/student_q_value", student_q_val.item())
-                self.logger.record("train/teacher-student_q_value", teacher_q_val.item() - student_q_val.item())
-                self.logger.record("train/q_value_threshold", self.q_val_threshold)
-                # print(f"Teacher q val = {str(teacher_q_val)} and Student q val = {str(student_q_val)}")
-                # curr_q_threshold = 2 - self.q_val_threshold if teacher_q_val < 0 else self.q_val_threshold
-                simulated_human_reward = 1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
-                # simulated_human_reward = 1 if teacher_q_val - student_q_val < self.q_val_threshold else -1
-                self.q_val_threshold += 0.000000009
-                # simulated_human_reward = teacher_q_val
-                # self.q_val_threshold = max(self.q_val_threshold, 0.045)
                 new_obs, reward, done, infos = env.step(action)
-
-                # curr_keyboard_feedback = None
-                # if human_feedback:
-                #     curr_keyboard_feedback = (
-                #         human_feedback.return_human_keyboard_feedback()
-                #     )
-
-                # human_feedback_received = (
-                #     curr_keyboard_feedback and type(curr_keyboard_feedback) == int
-                # )
 
                 self.num_timesteps += 1
                 episode_timesteps += 1
                 num_collected_steps += 1
                 self.curr_episode_timesteps += 1
+                feedback_file.write(f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n")
+
+                next_abstract_state = self.abstract_state(new_obs)
+                if self.curr_abstract_state != next_abstract_state:
+                    self.curr_abstract_state = next_abstract_state
+                    feedback_file.write(f"Abstract state changed at {str(self.num_timesteps)} to {str(self.curr_abstract_state)}\n")
+                
+                time.sleep(self.sleep_time)
+                curr_keyboard_feedback = None
+                if human_feedback:
+                    curr_keyboard_feedback = (
+                        human_feedback.return_human_keyboard_feedback()
+                    )
+
+                if curr_keyboard_feedback and type(curr_keyboard_feedback) == int:
+                    feedback_file.write(f"Human Feedback received at {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n")
+                else:
+                    curr_keyboard_feedback = 0
 
                 # Give access to local variables
                 callback.update_locals(locals())
@@ -498,22 +541,21 @@ class TamerSACOptim(OffPolicyAlgorithm):
 
                 # Retrieve reward and episode length if using Monitor wrapper
                 self._update_info_buffer(infos, done)
-
-                
-                reward[0] = simulated_human_reward if random.random() < 0.01 else 0
-
                 episode_reward += reward[0]
 
                 # Store data in replay buffer (normalized action and unnormalized observation)
                 self._store_transition(
-                    replay_buffer, buffer_action, new_obs, reward, done, infos
+                    replay_buffer, buffer_action, new_obs, reward, curr_keyboard_feedback, done, infos
                 )
+
+                # Can only do credit assignment for reward received from the environment
                 # self.apply_uniform_credit_assignment(
                 #     replay_buffer, float(simulated_human_reward), 0, min(35, self.curr_episode_timesteps)
                 # )
 
                 if human_feedback_gui:
                     human_feedback_gui.updateReward(episode_reward)
+                    human_feedback_gui.updateHumanReward(curr_keyboard_feedback)
 
                 self._update_current_progress_remaining(
                     self.num_timesteps, self._total_timesteps
@@ -551,3 +593,61 @@ class TamerSACOptim(OffPolicyAlgorithm):
         return RolloutReturn(
             mean_reward, num_collected_steps, num_collected_episodes, continue_training
         )
+    
+
+    def _store_transition(
+        self,
+        replay_buffer: HumanReplayBuffer,
+        buffer_action: np.ndarray,
+        new_obs: np.ndarray,
+        reward: np.ndarray,
+        human_reward: np.ndarray,
+        done: np.ndarray,
+        infos: List[Dict[str, Any]],
+    ) -> None:
+        """
+        Store transition in the replay buffer.
+        We store the normalized action and the unnormalized observation.
+        It also handles terminal observations (because VecEnv resets automatically).
+
+        :param replay_buffer: Replay buffer object where to store the transition.
+        :param buffer_action: normalized action
+        :param new_obs: next observation in the current episode
+            or first observation of the episode (when done is True)
+        :param reward: reward for the current transition
+        :param done: Termination signal
+        :param infos: List of additional information about the transition.
+            It may contain the terminal observations and information about timeout.
+        """
+        # Store only the unnormalized version
+        if self._vec_normalize_env is not None:
+            new_obs_ = self._vec_normalize_env.get_original_obs()
+            reward_ = self._vec_normalize_env.get_original_reward()
+        else:
+            # Avoid changing the original ones
+            self._last_original_obs, new_obs_, reward_ = self._last_obs, new_obs, reward
+
+        # As the VecEnv resets automatically, new_obs is already the
+        # first observation of the next episode
+        if done and infos[0].get("terminal_observation") is not None:
+            next_obs = infos[0]["terminal_observation"]
+            # VecNormalize normalizes the terminal observation
+            if self._vec_normalize_env is not None:
+                next_obs = self._vec_normalize_env.unnormalize_obs(next_obs)
+        else:
+            next_obs = new_obs_
+
+        replay_buffer.add(
+            self._last_original_obs,
+            next_obs,
+            buffer_action,
+            reward_,
+            human_reward,
+            done,
+            infos,
+        )
+
+        self._last_obs = new_obs
+        # Save the unnormalized observation
+        if self._vec_normalize_env is not None:
+            self._last_original_obs = new_obs_
