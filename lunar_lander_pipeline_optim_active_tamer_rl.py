@@ -17,13 +17,12 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.tamerRL_sac_record import TamerRLSACRecord
+from stable_baselines3.active_tamer.active_tamerRL_sac_optim import ActiveTamerRLSACOptim
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.sac.sac import SAC
-
 
 def get_abstract_state(curr_state_vec):
     # print(str(float(curr_state_vec[0][0])) + " " + str(float(curr_state_vec[0][1])))
@@ -48,7 +47,6 @@ def get_abstract_state(curr_state_vec):
 
     return x_state * 3 + y_state
 
-
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(
         config_data["steps"],
@@ -56,28 +54,29 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
         human_feedback=human_feedback,
     )
     mean_reward, std_reward = evaluate_policy(
-        model, env, n_eval_episodes=20, render=False
+        model, env, n_eval_episodes=20, render=True
     )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
 def main():
-    with open("configs/tamer_sac_record.yaml", "r") as f:
+    with open("configs/active_tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
     env = gym.make("LunarLanderContinuous-v2")
 
-    human_feedback = HumanFeedback()
-    app = QApplication(sys.argv)
-    feedback_gui = FeedbackInterface()
+    # human_feedback = HumanFeedback()
+    # app = QApplication(sys.argv)
+    # feedback_gui = FeedbackInterface()
     # feedback_gui = None
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        features_extractor_class=LunarLanderExtractor,
+        # features_extractor_class=LunarLanderExtractor,
         net_arch=[400, 300],
     )
+    os.makedirs(tensorboard_log_dir, exist_ok=True)
 
     newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
     kwargs = dict(seed=0)
@@ -94,9 +93,7 @@ def main():
         config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
     )
 
-    os.makedirs(tensorboard_log_dir, exist_ok=True)
-
-    model = TamerRLSACRecord(
+    model = ActiveTamerRLSACOptim(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -112,26 +109,34 @@ def main():
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
-        render=True,
-        abstract_state=get_abstract_state,
-        experiment_save_dir=config_data["human_data_save_path"],
+        render=False,
         trained_model=trained_model,
-        sleep_time=config_data["sleep_time_in_seconds"],
-        assign_credit=config_data["assign_credit"],
+        abstract_state=get_abstract_state,
     )
 
+    print(f"Model Policy = " + str(model.policy))
+
     if not config_data["load_model"]:
-        thread.Thread(
-            target=train_model,
-            args=[model, config_data, feedback_gui, human_feedback, env],
-            name="train_model",
-            daemon=True,
-        ).start()
-        sys.exit(app.exec_())
+        # thread.Thread(
+        #     target=train_model,
+        #     args=[model, config_data, feedback_gui, human_feedback, env],
+        #     name="train_model",
+        #     daemon=True,
+        # ).start()
+        # sys.exit(app.exec_())
+        model.learn(
+            config_data["steps"],
+            # human_feedback_gui=feedback_gui,
+            # human_feedback=human_feedback,
+        )
+        mean_reward, std_reward = evaluate_policy(
+            model, env, n_eval_episodes=20, render=False
+        )
+        print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
     else:
         del model
         model_num = config_data["load_model"]
-        model = TamerRLSACRecord.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = ActiveTamerRLSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
         print("Loaded pretrained model")
 
 
