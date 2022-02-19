@@ -17,9 +17,7 @@ from stable_baselines3.common.buffers import (
     HumanReplayBuffer,
 )
 from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.noise import ActionNoise
-from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.policies import BasePolicy
 from stable_baselines3.common.save_util import load_from_pkl, save_to_pkl
 from stable_baselines3.common.type_aliases import (
@@ -368,8 +366,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         tb_log_name: str = "run",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
-        human_feedback_gui: FeedbackInterface = None,
-        human_feedback: HumanFeedback = None,
+        human_feedback_gui = None,
+        human_feedback = None,
     ) -> "OffPolicyAlgorithm":
 
         total_timesteps, callback = self._setup_learn(
