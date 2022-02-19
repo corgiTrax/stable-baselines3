@@ -32,7 +32,6 @@ keys/
 .idea
 
 logs/
-log_dir/
 models/
 
 .ipynb_checkpoints
