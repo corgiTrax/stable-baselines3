@@ -600,8 +600,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         action_noise: Optional[ActionNoise] = None,
         learning_starts: int = 0,
         log_interval: Optional[int] = None,
-        human_feedback: HumanFeedback = None,
-        human_feedback_gui: FeedbackInterface = None,
+        human_feedback = None,
+        human_feedback_gui = None,
     ) -> RolloutReturn:
         """
         Collect experiences and store them into a ``ReplayBuffer``.
