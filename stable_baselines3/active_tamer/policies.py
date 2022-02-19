@@ -1,10 +1,10 @@
-from atexit import register
 import warnings
+from atexit import register
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import gym
-from matplotlib import use
 import torch as th
+from matplotlib import use
 from torch import nn
 
 from stable_baselines3.common.distributions import (
@@ -14,8 +14,8 @@ from stable_baselines3.common.distributions import (
 from stable_baselines3.common.policies import (
     BasePolicy,
     ContinuousCritic,
+    StatePredictor,
     register_policy,
-    StatePredictor
 )
 from stable_baselines3.common.preprocessing import get_action_dim
 from stable_baselines3.common.torch_layers import (
@@ -659,6 +659,7 @@ class SACHPolicy(BasePolicy):
 
 HumanMlpPolicy = SACHPolicy
 
+
 class ActiveSACHPolicy(BasePolicy):
     """
     Policy class (with both actor and critic) for SAC.
@@ -897,14 +898,14 @@ class ActiveSACHPolicy(BasePolicy):
             self.critic_kwargs, features_extractor
         )
         return ContinuousCritic(**critic_kwargs).to(self.device)
-    
+
     def make_state_predictor(
-            self, features_extractor: Optional[BaseFeaturesExtractor] = None
-        ) -> StatePredictor:
-            state_predictor_kwargs = self._update_features_extractor(
-                self.state_predictor_kwargs, features_extractor
-            )
-            return StatePredictor(**state_predictor_kwargs).to(self.device)
+        self, features_extractor: Optional[BaseFeaturesExtractor] = None
+    ) -> StatePredictor:
+        state_predictor_kwargs = self._update_features_extractor(
+            self.state_predictor_kwargs, features_extractor
+        )
+        return StatePredictor(**state_predictor_kwargs).to(self.device)
 
     def forward(self, obs: th.Tensor, deterministic: bool = False) -> th.Tensor:
         return self._predict(obs, deterministic=deterministic)
@@ -994,7 +995,7 @@ class ActiveSACHPolicy(BasePolicy):
     #             for name, param in self.state_predictor.named_parameters()
     #             if "features_extractor" not in name
     #         ]
-            
+
     #     else:
     #         # Create a separate features extractor for the critic
     #         # this requires more memory and computation

@@ -1,6 +1,6 @@
 import sys
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import time
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import gym
 import numpy as np
@@ -9,16 +9,20 @@ from torch.nn import functional as F
 
 from stable_baselines3.active_tamer.policies import SACPolicy
 from stable_baselines3.common.buffers import ReplayBuffer
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
-from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from stable_baselines3.common.utils import polyak_update
-from stable_baselines3.common.utils import should_collect_more_steps
+from stable_baselines3.common.type_aliases import (
+    GymEnv,
+    MaybeCallback,
+    RolloutReturn,
+    Schedule,
+    TrainFreq,
+)
+from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
 from stable_baselines3.common.vec_env import VecEnv
-from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 
 class ProbeTamer(OffPolicyAlgorithm):

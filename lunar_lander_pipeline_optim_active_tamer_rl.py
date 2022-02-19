@@ -17,12 +17,13 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.active_tamerRL_sac_optim import ActiveTamerRLSACOptim
+from stable_baselines3.active_tamer.active_tamerRL_sac_optim import (
+    ActiveTamerRLSACOptim,
+)
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common.human_feedback import HumanFeedback
-from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.sac.sac import SAC
+
 
 def get_abstract_state(curr_state_vec):
     # print(str(float(curr_state_vec[0][0])) + " " + str(float(curr_state_vec[0][1])))
@@ -46,6 +47,7 @@ def get_abstract_state(curr_state_vec):
         x_state = 1
 
     return x_state * 3 + y_state
+
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(

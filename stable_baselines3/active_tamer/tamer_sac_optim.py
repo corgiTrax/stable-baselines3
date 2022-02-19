@@ -1,6 +1,6 @@
+import random
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-import random
 
 import gym
 import numpy as np
@@ -9,16 +9,18 @@ from torch.nn import functional as F
 
 from stable_baselines3.active_tamer.policies import SACPolicy
 from stable_baselines3.common.buffers import ReplayBuffer
-from stable_baselines3.common.human_feedback import HumanFeedback
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
-from stable_baselines3.common.online_learning_interface import FeedbackInterface
-from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from stable_baselines3.common.utils import polyak_update
-from stable_baselines3.common.utils import should_collect_more_steps
+from stable_baselines3.common.type_aliases import (
+    GymEnv,
+    MaybeCallback,
+    RolloutReturn,
+    Schedule,
+    TrainFreq,
+)
+from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
 from stable_baselines3.common.vec_env import VecEnv
-from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 
 class TamerSACOptim(OffPolicyAlgorithm):
@@ -207,7 +209,7 @@ class TamerSACOptim(OffPolicyAlgorithm):
     def train(
         self,
         gradient_steps: int,
-        human_feedback_gui: HumanFeedback = None,
+        human_feedback_gui=None,
         batch_size: int = 64,
     ) -> None:
         # Switch to train mode (this affects batch norm / dropout)
@@ -334,8 +336,8 @@ class TamerSACOptim(OffPolicyAlgorithm):
     def learn(
         self,
         total_timesteps: int,
-        human_feedback_gui: FeedbackInterface = None,
-        human_feedback: HumanFeedback = None,
+        human_feedback_gui=None,
+        human_feedback=None,
         callback: MaybeCallback = None,
         log_interval: int = 4,
         eval_env: Optional[GymEnv] = None,
@@ -385,8 +387,8 @@ class TamerSACOptim(OffPolicyAlgorithm):
         action_noise: Optional[ActionNoise] = None,
         learning_starts: int = 0,
         log_interval: Optional[int] = None,
-        human_feedback: HumanFeedback = None,
-        human_feedback_gui: FeedbackInterface = None,
+        human_feedback=None,
+        human_feedback_gui=None,
     ) -> RolloutReturn:
         """
         Collect experiences and store them into a ``ReplayBuffer``.

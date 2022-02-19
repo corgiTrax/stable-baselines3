@@ -19,8 +19,6 @@ from PyQt5.QtWidgets import *
 
 from stable_baselines3.active_tamer.tamerRL_sac_optim import TamerRLSACOptim
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common.human_feedback import HumanFeedback
-from stable_baselines3.common.online_learning_interface import FeedbackInterface
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.sac.sac import SAC
 

@@ -6,11 +6,11 @@ import warnings
 from abc import ABC, abstractmethod
 from functools import partial
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-from git import base
 
 import gym
 import numpy as np
 import torch as th
+from git import base
 from torch import nn
 
 from stable_baselines3.common.distributions import (
@@ -1045,7 +1045,7 @@ def register_policy(name: str, policy: Type[BasePolicy]) -> None:
 
 class StatePredictor(BaseModel):
     """
-    Predict the next state for an environment given current state, 
+    Predict the next state for an environment given current state,
     shared encoder, and current action.
 
     :param observation_space: Obervation space
@@ -1084,7 +1084,9 @@ class StatePredictor(BaseModel):
         observation_dim = int(np.prod(get_obs_shape(self.observation_space)))
 
         self.share_features_extractor = share_features_extractor
-        predictor = create_mlp(features_dim + action_dim, observation_dim, net_arch, activation_fn)
+        predictor = create_mlp(
+            features_dim + action_dim, observation_dim, net_arch, activation_fn
+        )
         self.predict_state = nn.Sequential(*predictor)
 
     def forward(self, obs: th.Tensor, actions: th.Tensor) -> Tuple[th.Tensor, ...]:

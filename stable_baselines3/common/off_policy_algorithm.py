@@ -13,8 +13,8 @@ import torch as th
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.buffers import (
     DictReplayBuffer,
-    ReplayBuffer,
     HumanReplayBuffer,
+    ReplayBuffer,
 )
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.noise import ActionNoise
@@ -366,8 +366,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         tb_log_name: str = "run",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
-        human_feedback_gui = None,
-        human_feedback = None,
+        human_feedback_gui=None,
+        human_feedback=None,
     ) -> "OffPolicyAlgorithm":
 
         total_timesteps, callback = self._setup_learn(
@@ -600,8 +600,8 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         action_noise: Optional[ActionNoise] = None,
         learning_starts: int = 0,
         log_interval: Optional[int] = None,
-        human_feedback = None,
-        human_feedback_gui = None,
+        human_feedback=None,
+        human_feedback_gui=None,
     ) -> RolloutReturn:
         """
         Collect experiences and store them into a ``ReplayBuffer``.

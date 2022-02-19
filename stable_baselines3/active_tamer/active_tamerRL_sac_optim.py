@@ -1,23 +1,27 @@
+import random
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-import random
-from git import Object
 
 import gym
 import numpy as np
 import torch as th
+from git import Object
 from torch.nn import functional as F
 
 from stable_baselines3.active_tamer.policies import ActiveSACHPolicy
 from stable_baselines3.common.buffers import HumanReplayBuffer
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
-from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from stable_baselines3.common.utils import polyak_update
-from stable_baselines3.common.utils import should_collect_more_steps
+from stable_baselines3.common.type_aliases import (
+    GymEnv,
+    MaybeCallback,
+    RolloutReturn,
+    Schedule,
+    TrainFreq,
+)
+from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
 from stable_baselines3.common.vec_env import VecEnv
-from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 
 
 class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
@@ -113,7 +117,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         q_val_threshold: float = 0.99,
         rl_threshold: float = 0,
         abstract_state: Object = None,
-        prediction_threshold: float = 0.012
+        prediction_threshold: float = 0.012,
     ):
 
         super(ActiveTamerRLSACOptim, self).__init__(
@@ -217,7 +221,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
     def train(
         self,
         gradient_steps: int,
-        human_feedback_gui = None,
+        human_feedback_gui=None,
         batch_size: int = 64,
     ) -> None:
         # Switch to train mode (this affects batch norm / dropout)
@@ -235,7 +239,12 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         self._update_learning_rate(optimizers)
 
         ent_coef_losses, ent_coefs = [], []
-        actor_losses, critic_losses, human_critic_losses, state_prediction_losses = [], [], [], []
+        actor_losses, critic_losses, human_critic_losses, state_prediction_losses = (
+            [],
+            [],
+            [],
+            [],
+        )
 
         for gradient_step in range(gradient_steps):
             # Sample replay buffer
@@ -362,8 +371,12 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
             actor_loss.backward()
             self.actor.optimizer.step()
 
-            predicted_states = self.state_predictor.forward(replay_data.observations, actions_pi.detach())
-            state_prediction_loss = F.mse_loss(predicted_states, replay_data.next_observations)
+            predicted_states = self.state_predictor.forward(
+                replay_data.observations, actions_pi.detach()
+            )
+            state_prediction_loss = F.mse_loss(
+                predicted_states, replay_data.next_observations
+            )
             self.state_predictor.optimizer.zero_grad()
             state_prediction_loss.backward()
             self.state_predictor.optimizer.step()
@@ -386,7 +399,9 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         self.logger.record("train/ent_coef", np.mean(ent_coefs))
         self.logger.record("train/actor_loss", np.mean(actor_losses))
         self.logger.record("train/critic_loss", np.mean(critic_losses))
-        self.logger.record("train/state_prediction_loss", np.mean(state_prediction_losses))
+        self.logger.record(
+            "train/state_prediction_loss", np.mean(state_prediction_losses)
+        )
         self.logger.record("train/human_critic_loss", np.mean(human_critic_losses))
         self.logger.record("train/rl_threshold", self.rl_threshold)
         if len(ent_coef_losses) > 0:
@@ -395,8 +410,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
     def learn(
         self,
         total_timesteps: int,
-        human_feedback_gui = None,
-        human_feedback = None,
+        human_feedback_gui=None,
+        human_feedback=None,
         callback: MaybeCallback = None,
         log_interval: int = 4,
         eval_env: Optional[GymEnv] = None,
@@ -448,8 +463,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         action_noise: Optional[ActionNoise] = None,
         learning_starts: int = 0,
         log_interval: Optional[int] = None,
-        human_feedback = None,
-        human_feedback_gui = None,
+        human_feedback=None,
+        human_feedback_gui=None,
     ) -> RolloutReturn:
         """
         Collect experiences and store them into a ``ReplayBuffer``.
@@ -540,13 +555,25 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 new_obs, reward, done, infos = env.step(action)
                 next_abstract_state = self.get_abstract_state(prev_obs)
                 simulated_human_reward = 0
-                state_prediction_err = F.mse_loss(self.state_predictor(th.from_numpy(prev_obs).to(self.device).reshape(1, -1), th.from_numpy(action).to(self.device).reshape(1, -1)), 
-                                        th.from_numpy(new_obs).to(self.device).reshape(1, -1))
-                if next_abstract_state != self.curr_abstract_state or state_prediction_err > self.prediction_threshold:
-                    simulated_human_reward = 1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
+                state_prediction_err = F.mse_loss(
+                    self.state_predictor(
+                        th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
+                        th.from_numpy(action).to(self.device).reshape(1, -1),
+                    ),
+                    th.from_numpy(new_obs).to(self.device).reshape(1, -1),
+                )
+                if (
+                    next_abstract_state != self.curr_abstract_state
+                    or state_prediction_err > self.prediction_threshold
+                ):
+                    simulated_human_reward = (
+                        1
+                        if self.q_val_threshold * teacher_q_val < student_q_val
+                        else -1
+                    )
                     self.total_feedback += 1
                     self.curr_abstract_state = next_abstract_state
-                
+
                 self.q_val_threshold += 0.00000001
                 self.rl_threshold += 1 / 500000
                 self.num_timesteps += 1
@@ -554,7 +581,10 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 num_collected_steps += 1
                 self.curr_episode_timesteps += 1
 
-                self.logger.record("train/feedback_percentage", self.total_feedback / self.num_timesteps)
+                self.logger.record(
+                    "train/feedback_percentage",
+                    self.total_feedback / self.num_timesteps,
+                )
                 # Give access to local variables
                 callback.update_locals(locals())
                 # Only stop training if return value is False, not when it is None.

@@ -10,9 +10,9 @@ from stable_baselines3.common.preprocessing import get_action_dim, get_obs_shape
 from stable_baselines3.common.type_aliases import (
     DictReplayBufferSamples,
     DictRolloutBufferSamples,
+    HumanReplayBufferSamples,
     ReplayBufferSamples,
     RolloutBufferSamples,
-    HumanReplayBufferSamples,
 )
 from stable_baselines3.common.vec_env import VecNormalize
 
