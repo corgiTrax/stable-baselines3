@@ -115,7 +115,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         model_name: str = "ActiveTamerRLSACOptim",
         render: bool = False,
         q_val_threshold: float = 0.99,
-        rl_threshold: float = 0,
+        rl_threshold: float = 0.1,
         abstract_state: Object = None,
         prediction_threshold: float = 0.012,
     ):
@@ -575,7 +575,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     self.curr_abstract_state = next_abstract_state
 
                 self.q_val_threshold += 0.00000001
-                self.rl_threshold += 1 / 500000
+                # self.rl_threshold += 1 / 500000
                 self.num_timesteps += 1
                 episode_timesteps += 1
                 num_collected_steps += 1
