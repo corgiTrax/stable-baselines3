@@ -26,7 +26,6 @@ from stable_baselines3.sac.sac import SAC
 
 
 def get_abstract_state(curr_state_vec):
-    # print(str(float(curr_state_vec[0][0])) + " " + str(float(curr_state_vec[0][1])))
     y_state = -1
     y_obs = float(curr_state_vec[0][1])
     x_state = -1
@@ -71,7 +70,6 @@ def main():
     human_feedback = HumanFeedback()
     app = QApplication(sys.argv)
     feedback_gui = FeedbackInterface()
-    # feedback_gui = None
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(

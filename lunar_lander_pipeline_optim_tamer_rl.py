@@ -42,14 +42,9 @@ def main():
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
     env = gym.make("LunarLanderContinuous-v2")
 
-    # human_feedback = HumanFeedback()
-    # app = QApplication(sys.argv)
-    # feedback_gui = FeedbackInterface()
-    # feedback_gui = None
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        # features_extractor_class=LunarLanderExtractor,
         net_arch=[400, 300],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
