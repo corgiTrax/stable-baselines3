@@ -92,17 +92,8 @@ def main():
     print(f"Model Policy = " + str(model.policy))
 
     if not config_data["load_model"]:
-        # thread.Thread(
-        #     target=train_model,
-        #     args=[model, config_data, feedback_gui, human_feedback, env],
-        #     name="train_model",
-        #     daemon=True,
-        # ).start()
-        # sys.exit(app.exec_())
         model.learn(
             config_data["steps"],
-            # human_feedback_gui=feedback_gui,
-            # human_feedback=human_feedback,
         )
         mean_reward, std_reward = evaluate_policy(
             model, env, n_eval_episodes=20, render=False
