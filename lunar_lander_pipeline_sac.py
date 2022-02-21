@@ -17,10 +17,21 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.tamer_sac import TamerSAC
+from stable_baselines3.active_tamer.sac import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
-from stable_baselines3.sac.sac import SAC
+
+
+def train_model(model, config_data, feedback_gui, human_feedback, env):
+    model.learn(
+        config_data["steps"],
+        human_feedback_gui=feedback_gui,
+        human_feedback=human_feedback,
+    )
+    mean_reward, std_reward = evaluate_policy(
+        model, env, n_eval_episodes=20, render=True
+    )
+    print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
 def main():
@@ -33,9 +44,12 @@ def main():
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        features_extractor_class=LunarLanderExtractor,
+        net_arch=[400, 300],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
+
+    kwargs = dict(seed=0)
+    kwargs.update(dict(buffer_size=1))
 
     model = SAC(
         config_data["policy_name"],
@@ -43,6 +57,7 @@ def main():
         verbose=config_data["verbose"],
         tensorboard_log=tensorboard_log_dir,
         policy_kwargs=policy_kwargs,
+        save_every=config_data["save_every_steps"],
         learning_rate=config_data["learning_rate"],
         buffer_size=config_data["buffer_size"],
         learning_starts=config_data["learning_starts"],
@@ -52,20 +67,24 @@ def main():
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
+        render=False,
     )
 
+    print(f"Model Policy = " + str(model.policy))
+
     if not config_data["load_model"]:
-        model.learn(config_data["steps"])
+        model.learn(
+            config_data["steps"],
+        )
+        mean_reward, std_reward = evaluate_policy(
+            model, env, n_eval_episodes=20, render=False
+        )
+        print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
     else:
         del model
         model_num = config_data["load_model"]
-        model = SAC.load(f"models/TamerSAC_{model_num}.pt", env=env)
-        print("Pretrained model loaded.")
-
-    mean_reward, std_reward = evaluate_policy(
-        model, env, n_eval_episodes=20, render=False
-    )
-    print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
+        model = SAC.load(f"models/SAC_{model_num}.pt", env=env)
+        print("Loaded pretrained model")
 
 
 if __name__ == "__main__":

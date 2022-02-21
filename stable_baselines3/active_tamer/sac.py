@@ -1,3 +1,5 @@
+import random
+import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import gym
@@ -5,17 +7,25 @@ import numpy as np
 import torch as th
 from torch.nn import functional as F
 
+from stable_baselines3.active_tamer.policies import SACPolicy
 from stable_baselines3.common.buffers import ReplayBuffer
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
-from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from stable_baselines3.common.utils import polyak_update
-from stable_baselines3.sac.policies import SACPolicy
+from stable_baselines3.common.type_aliases import (
+    GymEnv,
+    MaybeCallback,
+    RolloutReturn,
+    Schedule,
+    TrainFreq,
+)
+from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
+from stable_baselines3.common.vec_env import VecEnv
 
 
 class SAC(OffPolicyAlgorithm):
     """
-    Soft Actor-Critic (SAC)
+    TAMER + Soft Actor-Critic (SAC): Use trained SAC model to give feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo
@@ -23,10 +33,8 @@ class SAC(OffPolicyAlgorithm):
     and from Stable Baselines (https://github.com/hill-a/stable-baselines)
     Paper: https://arxiv.org/abs/1801.01290
     Introduction to SAC: https://spinningup.openai.com/en/latest/algorithms/sac.html
-
     Note: we use double q target and not value target as discussed
     in https://github.com/hill-a/stable-baselines/issues/270
-
     :param policy: The policy model to use (MlpPolicy, CnnPolicy, ...)
     :param env: The environment to learn from (if registered in Gym, can be str)
     :param learning_rate: learning rate for adam optimizer,
@@ -78,8 +86,8 @@ class SAC(OffPolicyAlgorithm):
         env: Union[GymEnv, str],
         learning_rate: Union[float, Schedule] = 3e-4,
         buffer_size: int = 1_000_000,  # 1e6
-        learning_starts: int = 100,
-        batch_size: int = 256,
+        learning_starts: int = 5,
+        batch_size: int = 2,
         tau: float = 0.005,
         gamma: float = 0.99,
         train_freq: Union[int, Tuple[int, str]] = 1,
@@ -100,7 +108,10 @@ class SAC(OffPolicyAlgorithm):
         verbose: int = 0,
         seed: Optional[int] = None,
         device: Union[th.device, str] = "auto",
+        save_every: int = 2500,
         _init_setup_model: bool = True,
+        model_name: str = "SAC",
+        render: bool = False,
     ):
 
         super(SAC, self).__init__(
@@ -128,7 +139,10 @@ class SAC(OffPolicyAlgorithm):
             sde_sample_freq=sde_sample_freq,
             use_sde_at_warmup=use_sde_at_warmup,
             optimize_memory_usage=optimize_memory_usage,
+            save_every=save_every,
             supported_action_spaces=(gym.spaces.Box),
+            model_name=model_name,
+            render=render,
         )
 
         self.target_entropy = target_entropy
@@ -138,6 +152,7 @@ class SAC(OffPolicyAlgorithm):
         self.ent_coef = ent_coef
         self.target_update_interval = target_update_interval
         self.ent_coef_optimizer = None
+        self.curr_episode_timesteps = 0
 
         if _init_setup_model:
             self._setup_model()
@@ -187,8 +202,12 @@ class SAC(OffPolicyAlgorithm):
         self.critic = self.policy.critic
         self.critic_target = self.policy.critic_target
 
-    def train(self, gradient_steps: int, batch_size: int = 64) -> None:
-        print("SAC TRAIN CALLED")
+    def train(
+        self,
+        gradient_steps: int,
+        human_feedback_gui=None,
+        batch_size: int = 64,
+    ) -> None:
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizers learning rate
@@ -287,6 +306,9 @@ class SAC(OffPolicyAlgorithm):
             actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
             actor_losses.append(actor_loss.item())
 
+            if human_feedback_gui:
+                human_feedback_gui.updateLoss(actor_loss.item())
+
             # Optimize the actor
             self.actor.optimizer.zero_grad()
             actor_loss.backward()
@@ -299,6 +321,7 @@ class SAC(OffPolicyAlgorithm):
                 )
 
         self._n_updates += gradient_steps
+
         self.logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
         self.logger.record("train/ent_coef", np.mean(ent_coefs))
         self.logger.record("train/actor_loss", np.mean(actor_losses))
@@ -309,8 +332,10 @@ class SAC(OffPolicyAlgorithm):
     def learn(
         self,
         total_timesteps: int,
+        human_feedback_gui=None,
+        human_feedback=None,
         callback: MaybeCallback = None,
-        log_interval: int = 10000,
+        log_interval: int = 4,
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
@@ -321,6 +346,8 @@ class SAC(OffPolicyAlgorithm):
 
         return super(SAC, self).learn(
             total_timesteps=total_timesteps,
+            human_feedback_gui=human_feedback_gui,
+            human_feedback=human_feedback,
             callback=callback,
             log_interval=log_interval,
             eval_env=eval_env,
@@ -346,3 +373,145 @@ class SAC(OffPolicyAlgorithm):
         else:
             saved_pytorch_variables = ["ent_coef_tensor"]
         return state_dicts, saved_pytorch_variables
+
+    def collect_rollouts(
+        self,
+        env: VecEnv,
+        callback: BaseCallback,
+        train_freq: TrainFreq,
+        replay_buffer: ReplayBuffer,
+        action_noise: Optional[ActionNoise] = None,
+        learning_starts: int = 0,
+        log_interval: Optional[int] = None,
+        human_feedback=None,
+        human_feedback_gui=None,
+    ) -> RolloutReturn:
+        """
+        Collect experiences and store them into a ``ReplayBuffer``.
+
+        :param env: The training environment
+        :param callback: Callback that will be called at each step
+            (and at the beginning and end of the rollout)
+        :param train_freq: How much experience to collect
+            by doing rollouts of current policy.
+            Either ``TrainFreq(<n>, TrainFrequencyUnit.STEP)``
+            or ``TrainFreq(<n>, TrainFrequencyUnit.EPISODE)``
+            with ``<n>`` being an integer greater than 0.
+        :param action_noise: Action noise that will be used for exploration
+            Required for deterministic policy (e.g. TD3). This can also be used
+            in addition to the stochastic policy for SAC.
+        :param learning_starts: Number of steps before learning for the warm-up phase.
+        :param replay_buffer:
+        :param log_interval: Log data every ``log_interval`` episodes
+        :return:
+        """
+        # Switch to eval mode (this affects batch norm / dropout)
+        self.policy.set_training_mode(False)
+
+        episode_rewards, total_timesteps = [], []
+        num_collected_steps, num_collected_episodes = 0, 0
+
+        assert isinstance(env, VecEnv), "You must pass a VecEnv"
+        assert env.num_envs == 1, "OffPolicyAlgorithm only support single environment"
+        assert train_freq.frequency > 0, "Should at least collect one step or episode."
+
+        if self.use_sde:
+            self.actor.reset_noise()
+
+        callback.on_rollout_start()
+        continue_training = True
+
+        while should_collect_more_steps(
+            train_freq, num_collected_steps, num_collected_episodes
+        ):
+            done = False
+            episode_reward, episode_timesteps = 0.0, 0
+
+            while not done:
+                if (
+                    self.use_sde
+                    and self.sde_sample_freq > 0
+                    and num_collected_steps % self.sde_sample_freq == 0
+                ):
+                    # Sample a new noise matrix
+                    self.actor.reset_noise()
+
+                # Select action randomly or according to policy
+                action, buffer_action = self._sample_action(
+                    learning_starts, action_noise
+                )
+
+                # Rescale and perform action
+                if self.render:
+                    env.render()
+
+                new_obs, reward, done, infos = env.step(action)
+
+                self.num_timesteps += 1
+                episode_timesteps += 1
+                num_collected_steps += 1
+                self.curr_episode_timesteps += 1
+
+                # Give access to local variables
+                callback.update_locals(locals())
+                # Only stop training if return value is False, not when it is None.
+                if callback.on_step() is False:
+                    return RolloutReturn(
+                        0.0,
+                        num_collected_steps,
+                        num_collected_episodes,
+                        continue_training=False,
+                    )
+
+                # Retrieve reward and episode length if using Monitor wrapper
+                self._update_info_buffer(infos, done)
+
+                episode_reward += reward[0]
+
+                # Store data in replay buffer (normalized action and unnormalized observation)
+                self._store_transition(
+                    replay_buffer, buffer_action, new_obs, reward, done, infos
+                )
+                # self.apply_uniform_credit_assignment(
+                #     replay_buffer, float(simulated_human_reward), 0, min(35, self.curr_episode_timesteps)
+                # )
+
+                if human_feedback_gui:
+                    human_feedback_gui.updateReward(episode_reward)
+
+                self._update_current_progress_remaining(
+                    self.num_timesteps, self._total_timesteps
+                )
+
+                # For DQN, check if the target network should be updated
+                # and update the exploration schedule
+                # For SAC/TD3, the update is done as the same time as the gradient update
+                # see https://github.com/hill-a/stable-baselines/issues/900
+                self._on_step()
+
+                if not should_collect_more_steps(
+                    train_freq, num_collected_steps, num_collected_episodes
+                ):
+                    break
+
+            if done:
+                self.curr_episode_timesteps = 0
+                num_collected_episodes += 1
+                self._episode_num += 1
+                episode_rewards.append(episode_reward)
+                total_timesteps.append(episode_timesteps)
+
+                if action_noise is not None:
+                    action_noise.reset()
+
+                # Log training infos
+                if log_interval is not None and self._episode_num % log_interval == 0:
+                    self._dump_logs()
+
+        mean_reward = np.mean(episode_rewards) if num_collected_episodes > 0 else 0.0
+
+        callback.on_rollout_end()
+
+        return RolloutReturn(
+            mean_reward, num_collected_steps, num_collected_episodes, continue_training
+        )

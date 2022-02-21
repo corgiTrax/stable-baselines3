@@ -26,7 +26,6 @@ from stable_baselines3.sac.sac import SAC
 
 
 def get_abstract_state(curr_state_vec):
-    # print(str(float(curr_state_vec[0][0])) + " " + str(float(curr_state_vec[0][1])))
     y_state = -1
     y_obs = float(curr_state_vec[0][1])
     x_state = -1
@@ -68,14 +67,9 @@ def main():
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
     env = gym.make("LunarLanderContinuous-v2")
 
-    # human_feedback = HumanFeedback()
-    # app = QApplication(sys.argv)
-    # feedback_gui = FeedbackInterface()
-    # feedback_gui = None
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        # features_extractor_class=LunarLanderExtractor,
         net_arch=[400, 300],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
@@ -119,17 +113,8 @@ def main():
     print(f"Model Policy = " + str(model.policy))
 
     if not config_data["load_model"]:
-        # thread.Thread(
-        #     target=train_model,
-        #     args=[model, config_data, feedback_gui, human_feedback, env],
-        #     name="train_model",
-        #     daemon=True,
-        # ).start()
-        # sys.exit(app.exec_())
         model.learn(
             config_data["steps"],
-            # human_feedback_gui=feedback_gui,
-            # human_feedback=human_feedback,
         )
         mean_reward, std_reward = evaluate_policy(
             model, env, n_eval_episodes=20, render=False
