@@ -1,0 +1,113 @@
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+{<class 'stable_baselines3.common.policies.ActorCriticPolicy'>: {'MlpPolicy': <class 'stable_baselines3.common.policies.ActorCriticPolicy'>, 'CnnPolicy': <class 'stable_baselines3.common.policies.ActorCriticCnnPolicy'>, 'MultiInputPolicy': <class 'stable_baselines3.common.policies.MultiInputActorCriticPolicy'>}, <class 'stable_baselines3.td3.policies.TD3Policy'>: {'MlpPolicy': <class 'stable_baselines3.td3.policies.TD3Policy'>, 'CnnPolicy': <class 'stable_baselines3.td3.policies.CnnPolicy'>, 'MultiInputPolicy': <class 'stable_baselines3.td3.policies.MultiInputPolicy'>}, <class 'stable_baselines3.dqn.policies.DQNPolicy'>: {'MlpPolicy': <class 'stable_baselines3.dqn.policies.DQNPolicy'>, 'CnnPolicy': <class 'stable_baselines3.dqn.policies.CnnPolicy'>, 'MultiInputPolicy': <class 'stable_baselines3.dqn.policies.MultiInputPolicy'>}, <class 'stable_baselines3.sac.policies.SACPolicy'>: {'MlpPolicy': <class 'stable_baselines3.sac.policies.SACPolicy'>, 'CnnPolicy': <class 'stable_baselines3.sac.policies.CnnPolicy'>, 'MultiInputPolicy': <class 'stable_baselines3.sac.policies.MultiInputPolicy'>}, <class 'stable_baselines3.active_tamer.policies.SACPolicy'>: {'MlpPolicy': <class 'stable_baselines3.active_tamer.policies.SACPolicy'>, 'CnnPolicy': <class 'stable_baselines3.active_tamer.policies.CnnPolicy'>, 'MultiInputPolicy': <class 'stable_baselines3.active_tamer.policies.MultiInputPolicy'>}, <class 'stable_baselines3.active_tamer.policies.SACHPolicy'>: {'HumanMlpPolicy': <class 'stable_baselines3.active_tamer.policies.SACHPolicy'>}, <class 'stable_baselines3.active_tamer.policies.ActiveSACHPolicy'>: {'ActiveMlpPolicy': <class 'stable_baselines3.active_tamer.policies.ActiveSACHPolicy'>}}
+<class 'stable_baselines3.active_tamer.policies.ActiveSACHPolicy'>
+{'ActiveMlpPolicy': <class 'stable_baselines3.active_tamer.policies.ActiveSACHPolicy'>}
+ActiveMlpPolicy
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Model Policy = ActiveSACHPolicy(
+  (actor): Actor(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (latent_pi): Sequential(
+      (0): Linear(in_features=8, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+    )
+    (mu): Linear(in_features=300, out_features=2, bias=True)
+    (log_std): Linear(in_features=300, out_features=2, bias=True)
+  )
+  (critic): ContinuousCritic(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (qf0): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+    (qf1): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+  )
+  (human_critic): ContinuousCritic(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (qf0): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+    (qf1): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+  )
+  (state_predictor): StatePredictor(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (predict_state): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=8, bias=True)
+    )
+  )
+  (critic_target): ContinuousCritic(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (qf0): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+    (qf1): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+  )
+  (human_critic_target): ContinuousCritic(
+    (features_extractor): FlattenExtractor(
+      (flatten): Flatten(start_dim=1, end_dim=-1)
+    )
+    (qf0): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+    (qf1): Sequential(
+      (0): Linear(in_features=10, out_features=400, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=400, out_features=300, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=300, out_features=1, bias=True)
+    )
+  )
+)
+Logging to log_dir/ActiveTamerRLSACOptim_18
