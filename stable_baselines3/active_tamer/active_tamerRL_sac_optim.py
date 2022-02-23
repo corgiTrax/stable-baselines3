@@ -566,8 +566,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     # next_abstract_state != self.curr_abstract_state
                     # or state_prediction_err > self.prediction_threshold
 
-                    next_abstract_state != self.curr_abstract_state
-                    # state_prediction_err > self.prediction_threshold
+                    #next_abstract_state != self.curr_abstract_state
+                    state_prediction_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
                         1
