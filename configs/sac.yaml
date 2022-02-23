@@ -11,7 +11,7 @@ learning_rate: 0.00073
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000
 buffer_size: 1000000
-learning_starts: 0
+learning_starts: 10000
 batch_size: 256
 tau: 0.01
 train_freq: 1
