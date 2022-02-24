@@ -36,8 +36,13 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
+    
     with open("configs/tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
+    
+    torch.manual_seed(config_data['seed'])
+    random.seed(config_data['seed'])
+    np.random.seed(config_data['seed'])
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
     env = gym.make("LunarLanderContinuous-v2")
@@ -82,7 +87,7 @@ def main():
         seed=config_data["seed"],
         render=False,
         trained_model=trained_model,
-        percent_feedback=0.01,
+        percent_feedback=config_data['percent_feedback'],
     )
 
     print(f"Model Policy = " + str(model.policy))
