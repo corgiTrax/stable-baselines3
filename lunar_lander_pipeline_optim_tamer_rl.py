@@ -82,6 +82,7 @@ def main():
         seed=config_data["seed"],
         render=False,
         trained_model=trained_model,
+        percent_feedback=1.0,
     )
 
     print(f"Model Policy = " + str(model.policy))

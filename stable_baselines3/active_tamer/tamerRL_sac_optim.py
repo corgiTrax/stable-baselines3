@@ -1,6 +1,7 @@
 import random
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from datasets import percent
 
 import gym
 import numpy as np
@@ -115,6 +116,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         render: bool = False,
         q_val_threshold: float = 0.99,
         rl_threshold: float = 0,
+        percent_feedback: float = 1.0,
     ):
 
         super(TamerRLSACOptim, self).__init__(
@@ -159,6 +161,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
+        self.percent_feedback = percent_feedback
 
         if _init_setup_model:
             self._setup_model()
@@ -528,7 +531,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                     1 if self.q_val_threshold * teacher_q_val < student_q_val else -1
                 )
                 simulated_human_reward = (
-                    simulated_human_reward if random.random() < 0.05 else 0
+                    simulated_human_reward if random.random() < self.percent_feedback else 0
                 )
                 self.q_val_threshold += 0.00000001
                 self.rl_threshold += 1 / 500000
