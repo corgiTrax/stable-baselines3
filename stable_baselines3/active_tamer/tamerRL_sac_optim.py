@@ -162,6 +162,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
         self.percent_feedback = percent_feedback
+        self.total_feedback = 0
 
         if _init_setup_model:
             self._setup_model()
@@ -533,6 +534,8 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                 simulated_human_reward = (
                     simulated_human_reward if random.random() < self.percent_feedback else 0
                 )
+                self.total_feedback += 1 if simulated_human_reward != 0 else 0
+
                 self.q_val_threshold += 0.00000001
                 self.rl_threshold += 1 / 500000
                 new_obs, reward, done, infos = env.step(action)
@@ -541,6 +544,11 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                 episode_timesteps += 1
                 num_collected_steps += 1
                 self.curr_episode_timesteps += 1
+
+                self.logger.record(
+                    "train/feedback_percentage",
+                    self.total_feedback / self.num_timesteps,
+                )
 
                 # Give access to local variables
                 callback.update_locals(locals())
