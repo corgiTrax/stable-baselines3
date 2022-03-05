@@ -499,7 +499,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
 
         episode_rewards, total_timesteps = [], []
         num_collected_steps, num_collected_episodes = 0, 0
-        # curr_keyboard_feedback = None
+        curr_keyboard_feedback = None
 
         assert isinstance(env, VecEnv), "You must pass a VecEnv"
         assert env.num_envs == 1, "OffPolicyAlgorithm only support single environment"
