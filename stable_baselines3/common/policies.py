@@ -1096,3 +1096,55 @@ class StatePredictor(BaseModel):
             features = self.extract_features(obs)
         predictor_input = th.cat([features, actions], dim=1)
         return self.predict_state(predictor_input)
+
+
+class StateReconstructor(BaseModel):
+    """
+    Predict the next state for an environment given current state,
+    shared encoder, and current action.
+
+    :param observation_space: Obervation space
+    :param action_space: Action space
+    :param net_arch: Network architecture
+    :param features_extractor: Network to extract features
+        (a CNN when using images, a nn.Flatten() layer otherwise)
+    :param features_dim: Number of features
+    :param activation_fn: Activation function
+    :param normalize_images: Whether to normalize images or not,
+         dividing by 255.0 (True by default)
+    :param n_critics: Number of critic networks to create.
+    :param share_features_extractor: Whether the features extractor is shared or not
+        between the actor and the critic (this saves computation time)
+    """
+
+    def __init__(
+        self,
+        observation_space: gym.spaces.Space,
+        action_space: gym.spaces.Space,
+        net_arch: List[int],
+        features_extractor: nn.Module,
+        features_dim: int,
+        activation_fn: Type[nn.Module] = nn.ReLU,
+        normalize_images: bool = True,
+        share_features_extractor: bool = True,
+    ):
+        super().__init__(
+            observation_space,
+            action_space,
+            features_extractor=features_extractor,
+            normalize_images=normalize_images,
+        )
+        observation_dim = int(np.prod(get_obs_shape(self.observation_space)))
+
+        self.share_features_extractor = share_features_extractor
+        predictor = create_mlp(
+            features_dim, observation_dim, net_arch, activation_fn
+        )
+        self.predict_state = nn.Sequential(*predictor)
+
+    def forward(self, obs: th.Tensor) -> Tuple[th.Tensor, ...]:
+        # Learn the features extractor using the policy loss only
+        # when the features_extractor is shared with the actor
+        with th.set_grad_enabled(not self.share_features_extractor):
+            features = self.extract_features(obs)
+        return self.predict_state(features)

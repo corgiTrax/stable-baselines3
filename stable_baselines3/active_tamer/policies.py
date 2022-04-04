@@ -15,6 +15,7 @@ from stable_baselines3.common.policies import (
     BasePolicy,
     ContinuousCritic,
     StatePredictor,
+    StateReconstructor,
     register_policy,
 )
 from stable_baselines3.common.preprocessing import get_action_dim
@@ -776,6 +777,14 @@ class ActiveSACHPolicy(BasePolicy):
                 "share_features_extractor": share_features_extractor,
             }
         )
+        self.state_reconstruction_arch = [400, 300, 3, 300, 400]
+        self.state_reconstruction_kwargs = self.net_args.copy()
+        self.state_reconstruction_kwargs.update(
+            {
+                "net_arch": self.state_reconstruction_arch,
+                "share_features_extractor": share_features_extractor,
+            }
+        )
 
         self._build(lr_schedule)
 
@@ -819,6 +828,17 @@ class ActiveSACHPolicy(BasePolicy):
                 if "features_extractor" not in name
             ]
 
+            self.state_reconstructor = self.make_state_reconstructor(
+                features_extractor=self.actor.features_extractor
+            )
+            # Do not optimize the shared features extractor with the critic loss
+            # otherwise, there are gradient computation issues
+            reconstructor_parameters = [
+                param
+                for name, param in self.state_reconstructor.named_parameters()
+                if "features_extractor" not in name
+            ]
+
         else:
             # Create a separate features extractor for the critic
             # this requires more memory and computation
@@ -830,6 +850,9 @@ class ActiveSACHPolicy(BasePolicy):
 
             self.state_predictor = self.make_state_predictor(feature_extractor=None)
             predictor_parameters = self.state_predictor.parameters()
+
+            self.state_reconstructor = self.make_state_reconstructor(feature_extractor=None)
+            reconstructor_parameters = self.state_reconstructor.parameters()
 
         # Critic target should not share the features extractor with critic
         self.critic_target = self.make_critic(features_extractor=None)
@@ -848,6 +871,10 @@ class ActiveSACHPolicy(BasePolicy):
 
         self.state_predictor.optimizer = self.optimizer_class(
             predictor_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
+        )
+
+        self.state_reconstructor.optimizer = self.optimizer_class(
+            reconstructor_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
         )
 
         # Target networks should always be in eval mode
@@ -906,6 +933,14 @@ class ActiveSACHPolicy(BasePolicy):
             self.state_predictor_kwargs, features_extractor
         )
         return StatePredictor(**state_predictor_kwargs).to(self.device)
+    
+    def make_state_reconstructor(
+        self, features_extractor: Optional[BaseFeaturesExtractor] = None
+    ) -> StateReconstructor:
+        state_reconstructor_kwargs = self._update_features_extractor(
+            self.state_reconstruction_kwargs, features_extractor
+        )
+        return StateReconstructor(**state_reconstructor_kwargs).to(self.device)
 
     def forward(self, obs: th.Tensor, deterministic: bool = False) -> th.Tensor:
         return self._predict(obs, deterministic=deterministic)
@@ -928,105 +963,6 @@ class ActiveSACHPolicy(BasePolicy):
         self.human_critic.set_training_mode(mode)
         self.state_predictor.set_training_mode(mode)
         self.training = mode
-
-    # def __init__(
-    #     self,
-    #     observation_space: gym.spaces.Space,
-    #     action_space: gym.spaces.Space,
-    #     lr_schedule: Schedule,
-    #     net_arch: Optional[Union[List[int], Dict[str, List[int]]]] = None,
-    #     activation_fn: Type[nn.Module] = nn.ReLU,
-    #     use_sde: bool = False,
-    #     log_std_init: float = -3,
-    #     sde_net_arch: Optional[List[int]] = None,
-    #     use_expln: bool = False,
-    #     clip_mean: float = 2.0,
-    #     features_extractor_class: Type[BaseFeaturesExtractor] = FlattenExtractor,
-    #     features_extractor_kwargs: Optional[Dict[str, Any]] = None,
-    #     normalize_images: bool = True,
-    #     optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
-    #     optimizer_kwargs: Optional[Dict[str, Any]] = None,
-    #     n_critics: int = 2,
-    #     share_features_extractor: bool = True,
-    # ):
-    #     super(ActiveSACHPolicy, self).__init__(
-    #         observation_space,
-    #         action_space,
-    #         lr_schedule=lr_schedule,
-    #         net_arch=net_arch,
-    #         activation_fn=activation_fn,
-    #         use_sde=use_sde,
-    #         log_std_init=log_std_init,
-    #         sde_net_arch=sde_net_arch,
-    #         use_expln=use_expln,
-    #         clip_mean=clip_mean,
-    #         features_extractor_class=features_extractor_class,
-    #         features_extractor_kwargs=features_extractor_kwargs,
-    #         normalize_images=normalize_images,
-    #         optimizer_class=optimizer_class,
-    #         optimizer_kwargs=optimizer_kwargs,
-    #         n_critics=n_critics,
-    #         share_features_extractor=share_features_extractor,
-    #         squash_output=True,
-    #     )
-
-    #     self.state_predictor_arch = self.critic_arch
-    #     self.state_predictor_kwargs = self.net_args.copy()
-    #     self.state_predictor_kwargs.update(
-    #         {
-    #             "net_arch": self.state_predictor_arch,
-    #             "share_features_extractor": share_features_extractor,
-    #         }
-    #     )
-
-    #     self.state_predictor = None
-
-    # def _build(self, lr_schedule: Schedule) -> None:
-    #     super(ActiveSACHPolicy, self)._build(lr_schedule)
-
-    #     if self.share_features_extractor:
-    #         self.state_predictor = self.make_state_predictor(
-    #             features_extractor=self.actor.features_extractor
-    #         )
-    #         # Do not optimize the shared features extractor with the critic loss
-    #         # otherwise, there are gradient computation issues
-    #         predictor_parameters = [
-    #             param
-    #             for name, param in self.state_predictor.named_parameters()
-    #             if "features_extractor" not in name
-    #         ]
-
-    #     else:
-    #         # Create a separate features extractor for the critic
-    #         # this requires more memory and computation
-
-    #         self.state_predictor = self.make_state_predictor(feature_extractor=None)
-    #         predictor_parameters = self.state_predictor.parameters()
-
-    #     # Critic target should not share the features extractor with critic
-    #     self.state_predictor.optimizer = self.optimizer_class(
-    #         predictor_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
-    #     )
-
-    # def make_state_predictor(
-    #         self, features_extractor: Optional[BaseFeaturesExtractor] = None
-    #     ) -> StatePredictor:
-    #         state_predictor_kwargs = self._update_features_extractor(
-    #             self.state_predictor_kwargs, features_extractor
-    #         )
-    #         return StatePredictor(**state_predictor_kwargs).to(self.device)
-
-    # def set_training_mode(self, mode: bool) -> None:
-    #     super(ActiveSACHPolicy, self).set_training_mode(mode)
-    #     """
-    #     Put the policy in either training or evaluation mode.
-
-    #     This affects certain modules, such as batch normalisation and dropout.
-
-    #     :param mode: if true, set to training mode, else set to evaluation mode
-    #     """
-    #     self.state_predictor.set_training_mode(mode)
-
 
 ActiveMlpPolicy = ActiveSACHPolicy
 

@@ -217,6 +217,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         self.human_critic = self.policy.human_critic
         self.human_critic_target = self.policy.human_critic_target
         self.state_predictor = self.policy.state_predictor
+        self.state_reconstructor = self.policy.state_reconstructor
 
     def train(
         self,
@@ -239,11 +240,12 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         self._update_learning_rate(optimizers)
 
         ent_coef_losses, ent_coefs = [], []
-        actor_losses, critic_losses, human_critic_losses, state_prediction_losses = (
+        actor_losses, critic_losses, human_critic_losses, state_prediction_losses, state_recontructor_losses = (
             [],
             [],
             [],
             [],
+            []
         )
 
         for gradient_step in range(gradient_steps):
@@ -382,6 +384,16 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
             self.state_predictor.optimizer.step()
             state_prediction_losses.append(state_prediction_loss.item())
 
+
+            reconstructed_state = self.state_reconstructor.forward(replay_data.observations)
+            state_reconstructor_loss = F.mse_loss(
+                reconstructed_state, replay_data.observations
+            )
+            self.state_reconstructor.optimizer.zero_grad()
+            state_reconstructor_loss.backward()
+            self.state_reconstructor.optimizer.step()
+            state_recontructor_losses.append(state_reconstructor_loss.item())
+
             # Update target networks
             if gradient_step % self.target_update_interval == 0:
                 polyak_update(
@@ -401,6 +413,9 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         self.logger.record("train/critic_loss", np.mean(critic_losses))
         self.logger.record(
             "train/state_prediction_loss", np.mean(state_prediction_losses)
+        )
+        self.logger.record(
+            "train/state_reconstructor_loss", np.mean(state_recontructor_losses)
         )
         self.logger.record("train/human_critic_loss", np.mean(human_critic_losses))
         self.logger.record("train/rl_threshold", self.rl_threshold)
@@ -562,9 +577,14 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     ),
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
+                state_reconstructor_err = F.mse_loss(
+                    self.state_reconstructor(th.from_numpy(prev_obs).to(self.device).reshape(1, -1)),
+                    th.from_numpy(prev_obs).to(self.device).reshape(1, -1)
+                )
                 if (
                     # scene_graph_updated
-                    state_prediction_err > self.prediction_threshold
+                    # state_prediction_err > self.prediction_threshold
+                    state_reconstructor_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
                         1
