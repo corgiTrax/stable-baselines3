@@ -563,8 +563,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
                 if (
-                    scene_graph_updated
-                    # or state_prediction_err > self.prediction_threshold
+                    # scene_graph_updated
+                    state_prediction_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
                         1

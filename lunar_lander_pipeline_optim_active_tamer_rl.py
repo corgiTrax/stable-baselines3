@@ -65,7 +65,7 @@ class LunarLanderSceneGraph:
     
     def updateGraph(self, newState):
         prev_graph = self.getCurrGraph()
-        self.agent['location'] = {'x': newState[0], 'y': newState[1]}
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         return self.getCurrGraph() != prev_graph
 
 

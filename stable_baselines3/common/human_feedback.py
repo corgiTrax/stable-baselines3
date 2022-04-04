@@ -9,6 +9,7 @@ class HumanFeedback:
     def __init__(self, robot=None, feedback_gui=None):
         super(HumanFeedback, self).__init__()
         self.keyboard_feedback_dictionary = {
+            keyboard.KeyCode.from_char("0"): 0,
             keyboard.KeyCode.from_char("1"): -1,
             keyboard.KeyCode.from_char("2"): 1,
         }
