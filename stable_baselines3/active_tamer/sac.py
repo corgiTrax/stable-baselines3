@@ -353,7 +353,7 @@ class SAC(OffPolicyAlgorithm):
             eval_env=eval_env,
             eval_freq=eval_freq,
             n_eval_episodes=n_eval_episodes,
-            tb_log_name=tb_log_name,
+            tb_log_name=self.model_name,
             eval_log_path=eval_log_path,
             reset_num_timesteps=reset_num_timesteps,
         )

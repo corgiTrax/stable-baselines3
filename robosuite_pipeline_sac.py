@@ -17,56 +17,12 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.active_tamerRL_sac_optim import (
-    ActiveTamerRLSACOptim,
-)
+from stable_baselines3.active_tamer.sac import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
-from stable_baselines3.sac.sac import SAC
 
-
-def get_abstract_state(curr_state_vec):
-    y_state = -1
-    y_obs = float(curr_state_vec[0][1])
-    x_state = -1
-    x_obs = float(curr_state_vec[0][0])
-
-    if y_obs < 0.5:
-        y_state = 2
-    elif y_obs > 1:
-        y_state = 0
-    else:
-        y_state = 1
-
-    if x_obs < -0.3:
-        x_state = 0
-    elif x_obs > 0.3:
-        x_state = 2
-    else:
-        x_state = 1
-
-    return x_state * 3 + y_state
-
-class LunarLanderSceneGraph:
-    agent = {'location': {'x': 0, 'y': 0}}
-    flag1 = {'location': {'x': -0.28, 'y': 0.235}}
-    flag2 = {'location': {'x': 0.28, 'y': 0.235}}
-    mountain = {'location': {'x': 0, 'y': 0}}
-
-    def isLeft(self, obj_a, obj_b):
-        return obj_a['location']['x'] < obj_b['location']['x']
-    
-    def onTop(self, obj_a, obj_b):
-        return obj_a['location']['y'] > obj_b['location']['y']
-    
-    def getCurrGraph(self):
-        return [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
-                self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
-    
-    def updateGraph(self, newState):
-        prev_graph = self.getCurrGraph()
-        self.agent['location'] = {'x': newState[0], 'y': newState[1]}
-        return self.getCurrGraph() != prev_graph
+import robosuite as suite
+from robosuite import load_controller_config
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -82,11 +38,30 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
-    with open("configs/active_tamer_rl_sac.yaml", "r") as f:
+    with open("configs/sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
-    env = gym.make("LunarLanderContinuous-v2")
+
+    robosuite_config = {
+        "env_name": "Lift",
+        "robots": "Panda",
+        "controller_configs": load_controller_config(default_controller="OSC_POSE"),
+    }
+
+    env = suite.make(
+        **robosuite_config,
+        has_renderer=False,
+        has_offscreen_renderer=False,
+        render_camera="agentview",
+        ignore_done=False,
+        use_camera_obs=False,
+        reward_shaping=True,
+        control_freq=20,
+        hard_reset=False,
+    )
+
+    print(env)
 
     np.set_printoptions(threshold=np.inf)
 
@@ -95,22 +70,10 @@ def main():
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
-    newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
     kwargs = dict(seed=0)
     kwargs.update(dict(buffer_size=1))
 
-    custom_objects = {}
-    if newer_python_version:
-        custom_objects = {
-            "learning_rate": 0.0,
-            "lr_schedule": lambda _: 0.0,
-            "clip_range": lambda _: 0.0,
-        }
-    trained_model = SAC.load(
-        config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
-    )
-
-    model = ActiveTamerRLSACOptim(
+    model = SAC(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -127,8 +90,7 @@ def main():
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
         render=False,
-        trained_model=trained_model,
-        scene_graph=LunarLanderSceneGraph(),
+        model_name="SAC_Robosuite"
     )
 
     print(f"Model Policy = " + str(model.policy))
@@ -144,7 +106,7 @@ def main():
     else:
         del model
         model_num = config_data["load_model"]
-        model = ActiveTamerRLSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = SAC.load(f"models/SAC_{model_num}.pt", env=env)
         print("Loaded pretrained model")
 
 

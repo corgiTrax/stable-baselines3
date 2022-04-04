@@ -127,6 +127,8 @@ if __name__ == "__main__":
         hard_reset=False,
     )
 
+    print(env)
+
     # Wrap this environment in a visualization wrapper
     env = VisualizationWrapper(env, indicator_configs=None)
 
@@ -209,4 +211,5 @@ if __name__ == "__main__":
 
             # Step through the simulation and render
             obs, reward, done, info = env.step(action)
+            print(obs)
             env.render()

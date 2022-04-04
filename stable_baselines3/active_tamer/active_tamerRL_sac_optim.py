@@ -118,6 +118,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         rl_threshold: float = 0.1,
         abstract_state: Object = None,
         prediction_threshold: float = 0.012,
+        scene_graph: Object = None,
     ):
 
         super(ActiveTamerRLSACOptim, self).__init__(
@@ -162,8 +163,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
-        self.get_abstract_state = abstract_state
-        self.curr_abstract_state = 0
+        self.scene_graph = scene_graph
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
 
@@ -553,8 +553,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
-                next_abstract_state = self.get_abstract_state(prev_obs)
                 simulated_human_reward = 0
+                scene_graph_updated = self.scene_graph.updateGraph(new_obs)
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
                         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
@@ -563,8 +563,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
                 if (
-                    next_abstract_state != self.curr_abstract_state
-                    or state_prediction_err > self.prediction_threshold
+                    scene_graph_updated
+                    # or state_prediction_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
                         1
@@ -572,7 +572,6 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                         else -1
                     )
                     self.total_feedback += 1
-                    self.curr_abstract_state = next_abstract_state
 
                 self.q_val_threshold += 0.00000001
                 # self.rl_threshold += 1 / 500000
