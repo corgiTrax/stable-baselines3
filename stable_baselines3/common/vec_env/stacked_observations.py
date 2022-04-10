@@ -4,7 +4,10 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 from gym import spaces
 
-from stable_baselines3.common.preprocessing import is_image_space, is_image_space_channels_first
+from stable_baselines3.common.preprocessing import (
+    is_image_space,
+    is_image_space_channels_first,
+)
 
 
 class StackedObservations(object):
@@ -97,9 +100,13 @@ class StackedObservations(object):
         """
         self.stackedobs[...] = 0
         if self.channels_first:
-            self.stackedobs[:, -observation.shape[self.stack_dimension] :, ...] = observation
+            self.stackedobs[
+                :, -observation.shape[self.stack_dimension] :, ...
+            ] = observation
         else:
-            self.stackedobs[..., -observation.shape[self.stack_dimension] :] = observation
+            self.stackedobs[
+                ..., -observation.shape[self.stack_dimension] :
+            ] = observation
         return self.stackedobs
 
     def update(
@@ -117,7 +124,9 @@ class StackedObservations(object):
         :return: tuple of the stacked observations and the updated infos
         """
         stack_ax_size = observations.shape[self.stack_dimension]
-        self.stackedobs = np.roll(self.stackedobs, shift=-stack_ax_size, axis=self.stack_dimension)
+        self.stackedobs = np.roll(
+            self.stackedobs, shift=-stack_ax_size, axis=self.stack_dimension
+        )
         for i, done in enumerate(dones):
             if done:
                 if "terminal_observation" in infos[i]:
@@ -134,12 +143,18 @@ class StackedObservations(object):
                         )
                     infos[i]["terminal_observation"] = new_terminal
                 else:
-                    warnings.warn("VecFrameStack wrapping a VecEnv without terminal_observation info")
+                    warnings.warn(
+                        "VecFrameStack wrapping a VecEnv without terminal_observation info"
+                    )
                 self.stackedobs[i] = 0
         if self.channels_first:
-            self.stackedobs[:, -observations.shape[self.stack_dimension] :, ...] = observations
+            self.stackedobs[
+                :, -observations.shape[self.stack_dimension] :, ...
+            ] = observations
         else:
-            self.stackedobs[..., -observations.shape[self.stack_dimension] :] = observations
+            self.stackedobs[
+                ..., -observations.shape[self.stack_dimension] :
+            ] = observations
         return self.stackedobs, infos
 
 
@@ -172,7 +187,9 @@ class StackedDictObservations(StackedObservations):
         self.repeat_axis = {}
 
         for key, subspace in observation_space.spaces.items():
-            assert isinstance(subspace, spaces.Box), "StackedDictObservations only works with nested gym.spaces.Box"
+            assert isinstance(
+                subspace, spaces.Box
+            ), "StackedDictObservations only works with nested gym.spaces.Box"
             if isinstance(channels_order, str) or channels_order is None:
                 subspace_channel_order = channels_order
             else:
@@ -182,7 +199,9 @@ class StackedDictObservations(StackedObservations):
                 self.stack_dimension[key],
                 self.stackedobs[key],
                 self.repeat_axis[key],
-            ) = self.compute_stacking(num_envs, n_stack, subspace, subspace_channel_order)
+            ) = self.compute_stacking(
+                num_envs, n_stack, subspace, subspace_channel_order
+            )
 
     def stack_observation_space(self, observation_space: spaces.Dict) -> spaces.Dict:
         """
@@ -208,7 +227,9 @@ class StackedDictObservations(StackedObservations):
         for key, obs in observation.items():
             self.stackedobs[key][...] = 0
             if self.channels_first[key]:
-                self.stackedobs[key][:, -obs.shape[self.stack_dimension[key]] :, ...] = obs
+                self.stackedobs[key][
+                    :, -obs.shape[self.stack_dimension[key]] :, ...
+                ] = obs
             else:
                 self.stackedobs[key][..., -obs.shape[self.stack_dimension[key]] :] = obs
         return self.stackedobs
@@ -256,7 +277,9 @@ class StackedDictObservations(StackedObservations):
                             )
                         infos[i]["terminal_observation"][key] = new_terminal
                     else:
-                        warnings.warn("VecFrameStack wrapping a VecEnv without terminal_observation info")
+                        warnings.warn(
+                            "VecFrameStack wrapping a VecEnv without terminal_observation info"
+                        )
                     self.stackedobs[key][i] = 0
             if self.channels_first[key]:
                 self.stackedobs[key][:, -stack_ax_size:, ...] = observations[key]

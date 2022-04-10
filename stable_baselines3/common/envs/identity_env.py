@@ -8,7 +8,12 @@ from stable_baselines3.common.type_aliases import GymObs, GymStepReturn
 
 
 class IdentityEnv(Env):
-    def __init__(self, dim: Optional[int] = None, space: Optional[Space] = None, ep_length: int = 100):
+    def __init__(
+        self,
+        dim: Optional[int] = None,
+        space: Optional[Space] = None,
+        ep_length: int = 100,
+    ):
         """
         Identity environment for testing purposes
 
@@ -24,7 +29,9 @@ class IdentityEnv(Env):
                 dim = 1
             space = Discrete(dim)
         else:
-            assert dim is None, "arguments for both 'dim' and 'space' provided: at most one allowed"
+            assert (
+                dim is None
+            ), "arguments for both 'dim' and 'space' provided: at most one allowed"
 
         self.action_space = self.observation_space = space
         self.ep_length = ep_length
@@ -56,7 +63,13 @@ class IdentityEnv(Env):
 
 
 class IdentityEnvBox(IdentityEnv):
-    def __init__(self, low: float = -1.0, high: float = 1.0, eps: float = 0.05, ep_length: int = 100):
+    def __init__(
+        self,
+        low: float = -1.0,
+        high: float = 1.0,
+        eps: float = 0.05,
+        ep_length: int = 100,
+    ):
         """
         Identity environment for testing purposes
 
@@ -77,7 +90,9 @@ class IdentityEnvBox(IdentityEnv):
         return self.state, reward, done, {}
 
     def _get_reward(self, action: np.ndarray) -> float:
-        return 1.0 if (self.state - self.eps) <= action <= (self.state + self.eps) else 0.0
+        return (
+            1.0 if (self.state - self.eps) <= action <= (self.state + self.eps) else 0.0
+        )
 
 
 class IdentityEnvMultiDiscrete(IdentityEnv):
@@ -128,7 +143,9 @@ class FakeImageEnv(Env):
         self.observation_shape = (screen_height, screen_width, n_channels)
         if channel_first:
             self.observation_shape = (n_channels, screen_height, screen_width)
-        self.observation_space = Box(low=0, high=255, shape=self.observation_shape, dtype=np.uint8)
+        self.observation_space = Box(
+            low=0, high=255, shape=self.observation_shape, dtype=np.uint8
+        )
         if discrete:
             self.action_space = Discrete(action_dim)
         else:

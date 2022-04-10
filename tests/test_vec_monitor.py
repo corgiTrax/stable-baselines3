@@ -18,7 +18,9 @@ def test_vec_monitor(tmp_path):
     """
     env = DummyVecEnv([lambda: gym.make("CartPole-v1")])
     env.seed(0)
-    monitor_file = os.path.join(str(tmp_path), f"stable_baselines-test-{uuid.uuid4()}.monitor.csv")
+    monitor_file = os.path.join(
+        str(tmp_path), f"stable_baselines-test-{uuid.uuid4()}.monitor.csv"
+    )
     monitor_env = VecMonitor(env, monitor_file)
     monitor_env.reset()
     total_steps = 1000
@@ -38,10 +40,17 @@ def test_vec_monitor(tmp_path):
         first_line = file_handler.readline()
         assert first_line.startswith("#")
         metadata = json.loads(first_line[1:])
-        assert set(metadata.keys()) == {"t_start", "env_id"}, "Incorrect keys in monitor metadata"
+        assert set(metadata.keys()) == {
+            "t_start",
+            "env_id",
+        }, "Incorrect keys in monitor metadata"
 
         last_logline = pandas.read_csv(file_handler, index_col=None)
-        assert set(last_logline.keys()) == {"l", "t", "r"}, "Incorrect keys in monitor logline"
+        assert set(last_logline.keys()) == {
+            "l",
+            "t",
+            "r",
+        }, "Incorrect keys in monitor logline"
     os.remove(monitor_file)
 
 
@@ -52,7 +61,9 @@ def test_vec_monitor_load_results(tmp_path):
     tmp_path = str(tmp_path)
     env1 = DummyVecEnv([lambda: gym.make("CartPole-v1")])
     env1.seed(0)
-    monitor_file1 = os.path.join(str(tmp_path), f"stable_baselines-test-{uuid.uuid4()}.monitor.csv")
+    monitor_file1 = os.path.join(
+        str(tmp_path), f"stable_baselines-test-{uuid.uuid4()}.monitor.csv"
+    )
     monitor_env1 = VecMonitor(env1, monitor_file1)
 
     monitor_files = get_monitor_files(tmp_path)
@@ -72,7 +83,9 @@ def test_vec_monitor_load_results(tmp_path):
 
     env2 = DummyVecEnv([lambda: gym.make("CartPole-v1")])
     env2.seed(0)
-    monitor_file2 = os.path.join(str(tmp_path), f"stable_baselines-test-{uuid.uuid4()}.monitor.csv")
+    monitor_file2 = os.path.join(
+        str(tmp_path), f"stable_baselines-test-{uuid.uuid4()}.monitor.csv"
+    )
     monitor_env2 = VecMonitor(env2, monitor_file2)
     monitor_files = get_monitor_files(tmp_path)
     assert len(monitor_files) == 2

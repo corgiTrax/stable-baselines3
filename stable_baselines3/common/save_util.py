@@ -113,7 +113,11 @@ def data_to_json(data: Dict[str, Any]) -> str:
             # e.g. numpy scalars)
             if hasattr(data_item, "__dict__") or isinstance(data_item, dict):
                 # Take elements from __dict__ for custom classes
-                item_generator = data_item.items if isinstance(data_item, dict) else data_item.__dict__.items
+                item_generator = (
+                    data_item.items
+                    if isinstance(data_item, dict)
+                    else data_item.__dict__.items
+                )
                 for variable_name, variable_item in item_generator():
                     # Check if serializable. If not, just include the
                     # string-representation of the object.
@@ -127,7 +131,9 @@ def data_to_json(data: Dict[str, Any]) -> str:
     return json_string
 
 
-def json_to_data(json_string: str, custom_objects: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def json_to_data(
+    json_string: str, custom_objects: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """
     Turn JSON serialization of class-parameters back into dictionary.
 
@@ -176,7 +182,12 @@ def json_to_data(json_string: str, custom_objects: Optional[Dict[str, Any]] = No
 
 
 @functools.singledispatch
-def open_path(path: Union[str, pathlib.Path, io.BufferedIOBase], mode: str, verbose: int = 0, suffix: Optional[str] = None):
+def open_path(
+    path: Union[str, pathlib.Path, io.BufferedIOBase],
+    mode: str,
+    verbose: int = 0,
+    suffix: Optional[str] = None,
+):
     """
     Opens a path for reading or writing with a preferred suffix and raises debug information.
     If the provided path is a derivative of io.BufferedIOBase it ensures that the file
@@ -215,7 +226,9 @@ def open_path(path: Union[str, pathlib.Path, io.BufferedIOBase], mode: str, verb
 
 
 @open_path.register(str)
-def open_path_str(path: str, mode: str, verbose: int = 0, suffix: Optional[str] = None) -> io.BufferedIOBase:
+def open_path_str(
+    path: str, mode: str, verbose: int = 0, suffix: Optional[str] = None
+) -> io.BufferedIOBase:
     """
     Open a path given by a string. If writing to the path, the function ensures
     that the path exists.
@@ -233,7 +246,9 @@ def open_path_str(path: str, mode: str, verbose: int = 0, suffix: Optional[str] 
 
 
 @open_path.register(pathlib.Path)
-def open_path_pathlib(path: pathlib.Path, mode: str, verbose: int = 0, suffix: Optional[str] = None) -> io.BufferedIOBase:
+def open_path_pathlib(
+    path: pathlib.Path, mode: str, verbose: int = 0, suffix: Optional[str] = None
+) -> io.BufferedIOBase:
     """
     Open a path given by a string. If writing to the path, the function ensures
     that the path exists.
@@ -314,7 +329,9 @@ def save_to_zip_file(
         if data is not None:
             archive.writestr("data", serialized_data)
         if pytorch_variables is not None:
-            with archive.open("pytorch_variables.pth", mode="w") as pytorch_variables_file:
+            with archive.open(
+                "pytorch_variables.pth", mode="w"
+            ) as pytorch_variables_file:
                 th.save(pytorch_variables, pytorch_variables_file)
         if params is not None:
             for file_name, dict_ in params.items():
@@ -326,7 +343,9 @@ def save_to_zip_file(
         archive.writestr("system_info.txt", get_system_info(print_info=False)[1])
 
 
-def save_to_pkl(path: Union[str, pathlib.Path, io.BufferedIOBase], obj: Any, verbose: int = 0) -> None:
+def save_to_pkl(
+    path: Union[str, pathlib.Path, io.BufferedIOBase], obj: Any, verbose: int = 0
+) -> None:
     """
     Save an object to path creating the necessary folders along the way.
     If the path exists and is a directory, it will raise a warning and rename the path.
@@ -344,7 +363,9 @@ def save_to_pkl(path: Union[str, pathlib.Path, io.BufferedIOBase], obj: Any, ver
         pickle.dump(obj, file_handler, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_from_pkl(path: Union[str, pathlib.Path, io.BufferedIOBase], verbose: int = 0) -> Any:
+def load_from_pkl(
+    path: Union[str, pathlib.Path, io.BufferedIOBase], verbose: int = 0
+) -> Any:
     """
     Load an object from the path. If a suffix is provided in the path, it will use that suffix.
     If the path does not exist, it will attempt to load using the .pkl suffix.
@@ -421,7 +442,11 @@ def load_from_zip_file(
             # Check for all .pth files and load them using th.load.
             # "pytorch_variables.pth" stores PyTorch variables, and any other .pth
             # files store state_dicts of variables with custom names (e.g. policy, policy.optimizer)
-            pth_files = [file_name for file_name in namelist if os.path.splitext(file_name)[1] == ".pth"]
+            pth_files = [
+                file_name
+                for file_name in namelist
+                if os.path.splitext(file_name)[1] == ".pth"
+            ]
             for file_path in pth_files:
                 with archive.open(file_path, mode="r") as param_file:
                     # File has to be seekable, but param_file is not, so load in BytesIO first
@@ -434,7 +459,10 @@ def load_from_zip_file(
                     # Remove ".pth" ending with splitext
                     th_object = th.load(file_content, map_location=device)
                     # "tensors.pth" was renamed "pytorch_variables.pth" in v0.9.0, see PR #138
-                    if file_path == "pytorch_variables.pth" or file_path == "tensors.pth":
+                    if (
+                        file_path == "pytorch_variables.pth"
+                        or file_path == "tensors.pth"
+                    ):
                         # PyTorch variables (not state_dicts)
                         pytorch_variables = th_object
                     else:

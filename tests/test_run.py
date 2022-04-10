@@ -2,13 +2,19 @@ import numpy as np
 import pytest
 
 from stable_baselines3 import A2C, DDPG, DQN, PPO, SAC, TD3
-from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
+from stable_baselines3.common.noise import (
+    NormalActionNoise,
+    OrnsteinUhlenbeckActionNoise,
+)
 
 normal_action_noise = NormalActionNoise(np.zeros(1), 0.1 * np.ones(1))
 
 
 @pytest.mark.parametrize("model_class", [TD3, DDPG])
-@pytest.mark.parametrize("action_noise", [normal_action_noise, OrnsteinUhlenbeckActionNoise(np.zeros(1), 0.1 * np.ones(1))])
+@pytest.mark.parametrize(
+    "action_noise",
+    [normal_action_noise, OrnsteinUhlenbeckActionNoise(np.zeros(1), 0.1 * np.ones(1))],
+)
 def test_deterministic_pg(model_class, action_noise):
     """
     Test for DDPG and variants (TD3).
@@ -28,7 +34,14 @@ def test_deterministic_pg(model_class, action_noise):
 
 @pytest.mark.parametrize("env_id", ["CartPole-v1", "Pendulum-v0"])
 def test_a2c(env_id):
-    model = A2C("MlpPolicy", env_id, seed=0, policy_kwargs=dict(net_arch=[16]), verbose=1, create_eval_env=True)
+    model = A2C(
+        "MlpPolicy",
+        env_id,
+        seed=0,
+        policy_kwargs=dict(net_arch=[16]),
+        verbose=1,
+        create_eval_env=True,
+    )
     model.learn(total_timesteps=1000, eval_freq=500)
 
 
@@ -126,7 +139,9 @@ def test_train_freq(tmp_path, train_freq):
     model.learn(total_timesteps=150)
 
 
-@pytest.mark.parametrize("train_freq", ["4", ("1", "episode"), "non_sense", (1, "close")])
+@pytest.mark.parametrize(
+    "train_freq", ["4", ("1", "episode"), "non_sense", (1, "close")]
+)
 def test_train_freq_fail(train_freq):
     with pytest.raises(ValueError):
         model = SAC(

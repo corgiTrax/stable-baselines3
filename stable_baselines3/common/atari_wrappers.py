@@ -122,7 +122,9 @@ class MaxAndSkipEnv(gym.Wrapper):
     def __init__(self, env: gym.Env, skip: int = 4):
         gym.Wrapper.__init__(self, env)
         # most recent raw observations (for max pooling across time steps)
-        self._obs_buffer = np.zeros((2,) + env.observation_space.shape, dtype=env.observation_space.dtype)
+        self._obs_buffer = np.zeros(
+            (2,) + env.observation_space.shape, dtype=env.observation_space.dtype
+        )
         self._skip = skip
 
     def step(self, action: int) -> GymStepReturn:
@@ -189,7 +191,10 @@ class WarpFrame(gym.ObservationWrapper):
         self.width = width
         self.height = height
         self.observation_space = spaces.Box(
-            low=0, high=255, shape=(self.height, self.width, 1), dtype=env.observation_space.dtype
+            low=0,
+            high=255,
+            shape=(self.height, self.width, 1),
+            dtype=env.observation_space.dtype,
         )
 
     def observation(self, frame: np.ndarray) -> np.ndarray:
@@ -200,7 +205,9 @@ class WarpFrame(gym.ObservationWrapper):
         :return: the observation
         """
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-        frame = cv2.resize(frame, (self.width, self.height), interpolation=cv2.INTER_AREA)
+        frame = cv2.resize(
+            frame, (self.width, self.height), interpolation=cv2.INTER_AREA
+        )
         return frame[:, :, None]
 
 

@@ -9,10 +9,19 @@ import torch as th
 import stable_baselines3 as sb3
 from stable_baselines3 import A2C, PPO
 from stable_baselines3.common.atari_wrappers import ClipRewardEnv, MaxAndSkipEnv
-from stable_baselines3.common.env_util import is_wrapped, make_atari_env, make_vec_env, unwrap_wrapper
+from stable_baselines3.common.env_util import (
+    is_wrapped,
+    make_atari_env,
+    make_vec_env,
+    unwrap_wrapper,
+)
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.noise import ActionNoise, OrnsteinUhlenbeckActionNoise, VectorizedActionNoise
+from stable_baselines3.common.noise import (
+    ActionNoise,
+    OrnsteinUhlenbeckActionNoise,
+    VectorizedActionNoise,
+)
 from stable_baselines3.common.utils import get_system_info, polyak_update, zip_strict
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
@@ -22,7 +31,14 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 @pytest.mark.parametrize("vec_env_cls", [None, SubprocVecEnv])
 @pytest.mark.parametrize("wrapper_class", [None, gym.wrappers.TimeLimit])
 def test_make_vec_env(env_id, n_envs, vec_env_cls, wrapper_class):
-    env = make_vec_env(env_id, n_envs, vec_env_cls=vec_env_cls, wrapper_class=wrapper_class, monitor_dir=None, seed=0)
+    env = make_vec_env(
+        env_id,
+        n_envs,
+        vec_env_cls=vec_env_cls,
+        wrapper_class=wrapper_class,
+        monitor_dir=None,
+        seed=0,
+    )
 
     assert env.num_envs == n_envs
 
@@ -40,10 +56,14 @@ def test_make_vec_env(env_id, n_envs, vec_env_cls, wrapper_class):
 
 @pytest.mark.parametrize("env_id", ["BreakoutNoFrameskip-v4"])
 @pytest.mark.parametrize("n_envs", [1, 2])
-@pytest.mark.parametrize("wrapper_kwargs", [None, dict(clip_reward=False, screen_size=60)])
+@pytest.mark.parametrize(
+    "wrapper_kwargs", [None, dict(clip_reward=False, screen_size=60)]
+)
 def test_make_atari_env(env_id, n_envs, wrapper_kwargs):
     env_id = "BreakoutNoFrameskip-v4"
-    env = make_atari_env(env_id, n_envs, wrapper_kwargs=wrapper_kwargs, monitor_dir=None, seed=0)
+    env = make_atari_env(
+        env_id, n_envs, wrapper_kwargs=wrapper_kwargs, monitor_dir=None, seed=0
+    )
 
     assert env.num_envs == n_envs
 
@@ -67,23 +87,46 @@ def test_make_atari_env(env_id, n_envs, wrapper_kwargs):
 
 
 def test_vec_env_kwargs():
-    env = make_vec_env("MountainCarContinuous-v0", n_envs=1, seed=0, env_kwargs={"goal_velocity": 0.11})
+    env = make_vec_env(
+        "MountainCarContinuous-v0", n_envs=1, seed=0, env_kwargs={"goal_velocity": 0.11}
+    )
     assert env.get_attr("goal_velocity")[0] == 0.11
 
 
 def test_vec_env_wrapper_kwargs():
-    env = make_vec_env("MountainCarContinuous-v0", n_envs=1, seed=0, wrapper_class=MaxAndSkipEnv, wrapper_kwargs={"skip": 3})
+    env = make_vec_env(
+        "MountainCarContinuous-v0",
+        n_envs=1,
+        seed=0,
+        wrapper_class=MaxAndSkipEnv,
+        wrapper_kwargs={"skip": 3},
+    )
     assert env.get_attr("_skip")[0] == 3
 
 
 def test_vec_env_monitor_kwargs():
-    env = make_vec_env("MountainCarContinuous-v0", n_envs=1, seed=0, monitor_kwargs={"allow_early_resets": False})
+    env = make_vec_env(
+        "MountainCarContinuous-v0",
+        n_envs=1,
+        seed=0,
+        monitor_kwargs={"allow_early_resets": False},
+    )
     assert env.get_attr("allow_early_resets")[0] is False
 
-    env = make_atari_env("BreakoutNoFrameskip-v4", n_envs=1, seed=0, monitor_kwargs={"allow_early_resets": False})
+    env = make_atari_env(
+        "BreakoutNoFrameskip-v4",
+        n_envs=1,
+        seed=0,
+        monitor_kwargs={"allow_early_resets": False},
+    )
     assert env.get_attr("allow_early_resets")[0] is False
 
-    env = make_vec_env("MountainCarContinuous-v0", n_envs=1, seed=0, monitor_kwargs={"allow_early_resets": True})
+    env = make_vec_env(
+        "MountainCarContinuous-v0",
+        n_envs=1,
+        seed=0,
+        monitor_kwargs={"allow_early_resets": True},
+    )
     assert env.get_attr("allow_early_resets")[0] is True
 
     env = make_atari_env(
@@ -162,7 +205,9 @@ def test_evaluate_policy():
     with pytest.raises(AssertionError):
         evaluate_policy(model, model.get_env(), n_eval_episodes, reward_threshold=0.0)
 
-    episode_rewards, _ = evaluate_policy(model, model.get_env(), n_eval_episodes, return_episode_rewards=True)
+    episode_rewards, _ = evaluate_policy(
+        model, model.get_env(), n_eval_episodes, return_episode_rewards=True
+    )
     assert len(episode_rewards) == n_eval_episodes
 
     # Test that warning is given about no monitor
@@ -244,7 +289,9 @@ def test_evaluate_policy_monitors(vec_env_class):
             env = wrapper_class(env)
         else:
             if with_monitor:
-                env = vec_env_class([lambda: wrapper_class(Monitor(gym.make(env_id)))] * n_envs)
+                env = vec_env_class(
+                    [lambda: wrapper_class(Monitor(gym.make(env_id)))] * n_envs
+                )
             else:
                 env = vec_env_class([lambda: wrapper_class(gym.make(env_id))] * n_envs)
         return env
@@ -279,13 +326,19 @@ def test_evaluate_policy_monitors(vec_env_class):
     episode_rewards, episode_lengths = evaluate_policy(
         model, eval_env, n_eval_episodes, return_episode_rewards=True, warn=False
     )
-    assert all(map(lambda l: l == 1, episode_lengths)), "AlwaysDoneWrapper did not fix episode lengths to one"
+    assert all(
+        map(lambda l: l == 1, episode_lengths)
+    ), "AlwaysDoneWrapper did not fix episode lengths to one"
     eval_env.close()
 
     # Should get longer episodes with with Monitor (true episodes)
     eval_env = make_eval_env(with_monitor=True, wrapper_class=AlwaysDoneWrapper)
-    episode_rewards, episode_lengths = evaluate_policy(model, eval_env, n_eval_episodes, return_episode_rewards=True)
-    assert all(map(lambda l: l > 1, episode_lengths)), "evaluate_policy did not get episode lengths from Monitor"
+    episode_rewards, episode_lengths = evaluate_policy(
+        model, eval_env, n_eval_episodes, return_episode_rewards=True
+    )
+    assert all(
+        map(lambda l: l > 1, episode_lengths)
+    ), "evaluate_policy did not get episode lengths from Monitor"
     eval_env.close()
 
 
@@ -324,7 +377,9 @@ def test_vec_noise():
 
 def test_polyak():
     param1, param2 = th.nn.Parameter(th.ones((5, 5))), th.nn.Parameter(th.zeros((5, 5)))
-    target1, target2 = th.nn.Parameter(th.ones((5, 5))), th.nn.Parameter(th.zeros((5, 5)))
+    target1, target2 = th.nn.Parameter(th.ones((5, 5))), th.nn.Parameter(
+        th.zeros((5, 5))
+    )
     tau = 0.1
     polyak_update([param1], [param2], tau)
     with th.no_grad():

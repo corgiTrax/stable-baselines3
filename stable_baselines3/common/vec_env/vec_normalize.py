@@ -8,7 +8,11 @@ import numpy as np
 
 from stable_baselines3.common import utils
 from stable_baselines3.common.running_mean_std import RunningMeanStd
-from stable_baselines3.common.vec_env.base_vec_env import VecEnv, VecEnvStepReturn, VecEnvWrapper
+from stable_baselines3.common.vec_env.base_vec_env import (
+    VecEnv,
+    VecEnvStepReturn,
+    VecEnvWrapper,
+)
 
 
 class VecNormalize(VecEnvWrapper):
@@ -50,7 +54,10 @@ class VecNormalize(VecEnvWrapper):
 
         if isinstance(self.observation_space, gym.spaces.Dict):
             self.obs_spaces = self.observation_space.spaces
-            self.obs_rms = {key: RunningMeanStd(shape=self.obs_spaces[key].shape) for key in self.norm_obs_keys}
+            self.obs_rms = {
+                key: RunningMeanStd(shape=self.obs_spaces[key].shape)
+                for key in self.norm_obs_keys
+            }
         else:
             self.obs_spaces = None
             self.obs_rms = RunningMeanStd(shape=self.observation_space.shape)
@@ -78,7 +85,9 @@ class VecNormalize(VecEnvWrapper):
                 self.norm_obs_keys = list(self.observation_space.spaces.keys())
             # Check that all keys are of type Box
             for obs_key in self.norm_obs_keys:
-                if not isinstance(self.observation_space.spaces[obs_key], gym.spaces.Box):
+                if not isinstance(
+                    self.observation_space.spaces[obs_key], gym.spaces.Box
+                ):
                     raise ValueError(
                         f"VecNormalize only supports `gym.spaces.Box` observation spaces but {obs_key} "
                         f"is of type {self.observation_space.spaces[obs_key]}. "
@@ -88,7 +97,9 @@ class VecNormalize(VecEnvWrapper):
 
         elif isinstance(self.observation_space, gym.spaces.Box):
             if self.norm_obs_keys is not None:
-                raise ValueError("`norm_obs_keys` param is applicable only with `gym.spaces.Dict` observation spaces")
+                raise ValueError(
+                    "`norm_obs_keys` param is applicable only with `gym.spaces.Dict` observation spaces"
+                )
 
         else:
             raise ValueError(
@@ -132,7 +143,9 @@ class VecNormalize(VecEnvWrapper):
         :param venv:
         """
         if self.venv is not None:
-            raise ValueError("Trying to set venv of already initialized VecNormalize wrapper.")
+            raise ValueError(
+                "Trying to set venv of already initialized VecNormalize wrapper."
+            )
         VecEnvWrapper.__init__(self, venv)
 
         # Check only that the observation_space match
@@ -168,7 +181,9 @@ class VecNormalize(VecEnvWrapper):
             if not done:
                 continue
             if "terminal_observation" in infos[idx]:
-                infos[idx]["terminal_observation"] = self.normalize_obs(infos[idx]["terminal_observation"])
+                infos[idx]["terminal_observation"] = self.normalize_obs(
+                    infos[idx]["terminal_observation"]
+                )
 
         self.returns[dones] = 0
         return obs, rewards, dones, infos
@@ -185,7 +200,11 @@ class VecNormalize(VecEnvWrapper):
         :param obs_rms: associated statistics
         :return: normalized observation
         """
-        return np.clip((obs - obs_rms.mean) / np.sqrt(obs_rms.var + self.epsilon), -self.clip_obs, self.clip_obs)
+        return np.clip(
+            (obs - obs_rms.mean) / np.sqrt(obs_rms.var + self.epsilon),
+            -self.clip_obs,
+            self.clip_obs,
+        )
 
     def _unnormalize_obs(self, obs: np.ndarray, obs_rms: RunningMeanStd) -> np.ndarray:
         """
@@ -196,7 +215,9 @@ class VecNormalize(VecEnvWrapper):
         """
         return (obs * np.sqrt(obs_rms.var + self.epsilon)) + obs_rms.mean
 
-    def normalize_obs(self, obs: Union[np.ndarray, Dict[str, np.ndarray]]) -> Union[np.ndarray, Dict[str, np.ndarray]]:
+    def normalize_obs(
+        self, obs: Union[np.ndarray, Dict[str, np.ndarray]]
+    ) -> Union[np.ndarray, Dict[str, np.ndarray]]:
         """
         Normalize observations using this VecNormalize's observations statistics.
         Calling this method does not update statistics.
@@ -207,7 +228,9 @@ class VecNormalize(VecEnvWrapper):
             if isinstance(obs, dict) and isinstance(self.obs_rms, dict):
                 # Only normalize the specified keys
                 for key in self.norm_obs_keys:
-                    obs_[key] = self._normalize_obs(obs[key], self.obs_rms[key]).astype(np.float32)
+                    obs_[key] = self._normalize_obs(obs[key], self.obs_rms[key]).astype(
+                        np.float32
+                    )
             else:
                 obs_ = self._normalize_obs(obs, self.obs_rms).astype(np.float32)
         return obs_
@@ -218,10 +241,16 @@ class VecNormalize(VecEnvWrapper):
         Calling this method does not update statistics.
         """
         if self.norm_reward:
-            reward = np.clip(reward / np.sqrt(self.ret_rms.var + self.epsilon), -self.clip_reward, self.clip_reward)
+            reward = np.clip(
+                reward / np.sqrt(self.ret_rms.var + self.epsilon),
+                -self.clip_reward,
+                self.clip_reward,
+            )
         return reward
 
-    def unnormalize_obs(self, obs: Union[np.ndarray, Dict[str, np.ndarray]]) -> Union[np.ndarray, Dict[str, np.ndarray]]:
+    def unnormalize_obs(
+        self, obs: Union[np.ndarray, Dict[str, np.ndarray]]
+    ) -> Union[np.ndarray, Dict[str, np.ndarray]]:
         # Avoid modifying by reference the original object
         obs_ = deepcopy(obs)
         if self.norm_obs:
@@ -292,5 +321,8 @@ class VecNormalize(VecEnvWrapper):
 
     @property
     def ret(self) -> np.ndarray:
-        warnings.warn("`VecNormalize` `ret` attribute is deprecated. Please use `returns` instead.", DeprecationWarning)
+        warnings.warn(
+            "`VecNormalize` `ret` attribute is deprecated. Please use `returns` instead.",
+            DeprecationWarning,
+        )
         return self.returns

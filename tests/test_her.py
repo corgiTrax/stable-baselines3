@@ -156,7 +156,9 @@ def test_save_load(tmp_path, model_class, use_sde, online_sampling):
     params = deepcopy(model.policy.state_dict())
 
     # Modify all parameters to be random values
-    random_params = dict((param_name, th.rand_like(param)) for param_name, param in params.items())
+    random_params = dict(
+        (param_name, th.rand_like(param)) for param_name, param in params.items()
+    )
 
     # Update model parameters with the new random values
     model.policy.load_state_dict(random_params)
@@ -164,7 +166,9 @@ def test_save_load(tmp_path, model_class, use_sde, online_sampling):
     new_params = model.policy.state_dict()
     # Check that all params are different now
     for k in params:
-        assert not th.allclose(params[k], new_params[k]), "Parameters did not change as expected."
+        assert not th.allclose(
+            params[k], new_params[k]
+        ), "Parameters did not change as expected."
 
     params = new_params
 
@@ -178,7 +182,12 @@ def test_save_load(tmp_path, model_class, use_sde, online_sampling):
     # test custom_objects
     # Load with custom objects
     custom_objects = dict(learning_rate=2e-5, dummy=1.0)
-    model_ = model_class.load(str(tmp_path / "test_save.zip"), env=env, custom_objects=custom_objects, verbose=2)
+    model_ = model_class.load(
+        str(tmp_path / "test_save.zip"),
+        env=env,
+        custom_objects=custom_objects,
+        verbose=2,
+    )
     assert model_.verbose == 2
     # Check that the custom object was taken into account
     assert model_.learning_rate == custom_objects["learning_rate"]
@@ -192,7 +201,9 @@ def test_save_load(tmp_path, model_class, use_sde, online_sampling):
 
     # Check that all params are the same as before save load procedure now
     for key in params:
-        assert th.allclose(params[key], new_params[key]), "Model parameters not the same after save and load."
+        assert th.allclose(
+            params[key], new_params[key]
+        ), "Model parameters not the same after save and load."
 
     # check if model still selects the same actions
     new_selected_actions, _ = model.predict(observations, deterministic=True)
@@ -202,7 +213,9 @@ def test_save_load(tmp_path, model_class, use_sde, online_sampling):
     model.learn(total_timesteps=150)
 
     # Test that the change of parameters works
-    model = model_class.load(str(tmp_path / "test_save.zip"), env=env, verbose=3, learning_rate=2.0)
+    model = model_class.load(
+        str(tmp_path / "test_save.zip"), env=env, verbose=3, learning_rate=2.0
+    )
     assert model.learning_rate == 2.0
     assert model.verbose == 3
 
@@ -212,7 +225,9 @@ def test_save_load(tmp_path, model_class, use_sde, online_sampling):
 
 @pytest.mark.parametrize("online_sampling", [False, True])
 @pytest.mark.parametrize("truncate_last_trajectory", [False, True])
-def test_save_load_replay_buffer(tmp_path, recwarn, online_sampling, truncate_last_trajectory):
+def test_save_load_replay_buffer(
+    tmp_path, recwarn, online_sampling, truncate_last_trajectory
+):
     """
     Test if 'save_replay_buffer' and 'load_replay_buffer' works correctly
     """
@@ -258,7 +273,9 @@ def test_save_load_replay_buffer(tmp_path, recwarn, online_sampling, truncate_la
     if truncate_last_trajectory:
         assert len(recwarn) == 1
         warning = recwarn.pop(UserWarning)
-        assert "The last trajectory in the replay buffer will be truncated" in str(warning.message)
+        assert "The last trajectory in the replay buffer will be truncated" in str(
+            warning.message
+        )
     else:
         assert len(recwarn) == 0
 
@@ -287,8 +304,14 @@ def test_save_load_replay_buffer(tmp_path, recwarn, online_sampling, truncate_la
         )
     else:
         replay_buffer = model.replay_buffer.replay_buffer
-        assert np.allclose(old_replay_buffer.observations["observation"], replay_buffer.observations["observation"])
-        assert np.allclose(old_replay_buffer.observations["desired_goal"], replay_buffer.observations["desired_goal"])
+        assert np.allclose(
+            old_replay_buffer.observations["observation"],
+            replay_buffer.observations["observation"],
+        )
+        assert np.allclose(
+            old_replay_buffer.observations["desired_goal"],
+            replay_buffer.observations["desired_goal"],
+        )
         assert np.allclose(old_replay_buffer.actions, replay_buffer.actions)
         assert np.allclose(old_replay_buffer.rewards, replay_buffer.rewards)
         assert np.allclose(old_replay_buffer.dones, replay_buffer.dones)
@@ -337,14 +360,20 @@ def test_get_max_episode_length():
         get_time_limit(dict_env, current_max_episode_length=None)
 
     default_length = 10
-    assert get_time_limit(dict_env, current_max_episode_length=default_length) == default_length
+    assert (
+        get_time_limit(dict_env, current_max_episode_length=default_length)
+        == default_length
+    )
 
     env = gym.make("CartPole-v1")
     vec_env = DummyVecEnv([lambda: env])
 
     assert get_time_limit(vec_env, current_max_episode_length=None) == 500
     # Overwrite max_episode_steps
-    assert get_time_limit(vec_env, current_max_episode_length=default_length) == default_length
+    assert (
+        get_time_limit(vec_env, current_max_episode_length=default_length)
+        == default_length
+    )
 
     # Set max_episode_steps to None
     env.spec.max_episode_steps = None
@@ -353,7 +382,12 @@ def test_get_max_episode_length():
         get_time_limit(vec_env, current_max_episode_length=None)
 
     # Initialize HER and specify max_episode_length, should not raise an issue
-    DQN("MultiInputPolicy", dict_env, replay_buffer_class=HerReplayBuffer, replay_buffer_kwargs=dict(max_episode_length=5))
+    DQN(
+        "MultiInputPolicy",
+        dict_env,
+        replay_buffer_class=HerReplayBuffer,
+        replay_buffer_kwargs=dict(max_episode_length=5),
+    )
 
     with pytest.raises(ValueError):
         DQN("MultiInputPolicy", dict_env, replay_buffer_class=HerReplayBuffer)
@@ -361,7 +395,12 @@ def test_get_max_episode_length():
     # Wrapped in a timelimit, should be fine
     # Note: it requires env.spec to be defined
     env = DummyVecEnv([lambda: gym.wrappers.TimeLimit(BitFlippingEnv(), 10)])
-    DQN("MultiInputPolicy", env, replay_buffer_class=HerReplayBuffer, replay_buffer_kwargs=dict(max_episode_length=5))
+    DQN(
+        "MultiInputPolicy",
+        env,
+        replay_buffer_class=HerReplayBuffer,
+        replay_buffer_kwargs=dict(max_episode_length=5),
+    )
 
 
 @pytest.mark.parametrize("online_sampling", [False, True])
