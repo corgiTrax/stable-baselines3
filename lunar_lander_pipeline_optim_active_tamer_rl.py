@@ -10,6 +10,7 @@ from typing import Callable
 import gym
 import numpy as np
 import torch
+import collections
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -52,6 +53,8 @@ class LunarLanderSceneGraph:
     flag1 = {'location': {'x': -0.28, 'y': 0.235}}
     flag2 = {'location': {'x': 0.28, 'y': 0.235}}
     mountain = {'location': {'x': 0, 'y': 0}}
+    state_counts = collections.Counter()
+    total_counts = 0
 
     def isLeft(self, obj_a, obj_b):
         return obj_a['location']['x'] < obj_b['location']['x']
@@ -60,13 +63,18 @@ class LunarLanderSceneGraph:
         return obj_a['location']['y'] > obj_b['location']['y']
     
     def getCurrGraph(self):
-        return [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
+        curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
                 self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
+        
+        self.state_counts[tuple(curr_graph)] += 1
+        self.total_counts += 1
+        self.curr_prob = self.state_counts[tuple(curr_graph)] / self.total_counts
+        return curr_graph
     
     def updateGraph(self, newState):
         prev_graph = self.getCurrGraph()
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
-        return self.getCurrGraph() != prev_graph
+        return self.getCurrGraph() != prev_graph, 0.1 * (1 - self.curr_prob)
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):

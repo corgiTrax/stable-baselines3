@@ -777,7 +777,7 @@ class ActiveSACHPolicy(BasePolicy):
                 "share_features_extractor": share_features_extractor,
             }
         )
-        self.state_reconstruction_arch = [400, 300, 3, 300, 400]
+        self.state_reconstruction_arch = [400, 150, 3, 150, 400]
         self.state_reconstruction_kwargs = self.net_args.copy()
         self.state_reconstruction_kwargs.update(
             {
