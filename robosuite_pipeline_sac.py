@@ -22,6 +22,7 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
 import robosuite as suite
+from robosuite import wrappers
 from robosuite import load_controller_config
 
 
@@ -49,17 +50,17 @@ def main():
         "controller_configs": load_controller_config(default_controller="OSC_POSE"),
     }
 
-    env = suite.make(
+    env = wrappers.GymWrapper(suite.make(
         **robosuite_config,
         has_renderer=False,
-        has_offscreen_renderer=False,
+        has_offscreen_renderer=True,
         render_camera="agentview",
         ignore_done=False,
-        use_camera_obs=False,
+        use_camera_obs=True,
         reward_shaping=True,
         control_freq=20,
         hard_reset=False,
-    )
+    ))
 
     print(env)
 
