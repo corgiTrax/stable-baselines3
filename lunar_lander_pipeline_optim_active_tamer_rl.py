@@ -54,7 +54,7 @@ class LunarLanderSceneGraph:
     flag2 = {'location': {'x': 0.28, 'y': 0.235}}
     mountain = {'location': {'x': 0, 'y': 0}}
     state_counts = collections.Counter()
-    total_counts = 0
+    max_counts = 0
 
     def isLeft(self, obj_a, obj_b):
         return obj_a['location']['x'] < obj_b['location']['x']
@@ -67,8 +67,8 @@ class LunarLanderSceneGraph:
                 self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
         
         self.state_counts[tuple(curr_graph)] += 1
-        self.total_counts += 1
-        self.curr_prob = self.state_counts[tuple(curr_graph)] / self.total_counts
+        self.max_counts = max(self.max_counts, self.state_counts[tuple(curr_graph)])
+        self.curr_prob = self.state_counts[tuple(curr_graph)] / self.max_counts
         return curr_graph
     
     def updateGraph(self, newState):
