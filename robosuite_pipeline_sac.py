@@ -39,7 +39,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
-    with open("configs/sac.yaml", "r") as f:
+    with open("configs/robosuite/sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
@@ -53,10 +53,10 @@ def main():
     env = wrappers.GymWrapper(suite.make(
         **robosuite_config,
         has_renderer=False,
-        has_offscreen_renderer=True,
+        has_offscreen_renderer=False,
         render_camera="agentview",
         ignore_done=False,
-        use_camera_obs=True,
+        use_camera_obs=False,
         reward_shaping=True,
         control_freq=20,
         hard_reset=False,
@@ -67,7 +67,7 @@ def main():
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[400, 300],
+        net_arch=[256, 256],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
