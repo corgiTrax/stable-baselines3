@@ -18,11 +18,11 @@
 # trained_model: "trained-models/LunarLanderContinuous-v2.zip"
 
 gamma: 0.99
-seed: 53
+seed: 42
 tensorboard_log_dir: "log_dir"
 policy_name: "ActiveMlpPolicy"
 verbose: 1
-steps: 200000
+steps: 500000
 load_model: 0  
 save_every_steps: 50000
 learning_rate: 0.00073
