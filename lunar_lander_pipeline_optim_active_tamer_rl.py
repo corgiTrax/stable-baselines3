@@ -68,13 +68,13 @@ class LunarLanderSceneGraph:
         
         self.state_counts[tuple(curr_graph)] += 1
         self.max_counts = max(self.max_counts, self.state_counts[tuple(curr_graph)])
-        self.curr_prob = self.state_counts[tuple(curr_graph)] / self.max_counts
+        self.curr_prob = 0.1 * (1 - self.state_counts[tuple(curr_graph)] / self.max_counts) * max(1, 10 ** (20 / (self.state_counts[tuple(curr_graph)] ** 0.3)) - 2)
         return curr_graph
     
     def updateGraph(self, newState):
         prev_graph = self.getCurrGraph()
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
-        return self.getCurrGraph() != prev_graph, 0.1 * (1 - self.curr_prob)
+        return self.getCurrGraph() != prev_graph, self.curr_prob
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -90,7 +90,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
-    with open("configs/active_tamer_rl_sac.yaml", "r") as f:
+    with open("configs/lunar_lander/active_tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
