@@ -68,7 +68,8 @@ class LunarLanderSceneGraph:
         
         self.state_counts[tuple(curr_graph)] += 1
         self.max_counts = max(self.max_counts, self.state_counts[tuple(curr_graph)])
-        self.curr_prob = 0.1 * (1 - self.state_counts[tuple(curr_graph)] / self.max_counts) * max(1, (10 ** (20 / (self.state_counts[tuple(curr_graph)] ** 0.3)) - 0.0001 * self.state_counts[tuple(curr_graph)]))
+        scaling_factor = 10 ** (20 / (self.state_counts[tuple(curr_graph)] ** 0.3)) if self.state_counts[tuple(curr_graph)]  > 20000 else 1
+        self.curr_prob = 0.1 * (1 - self.state_counts[tuple(curr_graph)] / self.max_counts) * scaling_factor
         return curr_graph
     
     def updateGraph(self, newState):
