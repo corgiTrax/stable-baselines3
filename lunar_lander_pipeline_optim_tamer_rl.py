@@ -37,7 +37,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 def main():
     
-    with open("configs/tamer_rl_sac.yaml", "r") as f:
+    with open("configs/lunar_lander/tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
     
     torch.manual_seed(config_data['seed'])
