@@ -20,9 +20,12 @@ def tabulate_events(dpath, target_len):
     print(tags)
     for tag in tags:
         for events in zip(*[acc.Scalars(tag) for acc in summary_iterators]):
-            if np.mean([e.step for e in events]) < target_len:
-                out[tag].append([e.value for e in events])
-                steps[tag].append(np.mean([e.step for e in events]))
+            if tag == 'rollout/ep_rew_mean':
+                print(np.mean([e.step for e in events]))
+                print([e.step for e in events])
+                if np.mean([e.step for e in events]) < target_len:
+                    out[tag].append([e.value for e in events])
+                    steps[tag].append(np.mean([e.step for e in events]))
 
     return out, steps
 
@@ -41,7 +44,7 @@ def write_combined_events(dpath, d_combined, steps, dname='combined'):
             for i, mean in enumerate(means):
                 tf.summary.scalar(tag, mean, step=steps[tag][i])
 
-dpath = 'final_results/ActiveTamer'
+dpath = 'final_results/TamerRL30Random'
 
 data, steps = tabulate_events(dpath, 150000)
 write_combined_events(dpath, data, steps, dname='averaged')
