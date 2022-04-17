@@ -16,6 +16,7 @@ import torch.optim as optim
 import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
+import argparse
 
 from stable_baselines3.active_tamer.tamer_sac_bc import TamerSACBC
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -35,9 +36,12 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
-def main():
+def main(args):
     with open("configs/tamer_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
+    
+    if args.seed:
+        config_data['seed'] = args.seed
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
     env = gym.make("LunarLanderContinuous-v2")
@@ -102,4 +106,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    msg = "Overwrite config params"
+    parser = argparse.ArgumentParser(description = msg)
+    parser.add_argument("--seed", type=int, default=None)
+
+    args = parser.parse_args()
+    main(args)
