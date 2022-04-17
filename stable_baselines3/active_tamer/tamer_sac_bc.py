@@ -1,5 +1,6 @@
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from git import Object
 
 import gym
 import numpy as np
@@ -208,7 +209,7 @@ class TamerSACBC(OffPolicyAlgorithm):
     def train(
         self,
         gradient_steps: int,
-        human_feedback_gui: None,
+        human_feedback_gui: Object = None,
         batch_size: int = 64,
     ) -> None:
         # Switch to train mode (this affects batch norm / dropout)
