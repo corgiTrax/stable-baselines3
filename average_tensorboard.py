@@ -1,10 +1,12 @@
 import os
 from collections import defaultdict
+from matplotlib.pyplot import close
 
 import numpy as np
 from responses import target
 import tensorflow as tf
 from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+from torch import long
 
 
 def tabulate_events(dpath, target_len):
@@ -17,15 +19,23 @@ def tabulate_events(dpath, target_len):
 
     out = defaultdict(list)
     steps = defaultdict(list)
-    print(tags)
+    data = defaultdict(list)
+    longest_iterator = [-1, 0]
+
     for tag in tags:
-        for events in zip(*[acc.Scalars(tag) for acc in summary_iterators]):
-            if tag == 'rollout/ep_rew_mean':
-                print(np.mean([e.step for e in events]))
-                print([e.step for e in events])
-                if np.mean([e.step for e in events]) < target_len:
-                    out[tag].append([e.value for e in events])
-                    steps[tag].append(np.mean([e.step for e in events]))
+        data[tag] = []
+        for index, curr_iterator in enumerate(summary_iterators):
+            data[tag].append([(i.step, i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
+            if longest_iterator[1] < len(data[tag][-1]):
+                longest_iterator = [index, len(data[tag][-1])]
+    
+    for tag in tags:
+        for index, i in enumerate(summary_iterators[longest_iterator[0]].Scalars(tag)):
+            if i.step < target_len:
+                closest_indices = [min(data[tag][iterator],key=lambda x:abs(x[0] - i.step))[2] for iterator in range(len(summary_iterators))]
+                curr_values = [data[tag][iterator][closest_indices[iterator]][1] for iterator in range(len(summary_iterators))]
+                out[tag].append(curr_values)
+                steps[tag].append(i.step)
 
     return out, steps
 
@@ -44,7 +54,9 @@ def write_combined_events(dpath, d_combined, steps, dname='combined'):
             for i, mean in enumerate(means):
                 tf.summary.scalar(tag, mean, step=steps[tag][i])
 
-dpath = 'final_results/TamerRL30Random'
+dpath = 'final_results/ActiveTamer'
 
 data, steps = tabulate_events(dpath, 150000)
 write_combined_events(dpath, data, steps, dname='averaged')
+
+# tabulate_events(dpath, 150000)
