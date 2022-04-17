@@ -93,6 +93,8 @@ def main(args):
     if not config_data["load_model"]:
         model.learn(
             config_data["steps"],
+            human_feedback_gui=None,
+            human_feedback=None
         )
         mean_reward, std_reward = evaluate_policy(
             model, env, n_eval_episodes=20, render=True
