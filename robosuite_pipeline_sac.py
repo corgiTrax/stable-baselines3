@@ -46,7 +46,7 @@ def main():
 
     robosuite_config = {
         "env_name": "Lift",
-        "robots": "Panda",
+        "robots": "Sawyer",
         "controller_configs": load_controller_config(default_controller="OSC_POSE"),
     }
 
