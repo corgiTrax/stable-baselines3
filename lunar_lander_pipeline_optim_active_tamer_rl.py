@@ -56,26 +56,37 @@ class LunarLanderSceneGraph:
     mountain = {'location': {'x': 0, 'y': 0}}
     state_counts = collections.Counter()
     max_counts = 0
+    curr_graph = None
+    total_feedback = 1500
+    given_feedback = 0
 
     def isLeft(self, obj_a, obj_b):
         return obj_a['location']['x'] < obj_b['location']['x']
     
     def onTop(self, obj_a, obj_b):
         return obj_a['location']['y'] > obj_b['location']['y']
+
+    def getStateRank(self):
+        curr_graph_count = self.state_counts[tuple(self.curr_graph)]
+        rank = 0
+        for graph in self.state_counts:
+            if self.state_counts[graph] < curr_graph_count:
+                rank += 1
+        return rank
     
     def getCurrGraph(self):
-        curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
+        self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
                 self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
         
-        self.state_counts[tuple(curr_graph)] += 1
-        self.max_counts = max(self.max_counts, self.state_counts[tuple(curr_graph)])
-        self.curr_prob = 0.1 * (1 - self.state_counts[tuple(curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(curr_graph)]))
-        return curr_graph
+        self.state_counts[tuple(self.curr_graph)] += 1
+        self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
+        self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
     
     def updateGraph(self, newState):
-        prev_graph = self.getCurrGraph()
+        prev_graph = self.curr_graph
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
-        return self.getCurrGraph() != prev_graph, self.curr_prob
+        self.given_feedback += 1
+        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() < int(self.total_feedback / self.given_feedback)
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):

@@ -569,7 +569,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
                 simulated_human_reward = 0
-                scene_graph_updated, curr_state_prob = self.scene_graph.updateGraph(new_obs)
+                scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs)
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
                         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
@@ -583,7 +583,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 )
                 if (
                     # scene_graph_updated
-                    random.random() < curr_state_prob  
+                    # random.random() < curr_state_prob  
+                    unfamiliar_state
                     # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
