@@ -114,7 +114,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         model_name: str = "TamerRLSACOptim",
         render: bool = False,
         q_val_threshold: float = 0.99,
-        rl_threshold: float = 0,
+        rl_threshold: float = 0.1,
         percent_feedback: float = 1.0,
     ):
 
@@ -536,7 +536,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
                 self.total_feedback += 1 if simulated_human_reward != 0 else 0
 
                 self.q_val_threshold += 0.00000001
-                self.rl_threshold += 1 / 500000
+                # self.rl_threshold += 1 / 500000
                 new_obs, reward, done, infos = env.step(action)
 
                 self.num_timesteps += 1
