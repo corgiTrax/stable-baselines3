@@ -6,6 +6,7 @@ import random
 import sys
 import threading as thread
 from typing import Callable
+import copy
 
 import gym
 import numpy as np
@@ -81,9 +82,10 @@ class LunarLanderSceneGraph:
         self.state_counts[tuple(self.curr_graph)] += 1
         self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
         self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
-    
+        return self.curr_graph
+        
     def updateGraph(self, newState):
-        prev_graph = self.curr_graph
+        prev_graph = copy.copy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.given_feedback += 1
         return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= min(10, int(self.total_feedback / self.given_feedback))
