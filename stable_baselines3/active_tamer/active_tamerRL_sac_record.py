@@ -573,7 +573,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
                         self.feedback_file.write(
-                            f"Human Feedback received at timestpe {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                            f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
                         )
                     
                     else:

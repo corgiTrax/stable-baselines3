@@ -7,10 +7,12 @@ import sys
 import threading as thread
 from typing import Callable
 from gevent import config
+import copy
 
 import gym
 import numpy as np
 import torch
+import collections
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -48,6 +50,47 @@ def get_abstract_state(curr_state_vec):
         x_state = 1
 
     return x_state * 3 + y_state
+
+class LunarLanderSceneGraph:
+    agent = {'location': {'x': 0, 'y': 0}}
+    flag1 = {'location': {'x': -0.28, 'y': 0.235}}
+    flag2 = {'location': {'x': 0.28, 'y': 0.235}}
+    mountain = {'location': {'x': 0, 'y': 0}}
+    state_counts = collections.Counter()
+    max_counts = 0
+    curr_graph = None
+    total_feedback = 7500
+    given_feedback = 0
+
+    def isLeft(self, obj_a, obj_b):
+        return obj_a['location']['x'] < obj_b['location']['x']
+    
+    def onTop(self, obj_a, obj_b):
+        return obj_a['location']['y'] > obj_b['location']['y']
+
+    def getStateRank(self):
+        curr_graph_count = self.state_counts[tuple(self.curr_graph)]
+        rank = 0
+        for graph in self.state_counts:
+            if self.state_counts[graph] < curr_graph_count:
+                rank += 1
+        return rank
+    
+    def getCurrGraph(self):
+        self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
+                self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
+        
+        self.state_counts[tuple(self.curr_graph)] += 1
+        self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
+        self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
+        return self.curr_graph
+        
+    def updateGraph(self, newState):
+        prev_graph = copy.copy(self.curr_graph)
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
+        self.given_feedback += 1
+        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= min(10, int(self.total_feedback / self.given_feedback))
+
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
