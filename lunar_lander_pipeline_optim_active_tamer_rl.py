@@ -75,10 +75,22 @@ class LunarLanderSceneGraph:
                 rank += 1
         return rank
     
+    def midway(self, obj_a):
+        return obj_a['location']['y'] < 0.5
+    
+    def oob_left(self, obj_a):
+        return obj_a['location']['x'] < -0.33
+    
+    def oob_right(self, obj_a):
+        return obj_a['location']['x'] > 0.33
+    
+    def oob_top(self, obj_a):
+        return obj_a['location']['y'] < 0.0
+    
     def getCurrGraph(self):
-        self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
-                self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
-        
+        # self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
+        #         self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
+        self.curr_graph = [self.isLeft(self.agent, self.mountain), self.onTop(self.agent, self.mountain), self.midway(self.agent), self.oob_left(self.agent), self.oob_right(self.agent), self.oob_top(self.agent)]
         self.state_counts[tuple(self.curr_graph)] += 1
         self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
         self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
