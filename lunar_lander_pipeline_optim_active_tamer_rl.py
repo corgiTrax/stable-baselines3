@@ -79,13 +79,13 @@ class LunarLanderSceneGraph:
         return obj_a['location']['y'] < 0.5
     
     def oob_left(self, obj_a):
-        return obj_a['location']['x'] < -0.33
+        return obj_a['location']['x'] < -0.4
     
     def oob_right(self, obj_a):
-        return obj_a['location']['x'] > 0.33
+        return obj_a['location']['x'] > 0.4
     
     def oob_top(self, obj_a):
-        return obj_a['location']['y'] < 0.0
+        return obj_a['location']['y'] > 1.0
     
     def getCurrGraph(self):
         # self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
