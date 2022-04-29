@@ -100,7 +100,7 @@ class LunarLanderSceneGraph:
         prev_graph = copy.copy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.given_feedback += 1
-        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= min(10, int(self.total_feedback / self.given_feedback))
+        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= int(self.total_feedback / self.given_feedback)
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
