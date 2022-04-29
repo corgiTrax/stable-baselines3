@@ -584,8 +584,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 if (
                     # scene_graph_updated
                     # random.random() < curr_state_prob  
-                    unfamiliar_state or
-                    state_prediction_err > self.prediction_threshold
+                    unfamiliar_state
+                    # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
