@@ -582,9 +582,9 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     th.from_numpy(prev_obs).to(self.device).reshape(1, -1)
                 )
                 if (
-                    scene_graph_updated
+                    # scene_graph_updated
                     # random.random() < curr_state_prob  
-                    # unfamiliar_state
+                    unfamiliar_state
                     # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
