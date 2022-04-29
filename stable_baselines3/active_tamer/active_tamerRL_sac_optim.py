@@ -117,7 +117,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
         q_val_threshold: float = 0.99,
         rl_threshold: float = 0.1,
         abstract_state: Object = None,
-        prediction_threshold: float = 0.05,
+        prediction_threshold: float = 0.2,
         scene_graph: Object = None,
     ):
 
@@ -584,8 +584,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 if (
                     # scene_graph_updated
                     # random.random() < curr_state_prob  
-                    unfamiliar_state
-                    # state_prediction_err > self.prediction_threshold
+                    unfamiliar_state or
+                    state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
