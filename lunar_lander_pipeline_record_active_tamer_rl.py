@@ -59,7 +59,7 @@ class LunarLanderSceneGraph:
     state_counts = collections.Counter()
     max_counts = 0
     curr_graph = None
-    total_feedback = 7500
+    total_feedback = 7600
     given_feedback = 0
 
     def isLeft(self, obj_a, obj_b):
@@ -76,10 +76,22 @@ class LunarLanderSceneGraph:
                 rank += 1
         return rank
     
+    def midway(self, obj_a):
+        return obj_a['location']['y'] < 0.5
+    
+    def oob_left(self, obj_a):
+        return obj_a['location']['x'] < -0.4
+    
+    def oob_right(self, obj_a):
+        return obj_a['location']['x'] > 0.4
+    
+    def oob_top(self, obj_a):
+        return obj_a['location']['y'] > 1.0
+    
     def getCurrGraph(self):
         self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
                 self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
-        
+        # self.curr_graph = [self.isLeft(self.agent, self.mountain), self.onTop(self.agent, self.mountain), self.midway(self.agent), self.oob_left(self.agent), self.oob_right(self.agent), self.oob_top(self.agent)]
         self.state_counts[tuple(self.curr_graph)] += 1
         self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
         self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
@@ -89,7 +101,7 @@ class LunarLanderSceneGraph:
         prev_graph = copy.copy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.given_feedback += 1
-        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= min(10, int(self.total_feedback / self.given_feedback))
+        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= int(self.total_feedback / self.given_feedback)
 
 
 
@@ -156,6 +168,7 @@ def main():
         render=True,
         trained_model=trained_model,
         abstract_state=get_abstract_state,
+        scene_graph=LunarLanderSceneGraph()
     )
 
     print(f"Model Policy = " + str(model.policy))

@@ -122,7 +122,8 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
         rl_threshold: float = 0.1,
         abstract_state: Object = None,
         prediction_threshold: float = 0.012,
-        experiment_save_dir: str = "human_study/participant_defaul"
+        experiment_save_dir: str = "human_study/participant_default",
+        scene_graph: Object = None,
     ):
 
         super(ActiveTamerRLSACRecord, self).__init__(
@@ -167,6 +168,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
+        self.scene_graph = scene_graph
         self.get_abstract_state = abstract_state
         self.curr_abstract_state = 0
         self.prediction_threshold = prediction_threshold
@@ -550,9 +552,11 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                     ),
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
+                scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs)
                 if (
-                    next_abstract_state != self.curr_abstract_state
-                    or state_prediction_err > self.prediction_threshold
+                    # next_abstract_state != self.curr_abstract_state
+                    # or state_prediction_err > self.prediction_threshold
+                    unfamiliar_state
                 ):
                     self.feedback_file.write(
                         f"Abstract state at timestep {str(self.num_timesteps)} is {str(next_abstract_state)}\n"
