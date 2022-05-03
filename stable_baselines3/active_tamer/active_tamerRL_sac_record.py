@@ -22,7 +22,7 @@ from stable_baselines3.common.type_aliases import (
 )
 from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
 from stable_baselines3.common.vec_env import VecEnv
-
+import time
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
 
@@ -555,7 +555,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs)
                 if (
                     # next_abstract_state != self.curr_abstract_state
-                    # or state_prediction_err > self.prediction_threshold
+                    # state_prediction_err > self.prediction_threshold
                     unfamiliar_state
                 ):
                     self.feedback_file.write(
@@ -570,9 +570,11 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                             human_feedback.return_human_keyboard_feedback()
                         )
                         while not curr_keyboard_feedback or type(curr_keyboard_feedback) != int:
+                            time.sleep(0.01)
                             curr_keyboard_feedback = (
                                 human_feedback.return_human_keyboard_feedback()
                             ) # stall till you get human feedback
+                            # print(curr_keyboard_feedback)
                             print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
