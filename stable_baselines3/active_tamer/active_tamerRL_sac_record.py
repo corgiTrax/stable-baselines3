@@ -533,6 +533,25 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
+                teacher_action, _ = self.trained_model.predict(self._last_obs)
+                teacher_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(teacher_action).to(self.device),
+                )
+                teacher_q_val, _ = th.min(
+                    th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
+                )
+                teacher_q_val = teacher_q_val.cpu()[0][0]
+
+                student_q_val = self.trained_model.critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(action).to(self.device),
+                )
+                student_q_val, _ = th.min(
+                    th.cat(student_q_val, dim=1), dim=1, keepdim=True
+                )
+                student_q_val = student_q_val.cpu()[0][0]
+
                 # Rescale and perform action
                 if self.render:
                     env.render()
@@ -570,12 +589,17 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                             human_feedback.return_human_keyboard_feedback()
                         )
                         while not curr_keyboard_feedback or type(curr_keyboard_feedback) != int:
+                            simulated_human_reward = (
+                                1
+                                if self.q_val_threshold * teacher_q_val < student_q_val
+                                else -1
+                            )
                             time.sleep(0.01)
                             curr_keyboard_feedback = (
                                 human_feedback.return_human_keyboard_feedback()
                             ) # stall till you get human feedback
                             # print(curr_keyboard_feedback)
-                            print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
+                            # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
                         self.feedback_file.write(

@@ -118,7 +118,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
-    with open("configs/lunar_lander/active_tamer_rl_sac.yaml", "r") as f:
+    with open("configs/lunar_lander/active_tamer_rl_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
