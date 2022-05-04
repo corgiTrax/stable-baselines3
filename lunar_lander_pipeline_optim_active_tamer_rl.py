@@ -58,7 +58,7 @@ class LunarLanderSceneGraph:
     state_counts = collections.Counter()
     max_counts = 0
     curr_graph = None
-    total_feedback = 7600
+    total_feedback = 10000
     given_feedback = 0
 
     def isLeft(self, obj_a, obj_b):
@@ -115,7 +115,7 @@ class LunarLanderSceneGraph:
         self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
         self.agent['orientation'] = newState[0][4]
         self.given_feedback += 1
-        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= int(self.total_feedback / self.given_feedback)
+        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback) + 2)
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
