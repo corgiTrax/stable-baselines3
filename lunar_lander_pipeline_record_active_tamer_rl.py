@@ -52,14 +52,14 @@ def get_abstract_state(curr_state_vec):
     return x_state * 3 + y_state
 
 class LunarLanderSceneGraph:
-    agent = {'location': {'x': 0, 'y': 0}}
+    agent = {'location': {'x': 0, 'y': 0}, 'action': {'down': 0, 'lateral': 0}}
     flag1 = {'location': {'x': -0.28, 'y': 0.235}}
     flag2 = {'location': {'x': 0.28, 'y': 0.235}}
     mountain = {'location': {'x': 0, 'y': 0}}
     state_counts = collections.Counter()
     max_counts = 0
     curr_graph = None
-    total_feedback = 7600
+    total_feedback = 120000
     given_feedback = 0
 
     def isLeft(self, obj_a, obj_b):
@@ -88,21 +88,35 @@ class LunarLanderSceneGraph:
     def oob_top(self, obj_a):
         return obj_a['location']['y'] > 1.0
     
+    def main_engine_on(self, obj_a):
+        return obj_a['action']['down'] > 0
+    
+    def left_engine_on(self, obj_a):
+        return obj_a['action']['lateral']  < -0.5
+    
+    def right_engine_on(self, obj_a):
+        return obj_a['action']['lateral']  > 0.5
+
+    def is_upright(self, obj_a):
+        return obj_a['orientation'] > -0.5 and obj_a['orientation'] < 0.5 # this is in radians. 0.0 is facing +y on coord plane.
+    
     def getCurrGraph(self):
         self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
-                self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain)]
+                self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain), 
+                self.is_upright(self.agent), self.main_engine_on(self.agent)]
         # self.curr_graph = [self.isLeft(self.agent, self.mountain), self.onTop(self.agent, self.mountain), self.midway(self.agent), self.oob_left(self.agent), self.oob_right(self.agent), self.oob_top(self.agent)]
         self.state_counts[tuple(self.curr_graph)] += 1
         self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
         self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
         return self.curr_graph
         
-    def updateGraph(self, newState):
+    def updateGraph(self, newState, action):
         prev_graph = copy.copy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
+        self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
+        self.agent['orientation'] = newState[0][4]
         self.given_feedback += 1
-        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= int(self.total_feedback / self.given_feedback)
-
+        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback))
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
