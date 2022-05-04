@@ -110,7 +110,6 @@ class LunarLanderSceneGraph:
         return self.curr_graph
         
     def updateGraph(self, newState, action):
-        print(newState)
         prev_graph = copy.copy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
