@@ -535,7 +535,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 action, buffer_action = self._sample_action(
                     learning_starts, action_noise
                 )
-
+                
                 # Rescale and perform action
                 if self.render:
                     env.render()
@@ -569,7 +569,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
                 simulated_human_reward = 0
-                scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs)
+                scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs, action)
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
                         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
