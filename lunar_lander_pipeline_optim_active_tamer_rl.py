@@ -58,7 +58,7 @@ class LunarLanderSceneGraph:
     state_counts = collections.Counter()
     max_counts = 0
     curr_graph = None
-    total_feedback = 250000
+    total_feedback = 200000
     given_feedback = 0
 
     def isLeft(self, obj_a, obj_b):
