@@ -557,6 +557,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 student_q_val, _ = th.min(
                     th.cat(student_q_val, dim=1), dim=1, keepdim=True
                 )
+
                 student_q_val = student_q_val.cpu()[0][0]
 
                 self.logger.record("train/teacher_q_value", teacher_q_val.item())
@@ -569,7 +570,12 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
                 simulated_human_reward = 0
-                scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs, action)
+
+                human_critic_qval_estimate, _ = self.human_critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(action).to(self.device),
+                )
+                scene_graph_updated, curr_state_prob, unfamiliar_state, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action, human_critic_qval_estimate.cpu()[0][0], self.num_timesteps)
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
                         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
@@ -584,7 +590,8 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 if (
                     # scene_graph_updated
                     # random.random() < curr_state_prob  
-                    unfamiliar_state
+                    # unfamiliar_state
+                    ucb_rank_high
                     # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):

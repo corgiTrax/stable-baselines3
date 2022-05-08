@@ -594,6 +594,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                                 if self.q_val_threshold * teacher_q_val < student_q_val
                                 else -1
                             )
+                            print(f'Recommended Action at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
                             time.sleep(0.01)
                             curr_keyboard_feedback = (
                                 human_feedback.return_human_keyboard_feedback()

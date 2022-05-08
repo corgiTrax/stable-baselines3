@@ -7,6 +7,7 @@ import sys
 import threading as thread
 from typing import Callable
 import copy
+import math
 
 import gym
 import numpy as np
@@ -56,10 +57,12 @@ class LunarLanderSceneGraph:
     flag2 = {'location': {'x': 0.28, 'y': 0.235}}
     mountain = {'location': {'x': 0, 'y': 0}}
     state_counts = collections.Counter()
+    human_critic_average = collections.Counter()
     max_counts = 0
     curr_graph = None
     total_feedback = 200000
     given_feedback = 0
+    total_timesteps = 0
 
     def isLeft(self, obj_a, obj_b):
         return obj_a['location']['x'] < obj_b['location']['x']
@@ -75,6 +78,17 @@ class LunarLanderSceneGraph:
                 rank += 1
         return rank
     
+    def calculate_ucb(self, graph):
+        return self.human_critic_average[tuple(graph)] + 0.1 * math.sqrt(2 * self.total_timesteps / self.state_counts[tuple(graph)])       
+    
+    def getUCBRank(self):
+        curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
+        rank = 0
+        for graph in self.state_counts:
+            if self.calculate_ucb(graph) > curr_graph_ucb1:
+                rank += 1
+        return rank
+        
     def midway(self, obj_a):
         return obj_a['location']['y'] < 0.5
     
@@ -99,23 +113,30 @@ class LunarLanderSceneGraph:
     def is_upright(self, obj_a):
         return obj_a['orientation'] > -0.5 and obj_a['orientation'] < 0.5 # this is in radians. 0.0 is facing +y on coord plane.
     
-    def getCurrGraph(self):
+    def getCurrGraph(self, human_critic_estimate):
         self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
                 self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain), 
                 self.is_upright(self.agent), self.main_engine_on(self.agent), self.left_engine_on(self.agent), self.right_engine_on(self.agent)]
         # self.curr_graph = [self.isLeft(self.agent, self.mountain), self.onTop(self.agent, self.mountain), self.midway(self.agent), self.oob_left(self.agent), self.oob_right(self.agent), self.oob_top(self.agent)]
         self.state_counts[tuple(self.curr_graph)] += 1
+        if self.state_counts[tuple(self.curr_graph)] == 1:
+            self.human_critic_average[tuple(self.curr_graph)] = human_critic_estimate
+        else:
+            self.human_critic_average[tuple(self.curr_graph)] *= (self.state_counts[tuple(self.curr_graph)] - 1)/self.state_counts[tuple(self.curr_graph)]
+            self.human_critic_average[tuple(self.curr_graph)] += human_critic_estimate/self.state_counts[tuple(self.curr_graph)]
+        
         self.max_counts = max(self.max_counts, self.state_counts[tuple(self.curr_graph)])
         self.curr_prob = 0.1 * (1 - self.state_counts[tuple(self.curr_graph)] / self.max_counts) * max(1, (10 ** (5 / (self.state_counts[tuple(self.curr_graph)] ** 0.3)) - 0.003 * self.state_counts[tuple(self.curr_graph)]))
         return self.curr_graph
         
-    def updateGraph(self, newState, action):
+    def updateGraph(self, newState, action, human_critic_estimate, total_timesteps):
         prev_graph = copy.copy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
         self.agent['orientation'] = newState[0][4]
         self.given_feedback += 1
-        return self.getCurrGraph() != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback))
+        self.total_timesteps = total_timesteps
+        return self.getCurrGraph(human_critic_estimate) != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback)), self.getUCBRank() <= 10
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
