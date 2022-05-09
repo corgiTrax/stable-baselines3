@@ -571,10 +571,14 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 new_obs, reward, done, infos = env.step(action)
                 simulated_human_reward = 0
 
-                human_critic_qval_estimate, _ = self.human_critic.forward(
+                human_critic_qval_estimate = self.human_critic.forward(
                     th.from_numpy(self._last_obs).to(self.device),
                     th.from_numpy(action).to(self.device),
                 )
+                human_critic_qval_estimate, _ = th.min(
+                    th.cat(human_critic_qval_estimate, dim=1), dim=1, keepdim=True
+                )
+                
                 scene_graph_updated, curr_state_prob, unfamiliar_state, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action, human_critic_qval_estimate.cpu()[0][0], self.num_timesteps)
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
