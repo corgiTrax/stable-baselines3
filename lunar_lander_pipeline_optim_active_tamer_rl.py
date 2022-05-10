@@ -139,7 +139,7 @@ class LunarLanderSceneGraph:
         self.agent['orientation'] = newState[0][4]
         self.given_feedback += 1
         self.total_timesteps = total_timesteps
-        return self.getCurrGraph(human_critic_estimate) != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback)), self.getUCBRank() <= 45
+        return self.getCurrGraph(human_critic_estimate) != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback)), self.getUCBRank() <= 60
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
