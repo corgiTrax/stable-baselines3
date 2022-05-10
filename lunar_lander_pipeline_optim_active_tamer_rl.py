@@ -60,7 +60,7 @@ class LunarLanderSceneGraph:
     human_critic_average = collections.Counter()
     max_counts = 0
     curr_graph = None
-    total_feedback = 20000 #200000 for frequency based scene graph
+    total_feedback = 100000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
 
@@ -82,7 +82,7 @@ class LunarLanderSceneGraph:
         # file1 = open("ucb_proportions.txt", "a")
         # file1.write(f'{self.human_critic_average[tuple(graph)]}   {0.2 * math.sqrt(2 * self.given_feedback / self.state_counts[tuple(graph)])}\n')
         # file1.close() 
-        return abs(self.human_critic_average[tuple(graph)]) + 0.02 * math.sqrt(2 * self.given_feedback / self.state_counts[tuple(graph)])       
+        return self.human_critic_average[tuple(graph)] + 0.02 * math.sqrt(2 * self.given_feedback / self.state_counts[tuple(graph)])       
     
     def getUCBRank(self):
         curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
@@ -139,7 +139,7 @@ class LunarLanderSceneGraph:
         self.agent['orientation'] = newState[0][4]
         self.given_feedback += 1
         self.total_timesteps = total_timesteps
-        return self.getCurrGraph(human_critic_estimate) != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback)), self.getUCBRank() <= 50
+        return self.getCurrGraph(human_critic_estimate) != prev_graph, self.curr_prob, self.getStateRank() <= (int(self.total_feedback / self.given_feedback)), self.getUCBRank() <= (int(self.total_feedback / self.given_feedback))
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
