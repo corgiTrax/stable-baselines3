@@ -60,7 +60,7 @@ class LunarLanderSceneGraph:
     human_critic_average = collections.Counter()
     max_counts = 0
     curr_graph = None
-    total_feedback = 100000 #200000 for frequency based scene graph
+    total_feedback = 150000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
 
