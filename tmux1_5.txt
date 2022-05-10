@@ -1611,3 +1611,263 @@ Logging to log_dir/ActiveTamerRLSACOptim_161
 |    teacher-student_q... | 0.634    |
 |    teacher_q_value      | 63.8     |
 --------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 259      |
+|    ep_rew_mean          | 197      |
+| time/                   |          |
+|    episodes             | 232      |
+|    fps                  | 48       |
+|    time_elapsed         | 1206     |
+|    total_timesteps      | 58363    |
+| train/                  |          |
+|    actor_loss           | -6.5     |
+|    critic_loss          | 11.4     |
+|    ent_coef             | 0.0213   |
+|    ent_coef_loss        | -0.285   |
+|    feedback_percentage  | 0.0842   |
+|    human_critic_loss    | 0.025    |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 58362    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00154  |
+|    state_reconstruct... | 0.00157  |
+|    student_q_value      | 69.9     |
+|    teacher-student_q... | 0.772    |
+|    teacher_q_value      | 70.7     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 258      |
+|    ep_rew_mean          | 199      |
+| time/                   |          |
+|    episodes             | 236      |
+|    fps                  | 48       |
+|    time_elapsed         | 1229     |
+|    total_timesteps      | 59410    |
+| train/                  |          |
+|    actor_loss           | -6.48    |
+|    critic_loss          | 9.26     |
+|    ent_coef             | 0.02     |
+|    ent_coef_loss        | 0.865    |
+|    feedback_percentage  | 0.0827   |
+|    human_critic_loss    | 0.0137   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 59409    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.000922 |
+|    state_reconstruct... | 0.00205  |
+|    student_q_value      | 66.5     |
+|    teacher-student_q... | 0.186    |
+|    teacher_q_value      | 66.7     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 260      |
+|    ep_rew_mean          | 206      |
+| time/                   |          |
+|    episodes             | 240      |
+|    fps                  | 48       |
+|    time_elapsed         | 1250     |
+|    total_timesteps      | 60404    |
+| train/                  |          |
+|    actor_loss           | -6.45    |
+|    critic_loss          | 15.8     |
+|    ent_coef             | 0.0203   |
+|    ent_coef_loss        | -0.341   |
+|    feedback_percentage  | 0.0813   |
+|    human_critic_loss    | 0.0167   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 60403    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00222  |
+|    state_reconstruct... | 0.00171  |
+|    student_q_value      | 51       |
+|    teacher-student_q... | 0.535    |
+|    teacher_q_value      | 51.5     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 262      |
+|    ep_rew_mean          | 213      |
+| time/                   |          |
+|    episodes             | 244      |
+|    fps                  | 48       |
+|    time_elapsed         | 1272     |
+|    total_timesteps      | 61424    |
+| train/                  |          |
+|    actor_loss           | -6.65    |
+|    critic_loss          | 5.4      |
+|    ent_coef             | 0.0208   |
+|    ent_coef_loss        | -0.497   |
+|    feedback_percentage  | 0.0807   |
+|    human_critic_loss    | 0.0302   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 61423    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00131  |
+|    state_reconstruct... | 0.00168  |
+|    student_q_value      | 67       |
+|    teacher-student_q... | 0.0476   |
+|    teacher_q_value      | 67.1     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 264      |
+|    ep_rew_mean          | 217      |
+| time/                   |          |
+|    episodes             | 248      |
+|    fps                  | 48       |
+|    time_elapsed         | 1295     |
+|    total_timesteps      | 62485    |
+| train/                  |          |
+|    actor_loss           | -6.52    |
+|    critic_loss          | 11.7     |
+|    ent_coef             | 0.0202   |
+|    ent_coef_loss        | -0.675   |
+|    feedback_percentage  | 0.0795   |
+|    human_critic_loss    | 0.0294   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 62484    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00117  |
+|    state_reconstruct... | 0.00184  |
+|    student_q_value      | 49.4     |
+|    teacher-student_q... | 0.344    |
+|    teacher_q_value      | 49.7     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 268      |
+|    ep_rew_mean          | 219      |
+| time/                   |          |
+|    episodes             | 252      |
+|    fps                  | 48       |
+|    time_elapsed         | 1324     |
+|    total_timesteps      | 63853    |
+| train/                  |          |
+|    actor_loss           | -6.48    |
+|    critic_loss          | 18.5     |
+|    ent_coef             | 0.0201   |
+|    ent_coef_loss        | 0.17     |
+|    feedback_percentage  | 0.0845   |
+|    human_critic_loss    | 0.0229   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 63852    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00178  |
+|    state_reconstruct... | 0.00176  |
+|    student_q_value      | 47       |
+|    teacher-student_q... | 1.18     |
+|    teacher_q_value      | 48.1     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 266      |
+|    ep_rew_mean          | 215      |
+| time/                   |          |
+|    episodes             | 256      |
+|    fps                  | 48       |
+|    time_elapsed         | 1343     |
+|    total_timesteps      | 64733    |
+| train/                  |          |
+|    actor_loss           | -6.44    |
+|    critic_loss          | 14.6     |
+|    ent_coef             | 0.0207   |
+|    ent_coef_loss        | 0.472    |
+|    feedback_percentage  | 0.0836   |
+|    human_critic_loss    | 0.0249   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 64732    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00247  |
+|    state_reconstruct... | 0.00174  |
+|    student_q_value      | 84.9     |
+|    teacher-student_q... | 3.56     |
+|    teacher_q_value      | 88.5     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 273      |
+|    ep_rew_mean          | 217      |
+| time/                   |          |
+|    episodes             | 260      |
+|    fps                  | 48       |
+|    time_elapsed         | 1378     |
+|    total_timesteps      | 66324    |
+| train/                  |          |
+|    actor_loss           | -6.65    |
+|    critic_loss          | 12.5     |
+|    ent_coef             | 0.02     |
+|    ent_coef_loss        | -0.659   |
+|    feedback_percentage  | 0.0818   |
+|    human_critic_loss    | 0.0185   |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 66323    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00139  |
+|    state_reconstruct... | 0.00153  |
+|    student_q_value      | 39.3     |
+|    teacher-student_q... | -0.532   |
+|    teacher_q_value      | 38.8     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 266      |
+|    ep_rew_mean          | 212      |
+| time/                   |          |
+|    episodes             | 264      |
+|    fps                  | 48       |
+|    time_elapsed         | 1393     |
+|    total_timesteps      | 67019    |
+| train/                  |          |
+|    actor_loss           | -6.4     |
+|    critic_loss          | 13       |
+|    ent_coef             | 0.0196   |
+|    ent_coef_loss        | -0.615   |
+|    feedback_percentage  | 0.0811   |
+|    human_critic_loss    | 0.034    |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 67018    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00233  |
+|    state_reconstruct... | 0.00163  |
+|    student_q_value      | 52.8     |
+|    teacher-student_q... | -3.54    |
+|    teacher_q_value      | 49.3     |
+--------------------------------------
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 266      |
+|    ep_rew_mean          | 212      |
+| time/                   |          |
+|    episodes             | 268      |
+|    fps                  | 48       |
+|    time_elapsed         | 1414     |
+|    total_timesteps      | 68031    |
+| train/                  |          |
+|    actor_loss           | -6.19    |
+|    critic_loss          | 14.3     |
+|    ent_coef             | 0.019    |
+|    ent_coef_loss        | 0.397    |
+|    feedback_percentage  | 0.0801   |
+|    human_critic_loss    | 0.035    |
+|    learning_rate        | 0.00073  |
+|    n_updates            | 68030    |
+|    q_value_threshold    | 0.991    |
+|    rl_threshold         | 0.1      |
+|    state_prediction_... | 0.00175  |
+|    state_reconstruct... | 0.0018   |
+|    student_q_value      | 40.1     |
+|    teacher-student_q... | 0.106    |
+|    teacher_q_value      | 40.2     |
+--------------------------------------
