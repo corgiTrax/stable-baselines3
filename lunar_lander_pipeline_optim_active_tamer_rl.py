@@ -161,9 +161,9 @@ class LunarLanderSceneGraphV2:
     
     def calculate_ucb(self, graph):
         # file1 = open("ucb_proportions.txt", "a")
-        # file1.write(f'{self.human_critic_average[tuple(graph)]}   {0.2 * math.sqrt(2 * self.given_feedback / self.state_counts[tuple(graph)])}\n')
+        # file1.write(f'{self.aRPE_average[tuple(graph)]}   {0.01 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))}\n')
         # file1.close()
-        return self.aRPE_average[tuple(graph)] + 0.01 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
+        return self.aRPE_average[tuple(graph)] + 0.1 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
     
     def getUCBRank(self):
         curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
