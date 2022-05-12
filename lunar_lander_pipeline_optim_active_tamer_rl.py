@@ -162,8 +162,8 @@ class LunarLanderSceneGraphV2:
     def calculate_ucb(self, graph):
         # file1 = open("ucb_proportions.txt", "a")
         # file1.write(f'{self.human_critic_average[tuple(graph)]}   {0.2 * math.sqrt(2 * self.given_feedback / self.state_counts[tuple(graph)])}\n')
-        # file1.close() 
-        return self.aRPE_average[tuple(graph)] + 0.02 * math.sqrt(2 * self.given_feedback / self.num_feedback_given[tuple(graph)])       
+        # file1.close()
+        return self.aRPE_average[tuple(graph)] + 0.01 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
     
     def getUCBRank(self):
         curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
@@ -216,7 +216,7 @@ class LunarLanderSceneGraphV2:
         self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
         self.agent['orientation'] = newState[0][4]
         self.total_timesteps += 1
-        return self.getCurrGraph != prev_graph, self.getUCBRank() <= 30
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 40
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
