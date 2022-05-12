@@ -149,7 +149,7 @@ class LunarLanderSceneGraphV2:
     num_feedback_given = collections.Counter()
     aRPE_average = collections.Counter()
     curr_graph = None
-    total_feedback = 180000 #200000 for frequency based scene graph
+    total_feedback = 10000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
 
@@ -216,7 +216,7 @@ class LunarLanderSceneGraphV2:
         self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
         self.agent['orientation'] = newState[0][4]
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 75
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= (int(self.total_feedback / self.given_feedback))
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
