@@ -216,7 +216,7 @@ class LunarLanderSceneGraphV2:
         self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
         self.agent['orientation'] = newState[0][4]
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 60
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 45
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
