@@ -201,7 +201,7 @@ class LunarLanderSceneGraphV2:
         self.num_feedback_given[tuple(self.curr_graph)] += 1
         self.given_feedback += 1
         self.aRPE_average[tuple(self.curr_graph)] *= (self.num_feedback_given[tuple(self.curr_graph)] - 1)/self.num_feedback_given[tuple(self.curr_graph)]
-        self.aRPE_average[tuple(self.curr_graph)] += (human_feedback - human_critic_prediction)/self.num_feedback_given[tuple(self.curr_graph)]
+        self.aRPE_average[tuple(self.curr_graph)] += abs(human_feedback - human_critic_prediction)/self.num_feedback_given[tuple(self.curr_graph)]
 
     def getCurrGraph(self):
         self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
