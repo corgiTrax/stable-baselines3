@@ -573,7 +573,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     ),
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
-                scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs, action)
+                # scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs, action)
                 if (
                     # next_abstract_state != self.curr_abstract_state
                     # state_prediction_err > self.prediction_threshold

@@ -20,8 +20,8 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.human_tamerRL_sac_record import (
-    HumanTamerRLSACRecord,
+from stable_baselines3.active_tamer.tamerRL_sac_record import (
+    TamerRLSACRecord,
 )
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
@@ -184,7 +184,7 @@ def main():
         config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
     )
 
-    model = HumanTamerRLSACRecord(
+    model = TamerRLSACRecord(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
