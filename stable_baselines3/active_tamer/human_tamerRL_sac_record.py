@@ -581,21 +581,22 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                     # random.random() < self.percent_feedback
                     human_feedback
                 ):
-                    curr_keyboard_feedback = (
-                        human_feedback.return_human_keyboard_feedback()
-                    )
                     self.feedback_file.write(
                         f"Abstract state at timestep {str(self.num_timesteps)} is {str(next_abstract_state)}\n"
                     )
                     self.feedback_file.write(
                         f"State prediction error at timestep {str(self.num_timesteps)} is {str(self.prediction_threshold)}\n"
                     )
+                    curr_keyboard_feedback = (
+                        human_feedback.return_human_keyboard_feedback()
+                        )
+                    if curr_keyboard_feedback and type(curr_keyboard_feedback) == int:
+                        human_reward = curr_keyboard_feedback
+                        self.total_feedback += 1
+                        self.feedback_file.write(
+                            f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                        )
                     
-                    human_reward = curr_keyboard_feedback
-                    self.total_feedback += 1
-                    self.feedback_file.write(
-                        f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
-                    )
                     self.curr_abstract_state = next_abstract_state
 
                 self.q_val_threshold += 0.00000001
