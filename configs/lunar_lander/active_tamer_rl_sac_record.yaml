@@ -35,5 +35,5 @@ batch_size: 512
 tau: 0.01
 train_freq: 1
 gradient_steps: 1
-human_data_save_path: "human_study/dhruva_run_1"
+human_data_save_path: "human_study/participant_1"
 trained_model: "trained-models/LunarLanderContinuous-v2.zip"

@@ -261,6 +261,9 @@ def main():
         config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
     )
 
+    if os.path.exists(config_data['human_data_save_path']):
+        config_data['human_data_save_path'] = 'participant_' + str(int(random.random(0, 1) * 1000000000))
+
     model = ActiveTamerRLSACRecord(
         config_data["policy_name"],
         env,

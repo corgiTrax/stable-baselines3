@@ -586,10 +586,10 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                     ucb_rank_high
                 ):
                     self.feedback_file.write(
-                        f"Abstract state at timestep {str(self.num_timesteps)} is {str(next_abstract_state)}\n"
+                        f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
                     )
                     self.feedback_file.write(
-                        f"State prediction error at timestep {str(self.num_timesteps)} is {str(self.prediction_threshold)}\n"
+                        f"State prediction error at timestep {str(self.num_timesteps)} is {str(state_prediction_err)}\n"
                     )
                     if human_feedback:
                         _ = human_feedback.return_human_keyboard_feedback() # clear out buffer

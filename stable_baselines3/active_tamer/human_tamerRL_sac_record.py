@@ -573,7 +573,7 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                     ),
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
-                # scene_graph_updated, curr_state_prob, unfamiliar_state = self.scene_graph.updateGraph(new_obs, action)
+                _, _ = self.scene_graph.updateGraph(new_obs, action)
                 if (
                     # next_abstract_state != self.curr_abstract_state
                     # state_prediction_err > self.prediction_threshold
@@ -582,7 +582,7 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                     human_feedback
                 ):
                     self.feedback_file.write(
-                        f"Abstract state at timestep {str(self.num_timesteps)} is {str(next_abstract_state)}\n"
+                        f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
                     )
                     self.feedback_file.write(
                         f"State prediction error at timestep {str(self.num_timesteps)} is {str(self.prediction_threshold)}\n"
