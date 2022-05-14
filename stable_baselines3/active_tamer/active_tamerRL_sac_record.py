@@ -571,6 +571,9 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
                 )
+                self.feedback_file.write(
+                    f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
+                )
                 human_reward = 0
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(

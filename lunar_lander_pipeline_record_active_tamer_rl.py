@@ -262,7 +262,7 @@ def main():
     )
 
     while os.path.exists(config_data['human_data_save_path']):
-        config_data['human_data_save_path'] = 'participant_' + str(int(random.random(0, 1) * 1000000000))
+        config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
 
     model = ActiveTamerRLSACRecord(
         config_data["policy_name"],

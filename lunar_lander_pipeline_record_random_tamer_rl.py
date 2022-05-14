@@ -8,7 +8,7 @@ import threading as thread
 from typing import Callable
 from gevent import config
 import copy
-
+import math
 import gym
 import numpy as np
 import torch
@@ -152,6 +152,83 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
+class LunarLanderSceneGraphV2:
+    agent = {'location': {'x': 0, 'y': 0}, 'action': {'down': 0, 'lateral': 0}}
+    flag1 = {'location': {'x': -0.28, 'y': 0.235}}
+    flag2 = {'location': {'x': 0.28, 'y': 0.235}}
+    mountain = {'location': {'x': 0, 'y': 0}}
+    num_feedback_given = collections.Counter()
+    aRPE_average = collections.Counter()
+    curr_graph = None
+    total_feedback = 250000 #200000 for frequency based scene graph
+    given_feedback = 0
+    total_timesteps = 0
+
+    def isLeft(self, obj_a, obj_b):
+        return obj_a['location']['x'] < obj_b['location']['x']
+    
+    def onTop(self, obj_a, obj_b):
+        return obj_a['location']['y'] > obj_b['location']['y']
+    
+    def calculate_ucb(self, graph):
+        # file1 = open("ucb_proportions.txt", "a")
+        # file1.write(f'{self.aRPE_average[tuple(graph)]}   {0.01 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))}\n')
+        # file1.close()+
+        return self.aRPE_average[tuple(graph)] + 0.2 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
+    
+    def getUCBRank(self):
+        curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
+        rank = 0
+        for graph in self.num_feedback_given:
+            if self.calculate_ucb(graph) > curr_graph_ucb1:
+                rank += 1
+        return rank
+        
+    def midway(self, obj_a):
+        return obj_a['location']['y'] < 0.5
+    
+    def oob_left(self, obj_a):
+        return obj_a['location']['x'] < -0.4
+    
+    def oob_right(self, obj_a):
+        return obj_a['location']['x'] > 0.4
+    
+    def oob_top(self, obj_a):
+        return obj_a['location']['y'] > 1.0
+    
+    def main_engine_on(self, obj_a):
+        return obj_a['action']['down'] > 0
+    
+    def left_engine_on(self, obj_a):
+        return obj_a['action']['lateral']  < -0.5
+    
+    def right_engine_on(self, obj_a):
+        return obj_a['action']['lateral']  > 0.5
+
+    def is_upright(self, obj_a):
+        return obj_a['orientation'] > -0.5 and obj_a['orientation'] < 0.5 # this is in radians. 0.0 is facing +y on coord plane.
+    
+    def updateRPE(self, human_feedback, human_critic_prediction):
+        self.num_feedback_given[tuple(self.curr_graph)] += 1
+        self.given_feedback += 1
+        self.aRPE_average[tuple(self.curr_graph)] *= (self.num_feedback_given[tuple(self.curr_graph)] - 1)/self.num_feedback_given[tuple(self.curr_graph)]
+        self.aRPE_average[tuple(self.curr_graph)] += abs(human_feedback - human_critic_prediction)/self.num_feedback_given[tuple(self.curr_graph)]
+
+    def getCurrGraph(self):
+        self.curr_graph = [self.isLeft(self.agent, self.flag1), self.isLeft(self.agent, self.flag2), self.isLeft(self.agent, self.mountain),
+                self.onTop(self.agent, self.flag1), self.onTop(self.agent, self.flag2), self.onTop(self.agent, self.mountain), 
+                self.is_upright(self.agent), self.main_engine_on(self.agent), self.left_engine_on(self.agent), self.right_engine_on(self.agent)]
+        
+        return self.curr_graph
+        
+    def updateGraph(self, newState, action):
+        prev_graph = copy.copy(self.curr_graph)
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
+        self.agent['action'] = {'down': action[0][0], 'lateral': action[0][0]}
+        self.agent['orientation'] = newState[0][4]
+        self.total_timesteps += 1
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 60
+
 def main():
     with open("configs/lunar_lander/active_tamer_rl_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
@@ -185,7 +262,7 @@ def main():
     )
 
     while os.path.exists(config_data['human_data_save_path']):
-        config_data['human_data_save_path'] = 'participant_' + str(int(random.random(0, 1) * 1000000000))
+        config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
 
     model = TamerRLSACRecord(
         config_data["policy_name"],
@@ -207,7 +284,7 @@ def main():
         render=True,
         trained_model=trained_model,
         abstract_state=get_abstract_state,
-        scene_graph=LunarLanderSceneGraph(),
+        scene_graph=LunarLanderSceneGraphV2(),
         percent_feedback=0.06,
     )
 

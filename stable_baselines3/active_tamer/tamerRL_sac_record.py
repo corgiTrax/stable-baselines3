@@ -565,6 +565,12 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                 self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
                 )
+                self.feedback_file.write(
+                    f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
+                )
+                self.feedback_file.write(
+                    f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
+                )
                 human_reward = 0
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
@@ -580,9 +586,6 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     # unfamiliar_state
                     random.random() < self.percent_feedback
                 ):
-                    self.feedback_file.write(
-                        f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
-                    )
                     self.feedback_file.write(
                         f"State prediction error at timestep {str(self.num_timesteps)} is {str(self.prediction_threshold)}\n"
                     )
