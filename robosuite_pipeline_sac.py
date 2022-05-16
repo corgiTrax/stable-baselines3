@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import threading as thread
+import argparse
 from typing import Callable
 
 import gym
@@ -38,9 +39,12 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
-def main():
+def main(args):
     with open("configs/robosuite/sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
+    
+    if args.seed:
+        config_data['seed'] = args.seed
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
@@ -62,12 +66,10 @@ def main():
         hard_reset=False,
     ))
 
-    print(env)
-
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[256, 256],
+        net_arch=[400, 300],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -91,7 +93,6 @@ def main():
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
         render=False,
-        model_name="SAC_Robosuite"
     )
 
     print(f"Model Policy = " + str(model.policy))
@@ -112,4 +113,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    msg = "Overwrite config params"
+    parser = argparse.ArgumentParser(description = msg)
+    parser.add_argument("--seed", type=int, default=None)
+
+    args = parser.parse_args()
+    main(args)

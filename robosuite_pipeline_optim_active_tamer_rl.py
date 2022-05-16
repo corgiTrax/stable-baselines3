@@ -47,7 +47,7 @@ def main():
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
     robosuite_config = {
-        "env_name": "Lift",
+        "env_name": "Reaching",
         "robots": "Sawyer",
         "controller_configs": load_controller_config(default_controller="OSC_POSE"),
     }
