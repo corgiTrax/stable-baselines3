@@ -61,7 +61,7 @@ def main(args):
         render_camera="agentview",
         ignore_done=False,
         use_camera_obs=False,
-        reward_shaping=True,
+        reward_shaping=False,
         control_freq=20,
         hard_reset=False,
     ))
