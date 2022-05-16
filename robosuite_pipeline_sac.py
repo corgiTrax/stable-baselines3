@@ -70,7 +70,7 @@ def main(args):
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[400, 300],
+        net_arch=[256, 256],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
