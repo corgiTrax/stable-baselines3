@@ -51,7 +51,7 @@ def main(args):
     robosuite_config = {
         "env_name": "Reaching",
         "robots": "Sawyer",
-        "controller_configs": load_controller_config(default_controller="OSC_POSE"),
+        "controller_configs": load_controller_config(default_controller="JOINT_POSITION"),
     }
 
     env = wrappers.GymWrapper(suite.make(
