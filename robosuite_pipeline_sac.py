@@ -51,7 +51,7 @@ def main(args):
     robosuite_config = {
         "env_name": "Reaching",
         "robots": "Sawyer",
-        "controller_configs": load_controller_config(default_controller="JOINT_POSITION"),
+        "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
     }
 
     env = wrappers.GymWrapper(suite.make(
@@ -71,7 +71,7 @@ def main(args):
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[200, 200],
+        net_arch=[256, 256],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
