@@ -64,9 +64,10 @@ def main(args):
         reward_shaping=False,
         control_freq=20,
         hard_reset=False,
-    ), keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
-            'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state'])
+    ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
 
+    # keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
+    #         'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state']
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
