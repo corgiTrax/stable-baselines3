@@ -49,7 +49,7 @@ def main(args):
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
     robosuite_config = {
-        "env_name": "Lift",
+        "env_name": "Reaching",
         "robots": "Sawyer",
         "controller_configs": load_controller_config(default_controller="OSC_POSE"),
     }
@@ -64,7 +64,8 @@ def main(args):
         reward_shaping=False,
         control_freq=20,
         hard_reset=False,
-    ))
+    ), keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
+            'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state'])
 
     np.set_printoptions(threshold=np.inf)
 
