@@ -12,6 +12,7 @@ class HumanFeedback:
             # keyboard.KeyCode.from_char("3"): 0,
             keyboard.KeyCode.from_char("q"): -1,
             keyboard.KeyCode.from_char("e"): 1,
+            keyboard.KeyCode.from_char("w"): 0,
         }
 
         if robot:
@@ -52,9 +53,14 @@ class HumanFeedback:
         feedback = None
         # print(self.human_keyboard_feedback)
         if self.human_keyboard_feedback:
+            # print(self.human_keyboard_feedback)
             if "Press" in str(
                 self.human_keyboard_feedback
             ):  # only use keypresses as reward signals
+                # print("INSIDE IF STATEMENT")
+                # print(self.human_keyboard_feedback.key)
+                # print(self.keyboard_feedback_dictionary)
+                # print(self.human_keyboard_feedback.key in self.keyboard_feedback_dictionary)
                 if (
                     self.human_keyboard_feedback.key
                     in self.keyboard_feedback_dictionary

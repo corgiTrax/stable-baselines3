@@ -594,7 +594,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                         curr_keyboard_feedback = (
                             human_feedback.return_human_keyboard_feedback()
                         )
-                        while not curr_keyboard_feedback or type(curr_keyboard_feedback) != int:
+                        while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
                             simulated_human_reward = (
                                 1
                                 if self.q_val_threshold * teacher_q_val < student_q_val
