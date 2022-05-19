@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import threading as thread
+import argparse
 from typing import Callable
 
 import gym
@@ -39,17 +40,20 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
-def main():
+def main(args):
     
     with open("configs/robosuite/tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
+    if args.seed:
+        config_data['seed'] = args.seed
+
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
     robosuite_config = {
-        "env_name": "Lift",
+        "env_name": "Reaching",
         "robots": "Sawyer",
-        "controller_configs": load_controller_config(default_controller="OSC_POSE"),
+        "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
     }
 
     env = wrappers.GymWrapper(suite.make(
@@ -59,10 +63,10 @@ def main():
         render_camera="agentview",
         ignore_done=False,
         use_camera_obs=False,
-        reward_shaping=True,
+        reward_shaping=False,
         control_freq=20,
         hard_reset=False,
-    ))
+    ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
 
     print(env)
 
@@ -127,4 +131,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    msg = "Overwrite config params"
+    parser = argparse.ArgumentParser(description = msg)
+    parser.add_argument("--seed", type=int, default=None)
+
+    args = parser.parse_args()
+    main(args)
