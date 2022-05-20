@@ -68,7 +68,7 @@ if __name__ == "__main__":
     ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
 
     obs = env.reset()
-    env.viewer.set_camera(camera_id=0)
+    env.viewer.set_camera(camera_id=1)
 
     # Get action limits
     low, high = env.action_spec
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     trained_model = SAC.load(
-        "trained-models/SAC_32000.pt", env, custom_objects=custom_objects, **kwargs
+        "models/SAC_20000.pt", env, custom_objects=custom_objects, **kwargs
     )
     # do visualization
     for i in range(10000):
