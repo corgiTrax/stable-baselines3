@@ -61,7 +61,7 @@ def main(args):
         render_camera="agentview",
         ignore_done=False,
         use_camera_obs=False,
-        reward_shaping=False,
+        reward_shaping=True,
         control_freq=20,
         hard_reset=False,
     ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
