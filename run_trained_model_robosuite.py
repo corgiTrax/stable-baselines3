@@ -66,7 +66,9 @@ if __name__ == "__main__":
         control_freq=20,
         hard_reset=False,
     ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
-
+    
+    print(env.action_space)
+    print(env.observation_space)
     obs = env.reset()
     env.viewer.set_camera(camera_id=1)
 

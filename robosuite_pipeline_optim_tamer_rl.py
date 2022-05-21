@@ -65,6 +65,7 @@ def main(args):
         use_camera_obs=False,
         reward_shaping=False,
         control_freq=20,
+        reward_scale=10,
         hard_reset=False,
     ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
 
@@ -73,7 +74,7 @@ def main(args):
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[256, 256],
+        net_arch=[64, 64],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
