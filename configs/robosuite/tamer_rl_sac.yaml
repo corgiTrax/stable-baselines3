@@ -16,5 +16,5 @@ tau: 0.01
 train_freq: 1
 gradient_steps: 1
 human_data_save_path: "human_study/participant_1"
-trained_model: "models/SAC_140000.pt"
+trained_model: "trained-models/RobosuiteReaching.zip"
 percent_feedback: 1
