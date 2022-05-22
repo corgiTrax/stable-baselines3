@@ -67,7 +67,7 @@ def main(args):
         control_freq=20,
         reward_scale=10,
         hard_reset=False,
-    ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
+    ), keys=['robot0_eef_pos_xy'])
 
     print(env)
 
