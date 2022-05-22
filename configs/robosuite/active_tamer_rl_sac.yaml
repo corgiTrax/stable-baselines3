@@ -22,18 +22,18 @@ seed: 42
 tensorboard_log_dir: "log_dir"
 policy_name: "ActiveMlpPolicy"
 verbose: 1
-steps: 200000
+steps: 150000
 load_model: 0  
-save_every_steps: 50000
-learning_rate: 0.00073
-# 0.00073
+save_every_steps: 500000
+learning_rate: 0.00075
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000
 buffer_size: 1000000
 learning_starts: 0
-batch_size: 256
+batch_size: 512
 tau: 0.01
 train_freq: 1
 gradient_steps: 1
 human_data_save_path: "human_study/participant_1"
-trained_model: "trained-models/LunarLanderContinuous-v2.zip"
+trained_model: "models/SAC_140000.pt"
+percent_feedback: 1
