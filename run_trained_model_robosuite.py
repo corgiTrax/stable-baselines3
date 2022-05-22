@@ -64,6 +64,7 @@ if __name__ == "__main__":
         use_camera_obs=False,
         reward_shaping=False,
         control_freq=20,
+        reward_scale=10,
         hard_reset=False,
     ), keys=['robot0_eef_pos_xy'])
     
@@ -88,11 +89,10 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     trained_model = SAC.load(
-        "models/SAC_20000.pt", env, custom_objects=custom_objects, **kwargs
+        "models/SAC_144000.pt", env, custom_objects=custom_objects, **kwargs
     )
     # do visualization
     for i in range(10000):
-        print(obs)
         action = np.random.uniform(low, high)
         model_action, _ = trained_model.actor.action_log_prob(torch.tensor(obs).view(1, -1).to(device))
         # print(model_action[0].cpu().detach().numpy())

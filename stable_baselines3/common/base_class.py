@@ -773,7 +773,9 @@ class BaseAlgorithm(ABC):
                 x = data["action_space"].shape
             except Exception as e:
                 data["action_space"].shape = data["action_space"].high.shape
-
+            
+            print(data)
+            
             check_for_correct_spaces(
                 env, data["observation_space"], data["action_space"]
             )
