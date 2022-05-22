@@ -65,7 +65,7 @@ if __name__ == "__main__":
         reward_shaping=False,
         control_freq=20,
         hard_reset=False,
-    ), keys=['robot0_eef_quat', 'robot0_gripper_qpos'])
+    ), keys=['robot0_eef_pos_xy'])
     
     print(env.action_space)
     print(env.observation_space)
@@ -92,6 +92,7 @@ if __name__ == "__main__":
     )
     # do visualization
     for i in range(10000):
+        print(obs)
         action = np.random.uniform(low, high)
         model_action, _ = trained_model.actor.action_log_prob(torch.tensor(obs).view(1, -1).to(device))
         # print(model_action[0].cpu().detach().numpy())
@@ -101,3 +102,4 @@ if __name__ == "__main__":
             print("DONEEEE!!")
             print(reward)
             obs = env.reset()
+            print(obs)
