@@ -16,8 +16,11 @@ import torch.optim as optim
 import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
+import math
+import collections
+import copy
 
-from stable_baselines3.active_tamer.tamerRL_sac_optim import TamerRLSACOptim
+from stable_baselines3.active_tamer.active_tamerRL_sac_optim import ActiveTamerRLSACOptim
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.sac.sac import SAC
@@ -25,6 +28,64 @@ from stable_baselines3.sac.sac import SAC
 import robosuite as suite
 from robosuite import wrappers
 from robosuite import load_controller_config
+
+class ReachingSceneGraph:
+    agent = {'location': {'x': 0, 'y': 0}}
+    num_feedback_given = collections.Counter()
+    aRPE_average = collections.Counter()
+    curr_graph = None
+    total_feedback = 250000 #200000 for frequency based scene graph
+    given_feedback = 0
+    total_timesteps = 0
+    
+    def calculate_ucb(self, graph):
+        return self.aRPE_average[tuple(graph)] + 0.2 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
+    
+    def getUCBRank(self):
+        curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
+        rank = 0
+        for graph in self.num_feedback_given:
+            if self.calculate_ucb(graph) > curr_graph_ucb1:
+                rank += 1
+        return rank
+
+    def right(self, obj_a):
+        return obj_a['location']['x'] < -0.05
+
+    def center(self, obj_a):
+        return obj_a['location']['x'] > -0.05 and obj_a['location']['x'] < 0.05
+
+    def left(self, obj_a):
+        return obj_a['location']['x'] > 0.05
+
+    
+    def top(self, obj_a):
+        return obj_a['location']['y'] < -0.125
+
+    def middle(self, obj_a):
+        return obj_a['location']['y'] > -0.125 and obj_a['location']['y'] < 0.125
+
+    def bottom(self, obj_a):
+        return obj_a['location']['y'] > 0.125
+    
+
+    def updateRPE(self, human_feedback, human_critic_prediction):
+        self.num_feedback_given[tuple(self.curr_graph)] += 1
+        self.given_feedback += 1
+        self.aRPE_average[tuple(self.curr_graph)] *= (self.num_feedback_given[tuple(self.curr_graph)] - 1)/self.num_feedback_given[tuple(self.curr_graph)]
+        self.aRPE_average[tuple(self.curr_graph)] += abs(human_feedback - human_critic_prediction)/self.num_feedback_given[tuple(self.curr_graph)]
+
+    def getCurrGraph(self):
+        self.curr_graph = [self.right(self.agent), self.center(self.agent), self.left(self.agent), self.top(self.agent), 
+                            self.middle(self.agent), self.bottom(self.agent)]
+        
+        return self.curr_graph
+        
+    def updateGraph(self, newState, action):
+        prev_graph = copy.deepcopy(self.curr_graph)
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
+        self.total_timesteps += 1
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -41,7 +102,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 def main():
     
-    with open("configs/robosuite/tamer_rl_sac.yaml", "r") as f:
+    with open("configs/robosuite/active_tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
@@ -49,7 +110,7 @@ def main():
     robosuite_config = {
         "env_name": "Reaching",
         "robots": "Sawyer",
-        "controller_configs": load_controller_config(default_controller="OSC_POSE"),
+        "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
     }
 
     env = wrappers.GymWrapper(suite.make(
@@ -59,17 +120,18 @@ def main():
         render_camera="agentview",
         ignore_done=False,
         use_camera_obs=False,
-        reward_shaping=True,
+        reward_shaping=False,
         control_freq=20,
+        reward_scale=100,
         hard_reset=False,
-    ))
+    ), keys=['robot0_eef_pos_xy'])
 
     print(env)
 
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[256, 256],
+        net_arch=[64, 64],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -88,7 +150,7 @@ def main():
         config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
     )
 
-    model = TamerRLSACOptim(
+    model = ActiveTamerRLSACOptim(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -106,7 +168,7 @@ def main():
         seed=config_data["seed"],
         render=False,
         trained_model=trained_model,
-        percent_feedback=config_data['percent_feedback'],
+        scene_graph=ReachingSceneGraph(),
     )
 
     print(f"Model Policy = " + str(model.policy))
@@ -122,7 +184,7 @@ def main():
     else:
         del model
         model_num = config_data["load_model"]
-        model = TamerRLSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = ActiveTamerRLSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
         print("Loaded pretrained model")
 
 
