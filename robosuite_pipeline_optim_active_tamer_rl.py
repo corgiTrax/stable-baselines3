@@ -6,7 +6,7 @@ import random
 import sys
 import threading as thread
 from typing import Callable
-
+import argparse
 import gym
 import numpy as np
 import torch
@@ -100,10 +100,13 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
-def main():
+def main(args):
     
     with open("configs/robosuite/active_tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
+
+    if args.seed:
+        config_data['seed'] = args.seed
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
@@ -189,4 +192,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    msg = "Overwrite config params"
+    parser = argparse.ArgumentParser(description = msg)
+    parser.add_argument("--seed", type=int, default=None)
+
+    args = parser.parse_args()
+    main(args)
