@@ -65,7 +65,7 @@ def main(args):
         use_camera_obs=False,
         reward_shaping=False,
         control_freq=20,
-        reward_scale=10,
+        reward_scale=100,
         hard_reset=False,
     ), keys=['robot0_eef_pos_xy'])
 
