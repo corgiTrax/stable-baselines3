@@ -120,7 +120,6 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
         render: bool = False,
         q_val_threshold: float = 0.99,
         rl_threshold: float = 0.1,
-        abstract_state: Object = None,
         prediction_threshold: float = 0.012,
         experiment_save_dir: str = "human_study/participant_default",
         scene_graph: Object = None,
@@ -169,8 +168,6 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
         self.scene_graph = scene_graph
-        self.get_abstract_state = abstract_state
-        self.curr_abstract_state = 0
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
         self.feedback_file = None
@@ -567,7 +564,6 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
-                next_abstract_state = self.get_abstract_state(prev_obs)
                 self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
                 )
@@ -584,7 +580,6 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 )
                 scene_graph_updated, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action)
                 if (
-                    # next_abstract_state != self.curr_abstract_state
                     # state_prediction_err > self.prediction_threshold
                     ucb_rank_high
                 ):
@@ -621,8 +616,6 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                     else:
                         raise "Must instantiate a human feedback object to collect human feedback."
                     
-                    self.curr_abstract_state = next_abstract_state
-
                 self.q_val_threshold += 0.00000001
                 self.num_timesteps += 1
                 episode_timesteps += 1
