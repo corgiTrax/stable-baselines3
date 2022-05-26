@@ -26,7 +26,7 @@ def tabulate_events(dpath, target_len):
         data[tag] = []
         for index, curr_iterator in enumerate(summary_iterators):
             if tag == 'rollout/ep_rew_mean':
-                data[tag].append([(i.step, 10 * i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
+                data[tag].append([(i.step, i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
             else:
                 data[tag].append([(i.step, i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
                 if longest_iterator[1] < len(data[tag][-1]):
@@ -57,7 +57,7 @@ def write_combined_events(dpath, d_combined, steps, dname='combined'):
             for i, mean in enumerate(means):
                 tf.summary.scalar(tag, mean, step=steps[tag][i])
 
-dpath = 'averaged_results/SAC'
+dpath = 'lunar_lander_results_all/final_results/TamerRL25Random'
 
 data, steps = tabulate_events(dpath, 150000)
 write_combined_events(dpath, data, steps, dname='averaged')
