@@ -30,6 +30,10 @@ from stable_baselines3.sac.sac import SAC
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.online_learning_interface import FeedbackInterface
 
+import robosuite as suite
+from robosuite import wrappers
+from robosuite import load_controller_config
+
 class ReachingSceneGraph:
     agent = {'location': {'x': 0, 'y': 0}}
     num_feedback_given = collections.Counter()
@@ -102,11 +106,39 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
-    with open("configs/lunar_lander/active_tamer_rl_sac_record.yaml", "r") as f:
+    with open("configs/robosuite/tamer_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
-    env = gym.make("LunarLanderContinuous-v2")
+
+    robosuite_config = {
+        "env_name": "Reaching",
+        "robots": "Sawyer",
+        "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
+    }
+
+    env = wrappers.GymWrapper(suite.make(
+        **robosuite_config,
+        has_renderer=False,
+        has_offscreen_renderer=True,
+        render_camera="agentview",
+        camera_names="birdview",
+        camera_heights=1024,
+        camera_widths=1024,
+        ignore_done=False,
+        use_camera_obs=True,
+        reward_shaping=False,
+        control_freq=20,
+        reward_scale=100,
+        hard_reset=False,
+        render_gpu_device_id=0,
+    ), keys=['robot0_eef_pos_xy'])
+
+    # env.viewer.set_camera(camera_id=1)
+    env.reset()
+    # env.render()
+    import time
+    time.sleep(1)
 
     human_feedback = HumanFeedback()
     app = QApplication(sys.argv)
@@ -114,7 +146,7 @@ def main():
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[400, 300],
+        net_arch=[64, 64],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -155,26 +187,30 @@ def main():
         experiment_save_dir=config_data['human_data_save_path'],
         render=True,
         trained_model=trained_model,
-        abstract_state=get_abstract_state,
-        scene_graph=LunarLanderSceneGraphV2(),
-        percent_feedback=0.06,
+        scene_graph=ReachingSceneGraph()
     )
 
     print(f"Model Policy = " + str(model.policy))
 
     if not config_data["load_model"]:
-        thread.Thread(
-            target=train_model,
-            args=[model, config_data, feedback_gui, human_feedback, env],
-            name="train_model",
-            daemon=True,
-        ).start()
-        sys.exit(app.exec_())
+        # thread.Thread(
+        #     target=train_model,
+        #     args=[model, config_data, feedback_gui, human_feedback, env],
+        #     name="train_model",
+        #     daemon=True,
+        # ).start()
+        # thread.Thread(
+        #     target=viz_robosuite,
+        #     name="visualize_robosuite",
+        #     daemon=True,
+        # ).start()
+        # sys.exit(app.exec_())
+        train_model(model, config_data, feedback_gui, human_feedback, env)
     else:
         del model
-        model_num = config_data["load_model"]
-        model = HumanTamerRLSACRecord.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = HumanTamerRLSACRecord.load(f'models/{config_data["load_model"]}', env=env)
         print("Loaded pretrained model")
+        print(model)
 
 
 if __name__ == "__main__":

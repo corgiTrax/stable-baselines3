@@ -57,7 +57,7 @@ def write_combined_events(dpath, d_combined, steps, dname='combined'):
             for i, mean in enumerate(means):
                 tf.summary.scalar(tag, mean, step=steps[tag][i])
 
-dpath = 'lunar_lander_results_all/final_results/TamerRL25Random'
+dpath = 'averaged_results/BC'
 
 data, steps = tabulate_events(dpath, 150000)
 write_combined_events(dpath, data, steps, dname='averaged')

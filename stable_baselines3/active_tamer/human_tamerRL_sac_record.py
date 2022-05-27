@@ -120,7 +120,6 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
         render: bool = False,
         q_val_threshold: float = 0.99,
         rl_threshold: float = 0.1,
-        abstract_state: Object = None,
         prediction_threshold: float = 0.012,
         experiment_save_dir: str = "human_study/participant_default",
         scene_graph: Object = None,
@@ -170,8 +169,6 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
         self.scene_graph = scene_graph
-        self.get_abstract_state = abstract_state
-        self.curr_abstract_state = 0
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
         self.percent_feedback = percent_feedback
@@ -543,7 +540,7 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                 teacher_q_val, _ = th.min(
                     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
                 )
-                teacher_q_val = teacher_q_val.cpu()[0][0]
+                teacher_q_val = teacher_q_val.cpu()[0][0] * 100
 
                 student_q_val = self.trained_model.critic.forward(
                     th.from_numpy(self._last_obs).to(self.device),
@@ -552,16 +549,15 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                 student_q_val, _ = th.min(
                     th.cat(student_q_val, dim=1), dim=1, keepdim=True
                 )
-                student_q_val = student_q_val.cpu()[0][0]
+                student_q_val = student_q_val.cpu()[0][0] * 100
 
                 # Rescale and perform action
                 if self.render:
-                    env.render()
+                    env.render(mode="offscreen_robosuite")
 
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
-                next_abstract_state = self.get_abstract_state(prev_obs)
                 self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
                 )
@@ -578,7 +574,6 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                 )
                 _, _ = self.scene_graph.updateGraph(new_obs, action)
                 if (
-                    # next_abstract_state != self.curr_abstract_state
                     # state_prediction_err > self.prediction_threshold
                     # unfamiliar_state
                     # random.random() < self.percent_feedback
@@ -600,7 +595,6 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
                         )
                     
-                    self.curr_abstract_state = next_abstract_state
 
                 self.q_val_threshold += 0.00000001
                 self.num_timesteps += 1
