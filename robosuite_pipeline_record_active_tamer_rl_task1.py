@@ -20,6 +20,7 @@ import torch.optim as optim
 import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
+import time
 
 from stable_baselines3.active_tamer.active_tamerRL_sac_record import (
     ActiveTamerRLSACRecord,
@@ -33,6 +34,7 @@ from stable_baselines3.common.online_learning_interface import FeedbackInterface
 import robosuite as suite
 from robosuite import wrappers
 from robosuite import load_controller_config
+from PIL import Image
 
 
 class ReachingSceneGraph:
@@ -105,6 +107,16 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
+def viz_robosuite():
+    while True:
+        with open('robosuite_image.npy', 'rb') as f:
+            a = np.load(f)
+            img = Image.fromarray(a, 'RGB')
+            img = img.rotate(180)
+            img.show()
+            time.sleep(0.01)
+            img.close()
+
 def main():
     with open("configs/robosuite/active_tamer_rl_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
@@ -119,21 +131,23 @@ def main():
 
     env = wrappers.GymWrapper(suite.make(
         **robosuite_config,
-        has_renderer=True,
-        has_offscreen_renderer=False,
+        has_renderer=False,
+        has_offscreen_renderer=True,
         render_camera="agentview",
         ignore_done=False,
-        use_camera_obs=False,
+        use_camera_obs=True,
         reward_shaping=False,
         control_freq=20,
         reward_scale=100,
         hard_reset=False,
+        render_gpu_device_id=0,
     ), keys=['robot0_eef_pos_xy'])
 
-    env.viewer.set_camera(camera_id=1)
-    env.render()
+    # env.viewer.set_camera(camera_id=1)
+    env.reset()
+    # env.render()
     import time
-    time.sleep(5)
+    time.sleep(1)
 
     human_feedback = HumanFeedback()
     app = QApplication(sys.argv)
@@ -188,13 +202,19 @@ def main():
     print(f"Model Policy = " + str(model.policy))
 
     if not config_data["load_model"]:
-        thread.Thread(
-            target=train_model,
-            args=[model, config_data, feedback_gui, human_feedback, env],
-            name="train_model",
-            daemon=True,
-        ).start()
-        sys.exit(app.exec_())
+        # thread.Thread(
+        #     target=train_model,
+        #     args=[model, config_data, feedback_gui, human_feedback, env],
+        #     name="train_model",
+        #     daemon=True,
+        # ).start()
+        # thread.Thread(
+        #     target=viz_robosuite,
+        #     name="visualize_robosuite",
+        #     daemon=True,
+        # ).start()
+        # sys.exit(app.exec_())
+        train_model(model, config_data, feedback_gui, human_feedback, env)
     else:
         del model
         model_num = config_data["load_model"]

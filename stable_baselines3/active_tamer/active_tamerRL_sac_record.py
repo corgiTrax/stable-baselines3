@@ -559,7 +559,9 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
 
                 # Rescale and perform action
                 if self.render:
-                    env.render()
+                    env.render(mode="offscreen_robosuite")
+                    # print("Current X and Y coord:" + str(self._last_obs.copy()))
+                    # print("Next Action: " + str(action))
 
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
