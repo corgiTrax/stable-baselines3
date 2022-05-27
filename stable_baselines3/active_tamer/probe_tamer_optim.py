@@ -87,7 +87,7 @@ class ProbeTamerOptim(OffPolicyAlgorithm):
         policy: Union[str, Type[SACPolicy]],
         env: Union[GymEnv, str],
         abstract_state,
-        trained_model,
+        trained_model = None,
         learning_rate: Union[float, Schedule] = 3e-4,
         buffer_size: int = 1_000_000,  # 1e6
         learning_starts: int = 5,

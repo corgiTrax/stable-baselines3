@@ -96,6 +96,9 @@ def data_to_json(data: Dict[str, Any]) -> str:
             # Also store type of the class for consumption
             # from other languages/humans, so we have an
             # idea what was being stored.
+            print(data_key)
+            print(data_item)
+            if data_key == 'trained_model' or data_key == 'feedback_file': data_item = [0]
             base64_encoded = base64.b64encode(cloudpickle.dumps(data_item)).decode()
 
             # Use ":" to make sure we do
@@ -127,6 +130,7 @@ def data_to_json(data: Dict[str, Any]) -> str:
                         cloudpickle_serialization[variable_name] = str(variable_item)
 
             serializable_data[data_key] = cloudpickle_serialization
+
     json_string = json.dumps(serializable_data, indent=4)
     return json_string
 

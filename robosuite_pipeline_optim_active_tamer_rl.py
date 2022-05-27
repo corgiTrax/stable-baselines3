@@ -186,8 +186,7 @@ def main(args):
         print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
     else:
         del model
-        model_num = config_data["load_model"]
-        model = ActiveTamerRLSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = ActiveTamerRLSACOptim.load(f'models/{config_data["load_model"]}', env=env)
         print("Loaded pretrained model")
 
 

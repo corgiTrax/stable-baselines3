@@ -24,7 +24,7 @@ policy_name: "ActiveMlpPolicy"
 verbose: 1
 steps: 150000
 load_model: 0  
-save_every_steps: 500000
+save_every_steps: 1000
 learning_rate: 0.00075
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000
@@ -37,3 +37,4 @@ gradient_steps: 1
 human_data_save_path: "human_study/participant_1"
 trained_model: "trained-models/RobosuiteReaching.zip"
 percent_feedback: 1
+# load_model: "ActiveTamerRLSACRecord_5.pt"

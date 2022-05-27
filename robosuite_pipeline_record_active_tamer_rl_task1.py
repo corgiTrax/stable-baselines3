@@ -134,6 +134,9 @@ def main():
         has_renderer=False,
         has_offscreen_renderer=True,
         render_camera="agentview",
+        camera_names="birdview",
+        camera_heights=1024,
+        camera_widths=1024,
         ignore_done=False,
         use_camera_obs=True,
         reward_shaping=False,
@@ -217,9 +220,9 @@ def main():
         train_model(model, config_data, feedback_gui, human_feedback, env)
     else:
         del model
-        model_num = config_data["load_model"]
-        model = ActiveTamerRLSACRecord.load(f"models/TamerSAC_{model_num}.pt", env=env)
+        model = ActiveTamerRLSACRecord.load(f'models/{config_data["load_model"]}', env=env)
         print("Loaded pretrained model")
+        print(model)
 
 
 if __name__ == "__main__":
