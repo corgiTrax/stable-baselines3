@@ -118,7 +118,7 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         model_name: str = "HumanTamerRLSACRecord",
         render: bool = False,
-        q_val_threshold: float = 0.99,
+        q_val_threshold: float = 0.999,
         rl_threshold: float = 0.1,
         prediction_threshold: float = 0.012,
         experiment_save_dir: str = "human_study/participant_default",
@@ -540,7 +540,7 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                 teacher_q_val, _ = th.min(
                     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
                 )
-                teacher_q_val = teacher_q_val.cpu()[0][0] * 100
+                teacher_q_val = teacher_q_val.cpu()[0][0]
 
                 student_q_val = self.trained_model.critic.forward(
                     th.from_numpy(self._last_obs).to(self.device),
@@ -549,7 +549,7 @@ class HumanTamerRLSACRecord(OffPolicyAlgorithm):
                 student_q_val, _ = th.min(
                     th.cat(student_q_val, dim=1), dim=1, keepdim=True
                 )
-                student_q_val = student_q_val.cpu()[0][0] * 100
+                student_q_val = student_q_val.cpu()[0][0]
 
                 # Rescale and perform action
                 if self.render:

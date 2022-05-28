@@ -113,7 +113,7 @@ class TamerSACBC(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         model_name: str = "TamerSACBC",
         render: bool = False,
-        q_val_threshold: float = 0.05,
+        q_val_threshold: float = 0.999,
     ):
 
         super(TamerSACBC, self).__init__(

@@ -538,7 +538,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 teacher_q_val, _ = th.min(
                     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
                 )
-                teacher_q_val = teacher_q_val.cpu()[0][0] * 100
+                teacher_q_val = teacher_q_val.cpu()[0][0]
 
                 student_q_val = self.trained_model.critic.forward(
                     th.from_numpy(self._last_obs).to(self.device),
@@ -547,7 +547,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 student_q_val, _ = th.min(
                     th.cat(student_q_val, dim=1), dim=1, keepdim=True
                 )
-                student_q_val = student_q_val.cpu()[0][0] * 100
+                student_q_val = student_q_val.cpu()[0][0]
 
                 human_critic_qval_estimate = self.human_critic.forward(
                     th.from_numpy(self._last_obs).to(self.device),

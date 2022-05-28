@@ -113,7 +113,7 @@ class TamerRLSACOptim(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         model_name: str = "TamerRLSACOptim",
         render: bool = False,
-        q_val_threshold: float = 0.99,
+        q_val_threshold: float = 0.999,
         rl_threshold: float = 0.1,
         percent_feedback: float = 1.0,
     ):
