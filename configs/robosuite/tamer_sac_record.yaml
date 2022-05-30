@@ -36,6 +36,6 @@ tau: 0.01
 train_freq: 1
 gradient_steps: 1
 human_data_save_path: "human_study/participant_1"
-trained_model: "trained-models/RobosuiteReaching.zip"
+trained_model: "trained-models/RobosuiteReachingNew.zip"
 assign_credit: True
 sleep_time_in_seconds: 0.1

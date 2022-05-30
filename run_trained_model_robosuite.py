@@ -66,11 +66,11 @@ if __name__ == "__main__":
 
     env = wrappers.GymWrapper(suite.make(
         **robosuite_config,
-        has_renderer=False,
-        has_offscreen_renderer=True,
+        has_renderer=True,
+        has_offscreen_renderer=False,
         render_camera="agentview",
         ignore_done=False,
-        use_camera_obs=True,
+        use_camera_obs=False,
         reward_shaping=False,
         control_freq=20,
         reward_scale=10,
@@ -78,48 +78,46 @@ if __name__ == "__main__":
         render_gpu_device_id=0,
     ), keys=['robot0_eef_pos_xy'])
 
-    env = Monitor(env)
-    env = DummyVecEnv([lambda: env])
+    # env = Monitor(env)
+    # env = DummyVecEnv([lambda: env])
 
     # agentview_image
     
     print(env.action_space)
     print(env.observation_space)
     obs = env.reset()
-    env.render(mode="offscreen_robosuite")
-    print(obs)
-    # env.viewer.set_camera(camera_id=1)
+    env.render()
+    env.viewer.set_camera(camera_id=1)
 
-    # Get action limits
     # low, high = env.action_spec
 
-    # kwargs = dict(seed=0)
-    # kwargs.update(dict(buffer_size=1))
-    # newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
-    # custom_objects = {}
-    # if newer_python_version:
-    #     custom_objects = {
-    #         "learning_rate": 0.0,
-    #         "lr_schedule": lambda _: 0.0,
-    #         "clip_range": lambda _: 0.0,
-    # }
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    kwargs = dict(seed=0)
+    kwargs.update(dict(buffer_size=1))
+    newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
+    custom_objects = {}
+    if newer_python_version:
+        custom_objects = {
+            "learning_rate": 0.0,
+            "lr_schedule": lambda _: 0.0,
+            "clip_range": lambda _: 0.0,
+    }
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # trained_model = SAC.load(
-    #     "trained-models/RobosuiteReaching.zip", env, custom_objects=custom_objects, **kwargs
-    # )
-    # # do visualization
-    # for i in range(10000):
-    #     action = np.random.uniform(low, high)
-    #     model_action, _ = trained_model.actor.action_log_prob(torch.tensor(obs).view(1, -1).to(device))
-    #     print(model_action[0])
-    #     # print(model_action[0].cpu().detach().numpy())
-    #     obs, reward, done, _ = env.step(model_action[0].cpu().detach().numpy())
-    #     print(obs)
-    #     # env.render()
-    #     env.render(mode="offscreen_robosuite")
-    #     if done:
-    #         print("DONEEEE!!")
-    #         print(reward)
-    #         obs = env.reset()
-    #         print(obs)
+    trained_model = SAC.load(
+        "trained-models/RobosuiteReachingNew.zip", env, custom_objects=custom_objects, **kwargs
+    )
+    # do visualization
+    for i in range(10000):
+        # action = np.random.uniform(low, high)
+        model_action, _ = trained_model.actor.action_log_prob(torch.tensor(obs).view(1, -1).to(device))
+        print(model_action[0])
+        # print(model_action[0].cpu().detach().numpy())
+        obs, reward, done, _ = env.step(model_action[0].cpu().detach().numpy())
+        print(obs)
+        # env.render()
+        env.render()
+        if done:
+            print("DONEEEE!!")
+            print(reward)
+            obs = env.reset()
+            print(obs)
