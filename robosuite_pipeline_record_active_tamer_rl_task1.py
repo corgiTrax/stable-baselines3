@@ -42,7 +42,7 @@ class ReachingSceneGraph:
     num_feedback_given = collections.Counter()
     aRPE_average = collections.Counter()
     curr_graph = None
-    total_feedback = 250000 #200000 for frequency based scene graph
+    total_feedback = 150000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
     
