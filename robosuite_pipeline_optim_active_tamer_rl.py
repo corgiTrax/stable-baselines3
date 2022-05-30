@@ -85,7 +85,7 @@ class ReachingSceneGraph:
         prev_graph = copy.deepcopy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 2
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):

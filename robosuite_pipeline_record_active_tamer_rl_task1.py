@@ -42,7 +42,7 @@ class ReachingSceneGraph:
     num_feedback_given = collections.Counter()
     aRPE_average = collections.Counter()
     curr_graph = None
-    total_feedback = 150000 #200000 for frequency based scene graph
+    total_feedback = 10000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
     
@@ -93,7 +93,7 @@ class ReachingSceneGraph:
         prev_graph = copy.deepcopy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 2
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -141,7 +141,7 @@ def main():
         use_camera_obs=True,
         reward_shaping=False,
         control_freq=20,
-        reward_scale=100,
+        reward_scale=10,
         hard_reset=False,
         render_gpu_device_id=0,
     ), keys=['robot0_eef_pos_xy'])
