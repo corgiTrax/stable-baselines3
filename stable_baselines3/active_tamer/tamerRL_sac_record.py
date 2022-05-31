@@ -123,7 +123,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         prediction_threshold: float = 0.012,
         experiment_save_dir: str = "human_study/participant_default",
         scene_graph: Object = None,
-        percent_feedback: float=1.0,
+        percent_feedback: float=0.25,
     ):
 
         super(TamerRLSACRecord, self).__init__(
@@ -589,19 +589,19 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                         curr_keyboard_feedback = (
                             human_feedback.return_human_keyboard_feedback()
                         )
-                        while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
-                            simulated_human_reward = (
-                                1
-                                if self.q_val_threshold * teacher_q_val < student_q_val
-                                else -1
-                            )
-                            time.sleep(0.01)
-                            curr_keyboard_feedback = (
-                                human_feedback.return_human_keyboard_feedback()
-                            ) # stall till you get human feedback
+                        simulated_human_reward = (
+                            1
+                            if self.q_val_threshold * teacher_q_val < student_q_val
+                            else -1
+                        )
+                        # while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
+                        #     time.sleep(0.01)
+                        #     curr_keyboard_feedback = (
+                        #         human_feedback.return_human_keyboard_feedback()
+                            # ) # stall till you get human feedback
                             # print(curr_keyboard_feedback)
                             # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
-                        human_reward = curr_keyboard_feedback
+                        human_reward = simulated_human_reward
                         self.total_feedback += 1
                         self.feedback_file.write(
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
