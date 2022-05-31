@@ -594,14 +594,14 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                             if self.q_val_threshold * teacher_q_val < student_q_val
                             else -1
                         )
-                        # while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
-                        #     time.sleep(0.01)
-                        #     curr_keyboard_feedback = (
-                        #         human_feedback.return_human_keyboard_feedback()
-                            # ) # stall till you get human feedback
-                            # print(curr_keyboard_feedback)
+                        print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
+                        while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
+                            time.sleep(0.01)
+                            curr_keyboard_feedback = (
+                                human_feedback.return_human_keyboard_feedback()
+                            ) # stall till you get human feedback
                             # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
-                        human_reward = simulated_human_reward
+                        human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
                         self.feedback_file.write(
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
