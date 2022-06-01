@@ -9,7 +9,6 @@ import pickle5 as pickle
 
 
 # perls2 modules
-# sys.path.insert(1, '/home/robot/sawyer_rl/sawyer_rl/pkgs/stablebaselines3')
 sys.path.insert(1, '/home/robot/perls2') # path to perls2 library
 
 from stable_baselines3.common.env_checker import check_env
@@ -145,7 +144,7 @@ if __name__ == "__main__":
                         help="fix orientation for move_ee_delta")
     parser.add_argument('--fix_pos', action="store_true",
                         help="fix position for move_ee_delta")
-    parser.add_argument('--config_file', default='pkgs/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
+    parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
     parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
     args = parser.parse_args()
     kwargs = vars(args)

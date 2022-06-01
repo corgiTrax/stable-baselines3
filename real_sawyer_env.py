@@ -9,13 +9,13 @@ import pickle5 as pickle
 
 
 # stable baselines modules
-sys.path.insert(1, '/home/robot/sawyer_rl/sawyer_rl/pkgs/stablebaselines3')
+# sys.path.insert(1, '/home/robot/perls2')
 import stable_baselines3
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.active_tamer.sac import SAC
 
 # perls2 modules
-from pkgs.perls2.demos.sawyer_osc_2d import OpSpaceLineXYZ
+from demos.sawyer_osc_2d import OpSpaceLineXYZ
 
 
 class RealSawyerReachingEnv(gym.Env):
@@ -42,11 +42,11 @@ class RealSawyerReachingEnv(gym.Env):
         self.driver = driver
 
         # max time steps
-        self.max_steps = 200
+        self.max_steps = 900
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.05
+        self.ctrl_scale = 0.075
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -106,9 +106,9 @@ class RealSawyerReachingEnv(gym.Env):
             # task is completed
             done = True
 
-        # if self.steps > self.max_steps:
-        #     # max steps is reached
-        #     done = self.steps > self.max_steps # finish if reached maximum time steps
+        if self.steps > self.max_steps:
+            # max steps is reached
+            done = self.steps > self.max_steps # finish if reached maximum time steps
         
         info = {} 
 

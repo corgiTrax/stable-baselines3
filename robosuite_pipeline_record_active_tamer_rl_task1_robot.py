@@ -41,7 +41,7 @@ from robosuite import wrappers
 from robosuite import load_controller_config
 from PIL import Image
 
-from perls2.demos.sawyer_osc_2d import OpSpaceLineXYZ
+from demos.sawyer_osc_2d import OpSpaceLineXYZ
 from real_sawyer_env import RealSawyerReachingEnv
 
 class ReachingSceneGraph:
@@ -125,7 +125,7 @@ def viz_robosuite():
             img.close()
 
 def main():
-    with open("pkgs/stablebaselines3/configs/robosuite/active_tamer_rl_sac_record.yaml", "r") as f:
+    with open("configs/robosuite/active_tamer_rl_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
@@ -175,7 +175,7 @@ def main():
                         help="fix orientation for move_ee_delta")
     parser.add_argument('--fix_pos', action="store_true",
                         help="fix position for move_ee_delta")
-    parser.add_argument('--config_file', default='pkgs/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
+    parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
     parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
     args = parser.parse_args()
     kwargs = vars(args)

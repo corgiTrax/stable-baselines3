@@ -37,7 +37,7 @@ from robosuite import load_controller_config
 
 # For physical robot
 from real_sawyer_env import RealSawyerReachingEnv
-from perls2.demos.sawyer_osc_2d import OpSpaceLineXYZ
+from demos.sawyer_osc_2d import OpSpaceLineXYZ
 
 class ReachingSceneGraph:
     agent = {'location': {'x': 0, 'y': 0}}
@@ -109,7 +109,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 def main():
-    with open("pkgs/stablebaselines3/configs/robosuite/tamer_sac_record.yaml", "r") as f:
+    with open("configs/robosuite/tamer_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
@@ -154,7 +154,7 @@ def main():
                         help="fix orientation for move_ee_delta")
     parser.add_argument('--fix_pos', action="store_true",
                         help="fix position for move_ee_delta")
-    parser.add_argument('--config_file', default='pkgs/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
+    parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
     parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
     args = parser.parse_args()
     kwargs = vars(args)
