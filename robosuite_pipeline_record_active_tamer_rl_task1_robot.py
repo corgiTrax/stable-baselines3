@@ -100,7 +100,7 @@ class ReachingSceneGraph:
         prev_graph = copy.deepcopy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 2 
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 1 
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -211,9 +211,9 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
-    trained_model = SAC.load(
-        config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
-    )
+    # trained_model = SAC.load(
+    #     config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
+    # )
 
     while os.path.exists(config_data['human_data_save_path']):
         config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
@@ -236,7 +236,7 @@ def main():
         seed=config_data["seed"],
         experiment_save_dir=config_data['human_data_save_path'],
         render=True,
-        trained_model=trained_model,
+        trained_model=None,
         scene_graph=ReachingSceneGraph()
     )
 

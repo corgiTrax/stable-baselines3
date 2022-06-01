@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 import sys
 import torch
+import time
 
 import pickle5 as pickle
 
@@ -30,8 +31,8 @@ class RealSawyerReachingEnv(gym.Env):
         # define action space
         # self.action_space = spaces.Box(low=-0.1, high=0.1, shape=(self.action_dim, ))#, dtype=np.float32)
         self.action_space = spaces.Box(
-            low=np.array([-0.1, -0.1, -0.1, -1.0]),
-            high=np.array([0.1, 0.1, 0.1, 1.0]),
+            low=np.array([-0.25, -0.25, -0.25, -1.0]),
+            high=np.array([0.25, 0.25, 0.25, 1.0]),
             shape=(4,),
             dtype=np.float32)
 
@@ -83,12 +84,14 @@ class RealSawyerReachingEnv(gym.Env):
 
         # scale input to controller
         # action = self.ctrl_scale * action # for 2d action space model
+        sf = 1.5 # safety factor for boundary limit
         action = self.ctrl_scale * action[:2] # for 4d action space model
 
         # check workspace boundary condition
         eef_xpos = self.get_state()
-        x_in_bounds = self.x_lim[0] + action[0] < eef_xpos[0] < self.x_lim[1]
-        y_in_bounds = self.y_lim[0] + action[1] < eef_xpos[1] < self.y_lim[1]
+        print(f'Current position = {str(eef_xpos)}')
+        x_in_bounds = self.x_lim[0] < eef_xpos[0] + action[0] < self.x_lim[1]
+        y_in_bounds = self.y_lim[0] < eef_xpos[1] + action[1] < self.y_lim[1]
         
         if not x_in_bounds or not y_in_bounds:
             # if next action will send eef out of boundary, ignore the action
@@ -124,10 +127,15 @@ class RealSawyerReachingEnv(gym.Env):
 
         observation = self.get_state() # update observation
 
-        # # random eef position intialization
-        # for i in range(500):
-        #     action = np.random.uniform(-1, 1, 4)
-        #     observation, _, _, _ = self.step(action)
+        # random eef position intialization
+        for i in range(50):
+            action = np.random.uniform(-0.25, 0.25, 4)
+            observation, _, _, _ = self.step(action)
+        
+        self.steps = 0
+
+        print("--------------Finished Resetting. Starting in 5 sec-----------")
+        time.sleep(5)
 
         return observation
 

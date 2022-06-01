@@ -15,7 +15,7 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.active_tamer.sac import SAC
 
 # perls2 modules
-from perls2.demos.sawyer_osc_2d import OpSpaceLineXYZ
+from demos.sawyer_osc_2d import OpSpaceLineXYZ
 
 from real_sawyer_env import RealSawyerReachingEnv
 
@@ -100,6 +100,11 @@ def record_state(env):
     print(states_shifted - robosuite_states)
     print("correction term", error)
 
+def calibrate_boundary_helper(env):
+    while True:
+        # print("raw", driver.get_eef_xy())
+        print("calib", driver.get_eef_xy() - env.origin)
+
 
 if __name__ == "__main__":
 
@@ -155,16 +160,14 @@ if __name__ == "__main__":
 
     # check_env(env)
 
-    record_state(env)
-
+    # record_state(env)
+    calibrate_boundary_helper(env)
             
 
 
     ###### Test perls2 driver ######
 
-    ### For boundary clibration ####
-    # while True:
-    #     print(driver.get_eef_xy())
+
 
     #### Move to target ####
     # for i in range(20):

@@ -535,24 +535,24 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
-                teacher_action, _ = self.trained_model.predict(self._last_obs)
-                teacher_q_val = self.trained_model.critic.forward(
-                    th.from_numpy(self._last_obs).to(self.device),
-                    th.from_numpy(teacher_action).to(self.device),
-                )
-                teacher_q_val, _ = th.min(
-                    th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
-                )
-                teacher_q_val = teacher_q_val.cpu()[0][0]
+                # teacher_action, _ = self.trained_model.predict(self._last_obs)
+                # teacher_q_val = self.trained_model.critic.forward(
+                #     th.from_numpy(self._last_obs).to(self.device),
+                #     th.from_numpy(teacher_action).to(self.device),
+                # )
+                # teacher_q_val, _ = th.min(
+                #     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
+                # )
+                # teacher_q_val = teacher_q_val.cpu()[0][0]
 
-                student_q_val = self.trained_model.critic.forward(
-                    th.from_numpy(self._last_obs).to(self.device),
-                    th.from_numpy(action).to(self.device),
-                )
-                student_q_val, _ = th.min(
-                    th.cat(student_q_val, dim=1), dim=1, keepdim=True
-                )
-                student_q_val = student_q_val.cpu()[0][0]
+                # student_q_val = self.trained_model.critic.forward(
+                #     th.from_numpy(self._last_obs).to(self.device),
+                #     th.from_numpy(action).to(self.device),
+                # )
+                # student_q_val, _ = th.min(
+                #     th.cat(student_q_val, dim=1), dim=1, keepdim=True
+                # )
+                # student_q_val = student_q_val.cpu()[0][0]
 
                 # Rescale and perform action
                 if self.render:
@@ -570,6 +570,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                 self.feedback_file.write(
                     f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
                 )
+                print(f"Feedback needed at step {str(self.num_timesteps)}")
                 human_reward = 0
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
@@ -595,13 +596,13 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     curr_keyboard_feedback = (
                         human_feedback.return_human_keyboard_feedback()
                     )
-                    simulated_human_reward = (
-                        1
-                        if self.q_val_threshold * teacher_q_val < student_q_val
-                        else -1
-                    )
-                    print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
-                    if curr_keyboard_feedback is not None and type(curr_keyboard_feedback) != int:
+                    # simulated_human_reward = (
+                    #     1
+                    #     if self.q_val_threshold * teacher_q_val < student_q_val
+                    #     else -1
+                    # )
+                    # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
+                    if curr_keyboard_feedback is not None and type(curr_keyboard_feedback) == int:
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
                         self.feedback_file.write(
