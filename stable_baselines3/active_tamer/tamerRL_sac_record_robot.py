@@ -581,38 +581,35 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                 _, _ = self.scene_graph.updateGraph(new_obs, action)
                 if (
                     # state_prediction_err > self.prediction_threshold
-                    # unfamiliar_state
                     random.random() < self.percent_feedback
                 ):
                     self.feedback_file.write(
-                        f"State prediction error at timestep {str(self.num_timesteps)} is {str(self.prediction_threshold)}\n"
+                        f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
                     )
-                    if human_feedback:
-                        playsound("beep.wav", block=False) # play audio to signal human to give feedback
-                        _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
-                        curr_keyboard_feedback = (
-                            human_feedback.return_human_keyboard_feedback()
-                        )
-                        simulated_human_reward = (
-                            1
-                            if self.q_val_threshold * teacher_q_val < student_q_val
-                            else -1
-                        )
-                        print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
-                        while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
-                            time.sleep(0.01)
-                            curr_keyboard_feedback = (
-                                human_feedback.return_human_keyboard_feedback()
-                            ) # stall till you get human feedback
-                            # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
+                    self.feedback_file.write(
+                        f"State prediction error at timestep {str(self.num_timesteps)} is {str(state_prediction_err)}\n"
+                    )
+                    playsound("beep.wav", block=False) # play audio to signal human to give feedback
+                
+                if human_feedback:
+                    curr_keyboard_feedback = (
+                        human_feedback.return_human_keyboard_feedback()
+                    )
+                    simulated_human_reward = (
+                        1
+                        if self.q_val_threshold * teacher_q_val < student_q_val
+                        else -1
+                    )
+                    print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
+                    if curr_keyboard_feedback is not None and type(curr_keyboard_feedback) != int:
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
                         self.feedback_file.write(
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
                         )
-                    
-                    else:
-                        raise "Must instantiate a human feedback object to collect human feedback."
+                
+                else:
+                    raise "Must instantiate a human feedback object to collect human feedback."
                     
 
                 self.q_val_threshold += 0.00000001
