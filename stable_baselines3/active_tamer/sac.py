@@ -444,7 +444,7 @@ class SAC(OffPolicyAlgorithm):
                 # Rescale and perform action
                 if self.render:
                     env.render()
-
+                
                 new_obs, reward, done, infos = env.step(action)
 
                 self.num_timesteps += 1
