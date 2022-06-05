@@ -42,7 +42,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 def main(args):
     
-    with open("configs/robosuite_ballbasket/active_tamer_rl_sac.yaml", "r") as f:
+    with open("configs/robosuite_ballbasket/tamer_rl_sac.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     if args.seed:
@@ -51,7 +51,7 @@ def main(args):
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
     robosuite_config = {
-        "env_name": "Reaching",
+        "env_name": "BallBasket",
         "robots": "Sawyer",
         "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
     }
