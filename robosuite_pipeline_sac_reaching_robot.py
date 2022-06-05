@@ -18,7 +18,7 @@ import yaml
 # from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 # from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.sac import SAC
+from stable_baselines3.active_tamer.sac import SACRecord # CHANGED
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
@@ -30,8 +30,6 @@ from robosuite import load_controller_config
 sys.path.insert(1, '/home/robot/perls2')
 # perls2 modules
 from demos.sawyer_osc_2d import OpSpaceLineXYZ
-
-from playsound import playsound
 from real_sawyer_env import RealSawyerReachingEnv
 
 
@@ -48,7 +46,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main(args):
-    with open("configs/robosuite/sac.yaml", "r") as f:
+    with open("configs/robosuite/sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
     
     if args.seed:
@@ -104,6 +102,7 @@ def main(args):
     driver = OpSpaceLineXYZ(**kwargs)
 
     env = RealSawyerReachingEnv(driver)
+    env.reset()
 
     # keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
     #         'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state']
@@ -116,6 +115,9 @@ def main(args):
 
     kwargs = dict(seed=0)
     kwargs.update(dict(buffer_size=1))
+
+    while os.path.exists(config_data['data_save_path']):
+        config_data['data_save_path'] = "/".join(config_data['data_save_path'].split("/")[:-1]) + '/run_' + str(int(random.random() * 1000000000))
 
     model = SAC(
         config_data["policy_name"],
@@ -133,6 +135,7 @@ def main(args):
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
+        experiment_save_dir=config_data["data_save_path"],
         render=False,
     )
 
