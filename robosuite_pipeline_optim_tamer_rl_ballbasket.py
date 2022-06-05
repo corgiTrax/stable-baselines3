@@ -18,9 +18,10 @@ import yaml
 from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.sac import SAC
+from stable_baselines3.active_tamer.tamerRL_sac_optim import TamerRLSACOptim
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+from stable_baselines3.sac.sac import SAC
 
 import robosuite as suite
 from robosuite import wrappers
@@ -40,16 +41,17 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main(args):
-    with open("configs/robosuite/sac.yaml", "r") as f:
-        config_data = yaml.load(f, Loader=yaml.FullLoader)
     
+    with open("configs/robosuite_ballbasket/active_tamer_rl_sac.yaml", "r") as f:
+        config_data = yaml.load(f, Loader=yaml.FullLoader)
+
     if args.seed:
         config_data['seed'] = args.seed
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
     robosuite_config = {
-        "env_name": "BallBasket",
+        "env_name": "Reaching",
         "robots": "Sawyer",
         "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
     }
@@ -66,10 +68,9 @@ def main(args):
         hard_reset=False,
         prehensile=False,
     ), keys=['eef_xyz_gripper'])
-    print(env.action_space)
-    print(env.action_dim)
-    # keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
-    #         'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state']
+
+    print(env)
+
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
@@ -77,10 +78,22 @@ def main(args):
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
+    newer_python_version = sys.version_info.major == 3 and sys.version_info.minor >= 8
     kwargs = dict(seed=0)
     kwargs.update(dict(buffer_size=1))
 
-    model = SAC(
+    custom_objects = {}
+    if newer_python_version:
+        custom_objects = {
+            "learning_rate": 0.0,
+            "lr_schedule": lambda _: 0.0,
+            "clip_range": lambda _: 0.0,
+        }
+    trained_model = SAC.load(
+        config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
+    )
+
+    model = TamerRLSACOptim(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -97,6 +110,8 @@ def main(args):
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
         render=False,
+        trained_model=trained_model,
+        percent_feedback=config_data['percent_feedback'],
     )
 
     print(f"Model Policy = " + str(model.policy))
@@ -112,7 +127,7 @@ def main(args):
     else:
         del model
         model_num = config_data["load_model"]
-        model = SAC.load(f"models/SAC_{model_num}.pt", env=env)
+        model = TamerRLSACOptim.load(f"models/TamerSAC_{model_num}.pt", env=env)
         print("Loaded pretrained model")
 
 

@@ -569,6 +569,7 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
+                self.logger.record("train/training_rewards", reward)
                 simulated_human_reward = 0
 
                 human_critic_qval_estimate = self.human_critic.forward(
