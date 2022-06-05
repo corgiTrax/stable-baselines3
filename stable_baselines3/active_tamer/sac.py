@@ -446,6 +446,7 @@ class SAC(OffPolicyAlgorithm):
                     env.render()
                 
                 new_obs, reward, done, infos = env.step(action)
+                self.logger.record("train/training_rewards", reward)
 
                 self.num_timesteps += 1
                 episode_timesteps += 1
