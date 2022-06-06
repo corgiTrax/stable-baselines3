@@ -37,4 +37,3 @@ gradient_steps: 1
 human_data_save_path: "human_study/participant_1"
 trained_model: "trained-models/RobosuiteReachingNew.zip"
 credit_assignment: 0
-percent_feedback: 1
