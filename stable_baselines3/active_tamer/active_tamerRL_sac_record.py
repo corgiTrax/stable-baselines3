@@ -659,7 +659,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
 
                 # Can only do credit assignment for reward received from the environment
                 if self.credit_assignment > 0:
-                    self.apply_uniform_credit_assignment(
+                    self.apply_uniform_credit_assignment_human(
                         replay_buffer, float(human_reward), 0, min(self.credit_assignment, self.curr_episode_timesteps)
                     )
 

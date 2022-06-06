@@ -592,6 +592,19 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             replay_buffer.pos - np.arange(start_iter, end_iter)
         ) % replay_buffer.buffer_size
         replay_buffer.rewards[update_indies, 0] += reward / (end_iter - start_iter + 1)
+    
+    def apply_uniform_credit_assignment_human(
+        self, replay_buffer: HumanReplayBuffer, reward: float, start_iter: int, end_iter: int
+    ):
+        end_iter = (
+            end_iter
+            if (replay_buffer.full or replay_buffer.pos > end_iter)
+            else replay_buffer.pos
+        )
+        update_indies = (
+            replay_buffer.pos - np.arange(start_iter, end_iter)
+        ) % replay_buffer.buffer_size
+        replay_buffer.humanRewards[update_indies, 0] += reward / (end_iter - start_iter + 1)
 
     def collect_rollouts(
         self,
