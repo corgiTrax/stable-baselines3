@@ -188,8 +188,8 @@ class RealSawyerReachingEnv(Env):
         # workspace boundaries (low, high)
         # x bondary: 0.900 0.832 0.345 0.319
         # y boundary: -0.171 0.486 -0.178 0.467 
-        self.x_lim = np.array([0.35, 0.775]) - self.origin[0]
-        self.y_lim = np.array([-0.160, 0.467]) - self.origin[1]
+        self.x_lim = np.array([0.43, 0.775]) - self.origin[0]
+        self.y_lim = np.array([-0.160, 0.455]) - self.origin[1]
         # self.x_lim = np.array([-0.30, 0.14])
         # self.y_lim = np.array([-0.30, 0.14])
 
@@ -255,20 +255,20 @@ class RealSawyerReachingEnv(Env):
         # scale input to controller
         # action = self.ctrl_scale * action # for 2d action space model
         sf = 1.2 # safety factor for boundary limit
-        action_scaled = sf * self.ctrl_scale * action[:2] # for 4d action space model
+        # action_scaled = sf * self.ctrl_scale * action[:2] # for 4d action space model
+        new_action = self.ctrl_scale * (action[:2] + self.prev_action) / 2 # interpolation
 
         # check workspace boundary condition
         eef_xpos = self.get_state()
         # print(f'Current position = {str(eef_xpos)}')
-        x_in_bounds = self.x_lim[0] < eef_xpos[0] + action_scaled[0] < self.x_lim[1]
-        y_in_bounds = self.y_lim[0] < eef_xpos[1] + action_scaled[1] < self.y_lim[1]
+        x_in_bounds = self.x_lim[0] < eef_xpos[0] + sf * new_action[0] < self.x_lim[1]
+        y_in_bounds = self.y_lim[0] < eef_xpos[1] + sf * new_action[1] < self.y_lim[1]
         
         if not x_in_bounds or not y_in_bounds:
             # if next action will send eef out of boundary, ignore the action
             print("action out of bounds")
-            action = np.zeros(self.action_dim)
+            new_action = np.zeros(self.action_dim)
 
-        new_action = self.ctrl_scale * (action[:2] + self.prev_action) / 2 # interpolation
         self.driver.step_axis(new_action)
         # print("deltas", self.ctrl_scale * action)
         print("deltas", new_action)
@@ -315,6 +315,8 @@ class RealSawyerReachingEnv(Env):
             self.step(action)
             vec = self.init_state - self.get_state()
 
+        self.step(np.zeros(2))
+
     def _near_joint_limits(self, safety_factor=1.0):
         # self.robot_interface.step()
         print("lower", self.joint_lim_lower)
@@ -332,8 +334,8 @@ class RealSawyerReachingEnv(Env):
         print("----------------Resetting-----------------")
 
         self._move_to_initial_pos()
-        time.sleep(2)
-        self.driver.env.reset()
+        time.sleep(5)
+        #self.driver.env.reset()
         self.driver.connect_and_reset_robot()
         print("-----Moved to initial pos---------")
 
