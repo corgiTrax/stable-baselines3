@@ -18,9 +18,10 @@ import yaml
 # from lunar_lander_models import LunarLanderExtractor, LunarLanderStatePredictor
 # from PyQt5.QtWidgets import *
 
-from stable_baselines3.active_tamer.sac import SACRecord # CHANGED
+from stable_baselines3.sac.sac_record_robot import SACRecord # CHANGED
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+
 
 import robosuite as suite
 from robosuite import wrappers
@@ -102,7 +103,7 @@ def main(args):
     driver = OpSpaceLineXYZ(**kwargs)
 
     env = RealSawyerReachingEnv(driver)
-    env.reset()
+    # env.reset()
 
     # keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
     #         'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state']
@@ -119,7 +120,13 @@ def main(args):
     while os.path.exists(config_data['data_save_path']):
         config_data['data_save_path'] = "/".join(config_data['data_save_path'].split("/")[:-1]) + '/run_' + str(int(random.random() * 1000000000))
 
-    model = SAC(
+    # try pre-generating file and read 
+    # print(f"---------{config_data['data_save_path']}----------")
+    # os.makedirs(config_data['data_save_path'], exist_ok=True)
+    # f = open(f"{config_data['data_save_path']}/data_file.txt", "a")
+    # f.close()
+
+    model = SACRecord(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],

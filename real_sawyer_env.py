@@ -264,20 +264,19 @@ class RealSawyerReachingEnv(Env):
         info = {} 
 
         self.steps += 1
+        # print(self.steps)
 
         return observation, reward, done, info
 
     def _move_to_initial_pos(self):
 
         thresh = 0.01
-        print("-------initial state", self.init_state)
-        print("-------curr state", self.get_state())
         print(self.init_state - self.get_state())
 
         vec = self.init_state - self.get_state()
         while (abs(vec[0]) > thresh) or (abs(vec[1]) > thresh):
             action = self.init_state - self.get_state() # vector from current to initial position
-            print("-----RESET ACTION", action)
+            # print("-----RESET ACTION", action)
             self.step(action)
             vec = self.init_state - self.get_state()
             
@@ -288,17 +287,17 @@ class RealSawyerReachingEnv(Env):
 
         self._move_to_initial_pos()
         print("-----Moved to initial pos---------")
-        time.sleep(3)
+        time.sleep(2)
 
         observation = self.get_state() # update observation
-        print("Observation", observation)
+        # print("Observation", observation)
 
         # random eef position intialization
         if self.random_init:
             action_x = np.random.uniform(-0.015, 0.035, 1)
             action_y = np.random.uniform(-0.070, 0.070, 1)
             action = np.concatenate([action_x, action_y, np.zeros(2)])
-            print(f"-----Action is {action}------")
+            print(f"-----Taking Random Action {action}------")
             for i in range(50):
                 observation, _, _, _ = self.step(action)
         

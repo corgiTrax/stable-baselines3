@@ -1,16 +1,30 @@
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+import sys
 
 import gym
 import numpy as np
 import torch as th
 from torch.nn import functional as F
+import os
+import random
+import time
 
 from stable_baselines3.common.buffers import ReplayBuffer
 from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from stable_baselines3.common.utils import polyak_update
+from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
 from stable_baselines3.sac.policies import SACPolicy
+from stable_baselines3.common.vec_env import VecEnv
+from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.type_aliases import (
+    GymEnv,
+    MaybeCallback,
+    RolloutReturn,
+    Schedule,
+    TrainFreq,
+)
+
 
 
 class SACRecord(OffPolicyAlgorithm):
@@ -143,8 +157,9 @@ class SACRecord(OffPolicyAlgorithm):
         self.ent_coef = ent_coef
         self.target_update_interval = target_update_interval
         self.ent_coef_optimizer = None
-        self.data_file = None
+        self.curr_episode_timesteps = 0
 
+        self.data_file = None
         if experiment_save_dir:
             os.makedirs(experiment_save_dir, exist_ok=True)
             self.data_file = open(os.path.join(experiment_save_dir, "data_file.txt"), "w")
@@ -432,6 +447,12 @@ class SACRecord(OffPolicyAlgorithm):
                 new_obs, reward, done, infos = env.step(action)
 
                 # write time, state, action, reward to file
+                # self.data_file.write(
+                #     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
+                # )
+                # self.data_file.write(
+                #     f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
+                # )
                 self.data_file.write(
                     f"Current timestep = {str(self.num_timesteps)}\n"
                 )
@@ -442,7 +463,7 @@ class SACRecord(OffPolicyAlgorithm):
                     f"State = {str(new_obs)}\n"
                 )
                 self.data_file.write(
-                    f"Action = {str(acition)}\n"
+                    f"Action = {str(action)}\n"
                 )
                 self.data_file.write(
                     f"Reward = {str(reward)}\n"
@@ -461,6 +482,9 @@ class SACRecord(OffPolicyAlgorithm):
                 self.num_timesteps += 1
                 episode_timesteps += 1
                 num_collected_steps += 1
+                self.curr_episode_timesteps += 1
+                print(self.num_timesteps)
+
 
                 # Give access to local variables
                 callback.update_locals(locals())
@@ -508,6 +532,7 @@ class SACRecord(OffPolicyAlgorithm):
                     break
 
             if done:
+                self.curr_episode_timesteps = 0
                 num_collected_episodes += 1
                 self._episode_num += 1
                 episode_rewards.append(episode_reward)
