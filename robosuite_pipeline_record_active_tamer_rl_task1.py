@@ -199,7 +199,8 @@ def main():
         experiment_save_dir=config_data['human_data_save_path'],
         render=True,
         trained_model=trained_model,
-        scene_graph=ReachingSceneGraph()
+        scene_graph=ReachingSceneGraph(),
+        credit_assignment=config_data['credit_assignment']
     )
 
     print(f"Model Policy = " + str(model.policy))
