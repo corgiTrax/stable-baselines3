@@ -74,6 +74,8 @@ class BallBasketSceneGraph:
     
     def below(self, obj_a):
         return obj_a['location']['z'] < 0
+
+    # add a state of gripper open/close
     
 
     def updateRPE(self, human_feedback, human_critic_prediction):
