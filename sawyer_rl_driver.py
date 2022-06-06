@@ -103,7 +103,7 @@ def record_state(env, axis=0):
 def calibrate_boundary_helper(env):
     while True:
         print("raw", driver.get_eef_xy())
-        # print("calib", driver.get_eef_xy() - env.origin)
+        print("calib", driver.get_eef_xy() - env.origin)
 
 
 if __name__ == "__main__":
@@ -203,19 +203,22 @@ if __name__ == "__main__":
     env = RealSawyerReachingEnv(driver, random_init=True)
     # env = RealSawyerReachingEnv3d(driver)
 
-    for i in range(5):
-        print(f"Reset {i}")
-        env.reset()
+    # for i in range(5):
+    #     print(f"Reset {i}")
+    #     env.reset()
     # check_env(env)
 
     # record_state(env, axis=0)
-    # calibrate_boundary_helper(env)
-            
+    calibrate_boundary_helper(env)
 
-    # ### Motion Test ####
-    # for i in range(50):
+    ### Motion Test ####
+    # for i in range(1500):
+    #     action = np.random.uniform(-0.25, 0.25, 4)
+    #     print("action", action)
+    #     env.step(action)
+    # for i in range(1500):
     #     print("step ", i)
-    #     action = np.array([-0.02, 0, 0, 0])
+    #     action = np.array([0.04, 0, 0, 0])
     #     env.step(action)
         
         # if driver.reward():

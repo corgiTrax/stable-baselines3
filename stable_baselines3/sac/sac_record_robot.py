@@ -444,7 +444,10 @@ class SACRecord(OffPolicyAlgorithm):
                 if self.render:
                     env.render()
 
+                # action = np.random.uniform(-0.25, 0.25, 4)
+                # buffer_action = action
                 new_obs, reward, done, infos = env.step(action)
+                
 
                 # write time, state, action, reward to file
                 # self.data_file.write(

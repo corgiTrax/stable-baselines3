@@ -49,7 +49,7 @@ class RealSawyerReachingEnv3d(gym.Env):
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.075
+        self.ctrl_scale = 0.04
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -180,7 +180,7 @@ class RealSawyerReachingEnv(Env):
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.075
+        self.ctrl_scale = 0.03
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -188,14 +188,17 @@ class RealSawyerReachingEnv(Env):
         # workspace boundaries (low, high)
         # x bondary: 0.900 0.832 0.345 0.319
         # y boundary: -0.171 0.486 -0.178 0.467 
-        self.x_lim = np.array([0.319, 0.775]) - self.origin 
-        self.y_lim = np.array([-0.160, 0.467]) - self.origin
+        self.x_lim = np.array([0.43, 0.775]) - self.origin[0]
+        self.y_lim = np.array([-0.160, 0.467]) - self.origin[1]
+        # self.x_lim = np.array([-0.30, 0.14])
+        # self.y_lim = np.array([-0.30, 0.14])
+
 
         # Target boundaries
         # x boundary: 0.671 0.748 0.746 0.667
         # y boundary: 0.276 0.272 0.040 0.046
-        self.target_x = np.array([0.671, 0.746]) - self.origin
-        self.target_y =  np.array([0.046, 0.272]) - self.origin
+        self.target_x = np.array([0.671, 0.746]) - self.origin[0]
+        self.target_y =  np.array([0.046, 0.272]) - self.origin[1]
 
         # Whether to use random position initialization
         self.random_init = random_init
@@ -208,9 +211,25 @@ class RealSawyerReachingEnv(Env):
         # print("------NEUTRAL EEF ORI", self.robot_interface.ee_orientation)
 
         # print("--------INITIAL POS", self.get_state())
+        # print("-----JOINTS", self.robot_interface.q)
 
+        # get sawyer joint limits
+        joint_limits = self.robot_interface.get_joint_limits()
+        # print("JOINT LIMITS", joint_limits)
+        joint_lim_lower, joint_lim_upper = [], []
+        for i in range(7):
+            joint = joint_limits[i]
+            joint_lim_lower.append(joint['lower'])
+            joint_lim_upper.append(joint['upper'])
 
+        self.joint_lim_lower = np.array(joint_lim_lower)
+        self.joint_lim_upper = np.array(joint_lim_upper)
 
+        # print("LOWER LIMITS", self.joint_lim_lower)
+        # print("UPPER LIMITS", self.joint_lim_upper)
+
+        # record previous action
+        self.prev_action = np.zeros(2)
 
 
     def reward(self):
@@ -231,21 +250,25 @@ class RealSawyerReachingEnv(Env):
 
         # scale input to controller
         # action = self.ctrl_scale * action # for 2d action space model
-        sf = 1.5 # safety factor for boundary limit
-        action = self.ctrl_scale * action[:2] # for 4d action space model
+        sf = 1.2 # safety factor for boundary limit
+        action_scaled = sf * self.ctrl_scale * action[:2] # for 4d action space model
 
         # check workspace boundary condition
         eef_xpos = self.get_state()
         # print(f'Current position = {str(eef_xpos)}')
-        x_in_bounds = self.x_lim[0] < eef_xpos[0] + action[0] < self.x_lim[1]
-        y_in_bounds = self.y_lim[0] < eef_xpos[1] + action[1] < self.y_lim[1]
+        x_in_bounds = self.x_lim[0] < eef_xpos[0] + action_scaled[0] < self.x_lim[1]
+        y_in_bounds = self.y_lim[0] < eef_xpos[1] + action_scaled[1] < self.y_lim[1]
         
         if not x_in_bounds or not y_in_bounds:
             # if next action will send eef out of boundary, ignore the action
             print("action out of bounds")
             action = np.zeros(self.action_dim)
 
-        self.driver.step_axis(action) # take action
+        new_action = self.ctrl_scale * (action[:2] + self.prev_action) / 2 # interpolation
+        self.driver.step_axis(new_action)
+        # print("deltas", self.ctrl_scale * action)
+        # print("eef pos", self.get_state())
+        # self.driver.step_axis(self.ctrl_scale * action) # take action
         observation = self.get_state() # observation = [eef_x, eef_y]
         reward = self.reward()
         
@@ -261,10 +284,16 @@ class RealSawyerReachingEnv(Env):
             # max steps is reached
             done = self.steps > self.max_steps # finish if reached maximum time steps
         
+        # if self._near_joint_limits(safety_factor=0.9):
+        #     print("CLOSE TO JOINT LIMIT")
+
         info = {} 
 
         self.steps += 1
-        # print(self.steps)
+        # print("eef pos", observation)
+        # print(f"xlim: {self.x_lim}, ylim: {self.y_lim}")
+        
+        self.prev_action = action[:2]
 
         return observation, reward, done, info
 
@@ -279,7 +308,18 @@ class RealSawyerReachingEnv(Env):
             # print("-----RESET ACTION", action)
             self.step(action)
             vec = self.init_state - self.get_state()
-            
+
+    def _near_joint_limits(self, safety_factor=1.0):
+        # self.robot_interface.step()
+        print("lower", self.joint_lim_lower)
+        print("upper", self.joint_lim_upper)
+        print("joints", self.robot_interface.q)
+
+
+        return (
+            np.any(self.robot_interface.q < safety_factor * self.joint_lim_lower)
+            or np.any(self.robot_interface.q > safety_factor * self.joint_lim_upper)
+            )
     
     def reset(self):
 
@@ -294,7 +334,7 @@ class RealSawyerReachingEnv(Env):
 
         # random eef position intialization
         if self.random_init:
-            action_x = np.random.uniform(-0.015, 0.035, 1)
+            action_x = np.random.uniform(0, 0.035, 1)
             action_y = np.random.uniform(-0.070, 0.070, 1)
             action = np.concatenate([action_x, action_y, np.zeros(2)])
             print(f"-----Taking Random Action {action}------")

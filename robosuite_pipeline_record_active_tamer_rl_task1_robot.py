@@ -130,12 +130,6 @@ def main():
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
-    # robosuite_config = {
-    #     "env_name": "Reaching",
-    #     "robots": "Sawyer",
-    #     "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
-    # }
-
     parser = argparse.ArgumentParser(
         description="Test controllers and measure errors.")
     parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])

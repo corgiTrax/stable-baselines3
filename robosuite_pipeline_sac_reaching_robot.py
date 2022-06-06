@@ -46,12 +46,12 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
-def main(args):
+def main():
     with open("configs/robosuite/sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
     
-    if args.seed:
-        config_data['seed'] = args.seed
+    # if args.seed:
+    #     config_data['seed'] = args.seed
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
@@ -103,10 +103,7 @@ def main(args):
     driver = OpSpaceLineXYZ(**kwargs)
 
     env = RealSawyerReachingEnv(driver)
-    # env.reset()
 
-    # keys=['robot0_joint_pos_cos', 'robot0_joint_pos_sin', 'robot0_joint_vel', 'robot0_eef_quat', 
-    #         'robot0_gripper_qpos', 'robot0_gripper_qvel', 'robot0_proprio-state']
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
@@ -164,9 +161,10 @@ def main(args):
 
 
 if __name__ == "__main__":
-    msg = "Overwrite config params"
-    parser = argparse.ArgumentParser(description = msg)
-    parser.add_argument("--seed", type=int, default=None)
+    # msg = "Overwrite config params"
+    # parser = argparse.ArgumentParser(description = msg)
+    # parser.add_argument("--seed", type=int, default=None)
 
-    args = parser.parse_args()
-    main(args)
+    # args = parser.parse_args()
+    # main(args)
+    main()
