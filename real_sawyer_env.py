@@ -180,7 +180,7 @@ class RealSawyerReachingEnv(Env):
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.03
+        self.ctrl_scale = 0.05
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -188,7 +188,7 @@ class RealSawyerReachingEnv(Env):
         # workspace boundaries (low, high)
         # x bondary: 0.900 0.832 0.345 0.319
         # y boundary: -0.171 0.486 -0.178 0.467 
-        self.x_lim = np.array([0.43, 0.775]) - self.origin[0]
+        self.x_lim = np.array([0.35, 0.775]) - self.origin[0]
         self.y_lim = np.array([-0.160, 0.467]) - self.origin[1]
         # self.x_lim = np.array([-0.30, 0.14])
         # self.y_lim = np.array([-0.30, 0.14])
@@ -205,10 +205,14 @@ class RealSawyerReachingEnv(Env):
 
         # Initial position
         self.init_state = np.array([-0.25, 0])
+        # self.init_state = np.array([-0.15, 0])
+
 
         # print("------NEUTRAL POS", self.robot_interface.limb_neutral_positions)
+        # exit(-1)
         # print("------NEUTRAL EEF POS", self.robot_interface.ee_position)
         # print("------NEUTRAL EEF ORI", self.robot_interface.ee_orientation)
+        # exit(-1)
 
         # print("--------INITIAL POS", self.get_state())
         # print("-----JOINTS", self.robot_interface.q)
@@ -267,7 +271,9 @@ class RealSawyerReachingEnv(Env):
         new_action = self.ctrl_scale * (action[:2] + self.prev_action) / 2 # interpolation
         self.driver.step_axis(new_action)
         # print("deltas", self.ctrl_scale * action)
-        # print("eef pos", self.get_state())
+        print("deltas", new_action)
+        
+        print("eef pos", self.get_state())
         # self.driver.step_axis(self.ctrl_scale * action) # take action
         observation = self.get_state() # observation = [eef_x, eef_y]
         reward = self.reward()
@@ -326,8 +332,11 @@ class RealSawyerReachingEnv(Env):
         print("----------------Resetting-----------------")
 
         self._move_to_initial_pos()
-        print("-----Moved to initial pos---------")
         time.sleep(2)
+        self.driver.env.reset()
+        self.driver.connect_and_reset_robot()
+        print("-----Moved to initial pos---------")
+
 
         observation = self.get_state() # update observation
         # print("Observation", observation)

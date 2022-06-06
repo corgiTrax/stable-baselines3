@@ -159,10 +159,10 @@ class SACRecord(OffPolicyAlgorithm):
         self.ent_coef_optimizer = None
         self.curr_episode_timesteps = 0
 
-        self.data_file = None
+        self.feedback_file = None
         if experiment_save_dir:
             os.makedirs(experiment_save_dir, exist_ok=True)
-            self.data_file = open(os.path.join(experiment_save_dir, "data_file.txt"), "w")
+            self.feedback_file = open(os.path.join(experiment_save_dir, "feedback_file.txt"), "w")
 
         if _init_setup_model:
             self._setup_model()
@@ -456,19 +456,19 @@ class SACRecord(OffPolicyAlgorithm):
                 # self.data_file.write(
                 #     f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
                 # )
-                self.data_file.write(
+                self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}\n"
                 )
-                self.data_file.write(
+                self.feedback_file.write(
                     f"Current episode timestep = {str(self.curr_episode_timesteps)}\n"
                 )
-                self.data_file.write(
+                self.feedback_file.write(
                     f"State = {str(new_obs)}\n"
                 )
-                self.data_file.write(
+                self.feedback_file.write(
                     f"Action = {str(action)}\n"
                 )
-                self.data_file.write(
+                self.feedback_file.write(
                     f"Reward = {str(reward)}\n"
                 )
 

@@ -58,7 +58,7 @@ def main():
     ### initialize environment ###
     parser = argparse.ArgumentParser(
         description="Test controllers and measure errors.")
-    parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
+    parser.add_argument('--world', default='Real', help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
     parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
     parser.add_argument('--ctrl_type',
                         default="EEImpedance",
