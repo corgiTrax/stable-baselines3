@@ -29,12 +29,12 @@ import robosuite as suite
 from robosuite import wrappers
 from robosuite import load_controller_config
 
-class ReachingSceneGraph:
-    agent = {'location': {'x': 0, 'y': 0}}
+class BallBasketSceneGraph:
+    agent = {'location': {'x': 0, 'y': 0, 'z': 0}}
     num_feedback_given = collections.Counter()
     aRPE_average = collections.Counter()
     curr_graph = None
-    total_feedback = 250000 #200000 for frequency based scene graph
+    total_feedback = 50000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
     
@@ -68,6 +68,13 @@ class ReachingSceneGraph:
     def bottom(self, obj_a):
         return obj_a['location']['y'] > 0.125
     
+    
+    def above(self, obj_a):
+        return obj_a['location']['z'] > 0
+    
+    def below(self, obj_a):
+        return obj_a['location']['z'] < 0
+    
 
     def updateRPE(self, human_feedback, human_critic_prediction):
         self.num_feedback_given[tuple(self.curr_graph)] += 1
@@ -77,15 +84,15 @@ class ReachingSceneGraph:
 
     def getCurrGraph(self):
         self.curr_graph = [self.right(self.agent), self.center(self.agent), self.left(self.agent), self.top(self.agent), 
-                            self.middle(self.agent), self.bottom(self.agent)]
+                            self.middle(self.agent), self.bottom(self.agent), self.above(self.agent), self.below(self.agent)]
         
         return self.curr_graph
         
     def updateGraph(self, newState, action):
         prev_graph = copy.deepcopy(self.curr_graph)
-        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][1]}
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 2
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -171,7 +178,7 @@ def main(args):
         seed=config_data["seed"],
         render=False,
         trained_model=trained_model,
-        scene_graph=ReachingSceneGraph(),
+        scene_graph=BallBasketSceneGraph(),
     )
 
     print(f"Model Policy = " + str(model.policy))
