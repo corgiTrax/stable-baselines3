@@ -41,7 +41,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main(args):
-    with open("configs/robosuite_ballbasket/active_tamer_rl_sac.yaml", "r") as f:
+    with open("configs/robosuite_ballbasket/tamer_sac_bc.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     if args.seed:
