@@ -538,25 +538,6 @@ class TamerRLSACRecordStop(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
-                # teacher_action, _ = self.trained_model.predict(self._last_obs)
-                # teacher_q_val = self.trained_model.critic.forward(
-                #     th.from_numpy(self._last_obs).to(self.device),
-                #     th.from_numpy(teacher_action).to(self.device),
-                # )
-                # teacher_q_val, _ = th.min(
-                #     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
-                # )
-                # teacher_q_val = teacher_q_val.cpu()[0][0]
-
-                # student_q_val = self.trained_model.critic.forward(
-                #     th.from_numpy(self._last_obs).to(self.device),
-                #     th.from_numpy(action).to(self.device),
-                # )
-                # student_q_val, _ = th.min(
-                #     th.cat(student_q_val, dim=1), dim=1, keepdim=True
-                # )
-                # student_q_val = student_q_val.cpu()[0][0]
-
                 # Rescale and perform action
                 if self.render:
                     env.render(mode="offscreen_robosuite")
@@ -593,32 +574,34 @@ class TamerRLSACRecordStop(OffPolicyAlgorithm):
                     self.feedback_file.write(
                         f"State prediction error at timestep {str(self.num_timesteps)} is {str(state_prediction_err)}\n"
                     )
-                    playsound("beep.wav", block=False) # play audio to signal human to give feedback
+                    # playsound("beep.wav", block=False) # play audio to signal human to give feedback
+                    # print("human_feedback", human_feedback)
                     if human_feedback:
                         _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
                         curr_keyboard_feedback = (
                             human_feedback.return_human_keyboard_feedback()
                         )
-                        simulated_human_reward = (
-                            1
-                            if self.q_val_threshold * teacher_q_val < student_q_val
-                            else -1
-                        )
-                        print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
+                        # simulated_human_reward = (
+                        #     1
+                        #     if self.q_val_threshold * teacher_q_val < student_q_val
+                        #     else -1
+                        # )
+                        # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
                         while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
                             time.sleep(0.01)
                             curr_keyboard_feedback = (
                                 human_feedback.return_human_keyboard_feedback()
                             ) # stall till you get human feedback
                             # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
+                            # print("Keyboard feedback", curr_keyboard_feedback)
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
                         self.feedback_file.write(
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
                         )                
 
-                else:
-                    raise "Must instantiate a human feedback object to collect human feedback."
+                    else:
+                        raise "Must instantiate a human feedback object to collect human feedback."
                     
 
                 self.q_val_threshold += 0.00000001

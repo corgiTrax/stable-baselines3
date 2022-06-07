@@ -176,11 +176,13 @@ class RealSawyerReachingEnv(Env):
         self.driver = driver
 
         # max time steps
-        self.max_steps = 500
+        # self.max_steps = 500
+        self.max_steps = 50
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.075
+        # self.ctrl_scale = 0.075
+        self.ctrl_scale = 0.75
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -345,14 +347,20 @@ class RealSawyerReachingEnv(Env):
         # print("Observation", observation)
 
         # random eef position intialization
+        # if self.random_init:
+        #     action_x = np.random.uniform(0, 0.035, 1)
+        #     action_y = np.random.uniform(-0.070, 0.070, 1)
+        #     action = np.concatenate([action_x, action_y, np.zeros(2)])
+        #     print(f"-----Taking Random Action {action}------")
+        #     for i in range(50):
+        #         observation, _, _, _ = self.step(action)
         if self.random_init:
             action_x = np.random.uniform(0, 0.035, 1)
             action_y = np.random.uniform(-0.070, 0.070, 1)
             action = np.concatenate([action_x, action_y, np.zeros(2)])
             print(f"-----Taking Random Action {action}------")
-            for i in range(50):
+            for i in range(5):
                 observation, _, _, _ = self.step(action)
-        
         self.steps = 0
 
         print("--------------Finished Resetting. Starting in 3 sec-----------")

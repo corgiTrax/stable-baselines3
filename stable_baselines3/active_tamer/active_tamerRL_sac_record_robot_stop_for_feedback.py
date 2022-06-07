@@ -30,8 +30,7 @@ import os
 
 from playsound import playsound
 
-
-class TamerRLSACRecord(OffPolicyAlgorithm):
+class ActiveTamerRLSACRecordStop(OffPolicyAlgorithm):
     """
     TAMER + Soft Actor-Critic (SAC): Use trained SAC model to give feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
@@ -119,18 +118,17 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         device: Union[th.device, str] = "auto",
         save_every: int = 2500,
         _init_setup_model: bool = True,
-        model_name: str = "TamerRLSACRecord",
+        model_name: str = "ActiveTamerRLSACRecordStop",
         render: bool = False,
         q_val_threshold: float = 0.999,
         rl_threshold: float = 0.1,
         prediction_threshold: float = 0.012,
         experiment_save_dir: str = "human_study/participant_default",
         scene_graph: Object = None,
-        percent_feedback: float=0.25,
         credit_assignment: int = 0,
     ):
 
-        super(TamerRLSACRecord, self).__init__(
+        super(ActiveTamerRLSACRecordStop, self).__init__(
             policy,
             env,
             ActiveSACHPolicy,
@@ -175,7 +173,6 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         self.scene_graph = scene_graph
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
-        self.percent_feedback = percent_feedback
         self.feedback_file = None
         if experiment_save_dir:
             os.makedirs(experiment_save_dir, exist_ok=True)
@@ -187,7 +184,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         self.credit_assignment = credit_assignment
 
     def _setup_model(self) -> None:
-        super(TamerRLSACRecord, self)._setup_model()
+        super(ActiveTamerRLSACRecordStop, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -433,12 +430,12 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
-        tb_log_name: str = "TamerRLSACRecord",
+        tb_log_name: str = "ActiveTamerRLStop",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
 
-        return super(TamerRLSACRecord, self).learn(
+        return super(ActiveTamerRLSACRecordStop, self).learn(
             total_timesteps=total_timesteps,
             human_feedback_gui=human_feedback_gui,
             human_feedback=human_feedback,
@@ -453,7 +450,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(TamerRLSACRecord, self)._excluded_save_params() + [
+        return super(ActiveTamerRLSACRecordStop, self)._excluded_save_params() + [
             "actor",
             "critic",
             "critic_target",
@@ -538,28 +535,19 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     learning_starts, action_noise
                 )
 
-                # teacher_action, _ = self.trained_model.predict(self._last_obs)
-                # teacher_q_val = self.trained_model.critic.forward(
-                #     th.from_numpy(self._last_obs).to(self.device),
-                #     th.from_numpy(teacher_action).to(self.device),
-                # )
-                # teacher_q_val, _ = th.min(
-                #     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
-                # )
-                # teacher_q_val = teacher_q_val.cpu()[0][0]
-
-                # student_q_val = self.trained_model.critic.forward(
-                #     th.from_numpy(self._last_obs).to(self.device),
-                #     th.from_numpy(action).to(self.device),
-                # )
-                # student_q_val, _ = th.min(
-                #     th.cat(student_q_val, dim=1), dim=1, keepdim=True
-                # )
-                # student_q_val = student_q_val.cpu()[0][0]
+                human_critic_qval_estimate = self.human_critic.forward(
+                    th.from_numpy(self._last_obs).to(self.device),
+                    th.from_numpy(action).to(self.device),
+                )
+                human_critic_qval_estimate, _ = th.min(
+                    th.cat(human_critic_qval_estimate, dim=1), dim=1, keepdim=True
+                )
 
                 # Rescale and perform action
                 if self.render:
                     env.render(mode="offscreen_robosuite")
+                    # print("Current X and Y coord:" + str(self._last_obs.copy()))
+                    # print("Next Action: " + str(action))
 
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
@@ -570,10 +558,6 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                 self.feedback_file.write(
                     f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
                 )
-                self.feedback_file.write(
-                    f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
-                )
-                print(f"Feedback needed at step {str(self.num_timesteps)}")
                 human_reward = 0
                 state_prediction_err = F.mse_loss(
                     self.state_predictor(
@@ -582,10 +566,10 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     ),
                     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
                 )
-                _, _ = self.scene_graph.updateGraph(new_obs, action)
+                scene_graph_updated, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action)
                 if (
                     # state_prediction_err > self.prediction_threshold
-                    random.random() < self.percent_feedback
+                    ucb_rank_high
                 ):
                     self.feedback_file.write(
                         f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
@@ -593,28 +577,36 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
                     self.feedback_file.write(
                         f"State prediction error at timestep {str(self.num_timesteps)} is {str(state_prediction_err)}\n"
                     )
-                    playsound("beep.wav", block=False) # play audio to signal human to give feedback
-                if human_feedback:
-                    curr_keyboard_feedback = (
-                        human_feedback.return_human_keyboard_feedback()
-                    )
-                    # simulated_human_reward = (
-                    #     1
-                    #     if self.q_val_threshold * teacher_q_val < student_q_val
-                    #     else -1
-                    # )
-                    # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
-                    if curr_keyboard_feedback is not None and type(curr_keyboard_feedback) == int:
+                    print(f"Feedback needed at step {str(self.num_timesteps)}")
+                    # playsound("beep.wav", block=False) # play audio to signal human to give feedback
+                
+                    if human_feedback:
+                        _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
+                        curr_keyboard_feedback = (
+                            human_feedback.return_human_keyboard_feedback()
+                        )
+                        # simulated_human_reward = (
+                        #     1
+                        #     if self.q_val_threshold * teacher_q_val < student_q_val
+                        #     else -1
+                        # )
+                        # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
+                        while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
+                            time.sleep(0.01)
+                            curr_keyboard_feedback = (
+                                human_feedback.return_human_keyboard_feedback()
+                            ) # stall till you get human feedback
+                            # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
                         human_reward = curr_keyboard_feedback
                         self.total_feedback += 1
+                        self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
                         self.feedback_file.write(
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
                         )
-                
-                else:
-                    raise "Must instantiate a human feedback object to collect human feedback."
                     
-
+                    else:
+                        raise "Must instantiate a human feedback object to collect human feedback."
+                 
                 self.q_val_threshold += 0.00000001
                 self.num_timesteps += 1
                 episode_timesteps += 1
@@ -653,7 +645,7 @@ class TamerRLSACRecord(OffPolicyAlgorithm):
 
                 # Can only do credit assignment for reward received from the environment
                 if self.credit_assignment > 0:
-                    self.apply_uniform_credit_assignment(
+                    self.apply_uniform_credit_assignment_human(
                         replay_buffer, float(human_reward), 0, min(self.credit_assignment, self.curr_episode_timesteps)
                     )
 

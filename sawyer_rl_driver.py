@@ -201,6 +201,7 @@ if __name__ == "__main__":
     driver = OpSpaceLineXYZ(**kwargs)
 
     env = RealSawyerReachingEnv(driver, random_init=True)
+
     # env = RealSawyerReachingEnv3d(driver)
 
     # for i in range(5):

@@ -1,6 +1,0 @@
-ctrl_scale = 0.075
-No interpolation
-500 steps/session
-10k total time steps
-reward scale = 100
-boundary safety factor = 1.2 
