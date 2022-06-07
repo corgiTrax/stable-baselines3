@@ -8,7 +8,7 @@
 # save_every_steps: 1000
 # learning_rate: 0.0003
 # # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
-# buffer_size: 3072
+# buffer_size: 307uttuuuuuuttttuuttttuuttuuuutuuuuuuttttttttuuuuuuuuuuuttuuuuttttttttuttutttuuttttttttttuuuuuuuuttuuuuuututttuuuutttt2
 # learning_starts: 32
 # batch_size: 32
 # tau: 0.01
@@ -25,17 +25,16 @@ verbose: 1
 steps: 10000
 load_model: 0  
 save_every_steps: 100
-learning_rate: 0.00073
-# 0.00073
+learning_rate: 0.00075
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000
 buffer_size: 1000000
-learning_starts: 10000
-batch_size: 256
+learning_starts: 0
+batch_size: 512
 tau: 0.01
 train_freq: 1
 gradient_steps: 1
-human_data_save_path: "robot_experiment_humanSAC/run_1"
-trained_model: "trained-models/RealRobotReachingNew.zip"
-assign_credit: True
-sleep_time_in_seconds: 0.1
+human_data_save_path: "robot_experiment_randomTAMER/participant_1"
+# trained_model: "trained-models/RobosuiteReachingNew.zip"
+credit_assignment: 0
+percent_feedback: 1

@@ -109,7 +109,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 def main():
-    with open("configs/robosuite/tamer_sac_record.yaml", "r") as f:
+    with open("configs/robosuite/tamer_sac_record_robot.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
@@ -164,7 +164,7 @@ def main():
     env = RealSawyerReachingEnv(driver)    
 
     # env.viewer.set_camera(camera_id=1)
-    env.reset()
+    # env.reset()
     # env.render()
     import time
     time.sleep(1)

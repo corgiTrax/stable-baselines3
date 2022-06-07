@@ -176,7 +176,7 @@ class RealSawyerReachingEnv(Env):
         self.driver = driver
 
         # max time steps
-        self.max_steps = 700
+        self.max_steps = 500
         self.steps = 0 
 
         # scaling factor from action -> osc control command
@@ -277,9 +277,6 @@ class RealSawyerReachingEnv(Env):
                 new_action = np.zeros(self.action_dim)
 
         self.driver.step_axis(new_action)
-        # print("deltas", self.ctrl_scale * action)
-        # print("deltas", new_action)
-        # print("eef pos", self.get_state())
         # self.driver.step_axis(self.ctrl_scale * action) # take action - no interpolation
         observation = self.get_state() # observation = [eef_x, eef_y]
         reward = self.reward()
@@ -295,19 +292,17 @@ class RealSawyerReachingEnv(Env):
         if self.steps > self.max_steps:
             # max steps is reached
             done = self.steps > self.max_steps # finish if reached maximum time steps
-        
-        # if self._near_joint_limits(safety_factor=0.9):
-        #     print("CLOSE TO JOINT LIMIT")
 
         info = {} 
 
         self.steps += 1
-        # print("eef pos", observation)
-        # print(f"xlim: {self.x_lim}, ylim: {self.y_lim}")
         
         self.prev_action = action[:2]
 
         return observation, reward, done, info
+
+    def _step_to_home(self, action):
+        self.driver.step_axis(self.ctrl_scale * action)
 
     def _move_to_initial_pos(self):
 
@@ -318,7 +313,7 @@ class RealSawyerReachingEnv(Env):
         while (abs(vec[0]) > thresh) or (abs(vec[1]) > thresh):
             action = self.init_state - self.get_state() # vector from current to initial position
             # print("-----RESET ACTION", action)
-            self.step(action, boundary=False) # ignore boundary when reseting to make sure robo can return to home position
+            self._step_to_home(action) # ignore boundary when reseting to make sure robo can return to home position
             vec = self.init_state - self.get_state()
 
         self.step(np.zeros(2))
