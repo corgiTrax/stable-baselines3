@@ -216,12 +216,12 @@ if __name__ == "__main__":
     #     action = np.random.uniform(-0.25, 0.25, 4)
     #     print("action", action)
     #     env.step(action)
-    for i in range(10):
-        print("step ", i)
-        action = np.array([0.25, 0, 0, 0])
-        env.step(action)
+    # for i in range(35):
+    #     print("step ", i)
+    #     action = np.array([0.25, 0, 0, 0])
+    #     env.step(action)
 
-    env.reset()
+    # env.reset()
         
         # if driver.reward():
         #     print("----Target Reached-----")

@@ -1,0 +1,3 @@
+Current timestep = 0. State = [[-0.23180033  0.12560771]]. Action = [[ 0.06171083 -0.07940921  0.10086951  0.69032884]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 0 is None
