@@ -84,7 +84,7 @@ class RealSawyerReachingEnv3d(gym.Env):
         return self.driver.get_eef_xy() - self.origin
 
 
-    def step(self, action):
+    def step(self, action, boundary=True):
 
         # scale input to controller
         # action = self.ctrl_scale * action # for 2d action space model
@@ -96,11 +96,11 @@ class RealSawyerReachingEnv3d(gym.Env):
         # print(f'Current position = {str(eef_xpos)}')
         x_in_bounds = self.x_lim[0] < eef_xpos[0] + action[0] < self.x_lim[1]
         y_in_bounds = self.y_lim[0] < eef_xpos[1] + action[1] < self.y_lim[1]
-        
-        if not x_in_bounds or not y_in_bounds:
-            # if next action will send eef out of boundary, ignore the action
-            print("action out of bounds")
-            action = np.zeros(self.action_dim)
+        if boundary:
+            if not x_in_bounds or not y_in_bounds:
+                # if next action will send eef out of boundary, ignore the action
+                print("action out of bounds")
+                action = np.zeros(self.action_dim)
 
         self.driver.step_axis(action) # take action
         observation = self.get_state() # observation = [eef_x, eef_y]
@@ -176,11 +176,11 @@ class RealSawyerReachingEnv(Env):
         self.driver = driver
 
         # max time steps
-        self.max_steps = 900
+        self.max_steps = 700
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.05
+        self.ctrl_scale = 0.075
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -242,7 +242,11 @@ class RealSawyerReachingEnv(Env):
         x_in_target = self.target_x[0] < eef_xpos[0] < self.target_x[1]
         y_in_target = self.target_y[0] < eef_xpos[1] < self.target_y[1]
 
-        return int(x_in_target and y_in_target)
+        if x_in_target and y_in_target:
+            return 100
+
+        return 0
+        # return int(x_in_target and y_in_target)
 
 
     def get_state(self):
@@ -250,13 +254,15 @@ class RealSawyerReachingEnv(Env):
         return self.driver.get_eef_xy() - self.origin
 
 
-    def step(self, action):
+    def step(self, action, boundary=True):
 
         # scale input to controller
         # action = self.ctrl_scale * action # for 2d action space model
         sf = 1.2 # safety factor for boundary limit
+        cur_action_weight = 1.0 # how much weight current action carries in interpolation
+
         # action_scaled = sf * self.ctrl_scale * action[:2] # for 4d action space model
-        new_action = self.ctrl_scale * (action[:2] + self.prev_action) / 2 # interpolation
+        new_action = self.ctrl_scale * (cur_action_weight * action[:2] + (1 - cur_action_weight) * self.prev_action) / 2 # interpolation
 
         # check workspace boundary condition
         eef_xpos = self.get_state()
@@ -264,17 +270,17 @@ class RealSawyerReachingEnv(Env):
         x_in_bounds = self.x_lim[0] < eef_xpos[0] + sf * new_action[0] < self.x_lim[1]
         y_in_bounds = self.y_lim[0] < eef_xpos[1] + sf * new_action[1] < self.y_lim[1]
         
-        if not x_in_bounds or not y_in_bounds:
-            # if next action will send eef out of boundary, ignore the action
-            print("action out of bounds")
-            new_action = np.zeros(self.action_dim)
+        if boundary:
+            if not x_in_bounds or not y_in_bounds:
+                # if next action will send eef out of boundary, ignore the action
+                print("action out of bounds")
+                new_action = np.zeros(self.action_dim)
 
         self.driver.step_axis(new_action)
         # print("deltas", self.ctrl_scale * action)
-        print("deltas", new_action)
-        
-        print("eef pos", self.get_state())
-        # self.driver.step_axis(self.ctrl_scale * action) # take action
+        # print("deltas", new_action)
+        # print("eef pos", self.get_state())
+        # self.driver.step_axis(self.ctrl_scale * action) # take action - no interpolation
         observation = self.get_state() # observation = [eef_x, eef_y]
         reward = self.reward()
         
@@ -312,7 +318,7 @@ class RealSawyerReachingEnv(Env):
         while (abs(vec[0]) > thresh) or (abs(vec[1]) > thresh):
             action = self.init_state - self.get_state() # vector from current to initial position
             # print("-----RESET ACTION", action)
-            self.step(action)
+            self.step(action, boundary=False) # ignore boundary when reseting to make sure robo can return to home position
             vec = self.init_state - self.get_state()
 
         self.step(np.zeros(2))
