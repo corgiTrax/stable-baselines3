@@ -70,10 +70,10 @@ class BallBasketSceneGraph:
     
     
     def above(self, obj_a):
-        return obj_a['location']['z'] > 0
+        return obj_a['location']['z'] > 0.875
     
     def below(self, obj_a):
-        return obj_a['location']['z'] < 0
+        return obj_a['location']['z'] < 0.875
 
     
     def gripper_open(self, obj_a):
