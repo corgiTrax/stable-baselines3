@@ -35,7 +35,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
         human_feedback=human_feedback,
     )
     mean_reward, std_reward = evaluate_policy(
-        model, env, n_eval_episodes=20, render=True
+        model, env, n_eval_episodes=20, render=False
     )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 

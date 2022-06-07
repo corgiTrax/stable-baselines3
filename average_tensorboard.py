@@ -57,7 +57,7 @@ def write_combined_events(dpath, d_combined, steps, dname='combined'):
             for i, mean in enumerate(means):
                 tf.summary.scalar(tag, mean, step=steps[tag][i])
 
-dpath = 'ballbasket_task_results_all/averaged_results/Tamer100'
+dpath = 'ballbasket_task_results_all/averaged_results/BC'
 
 data, steps = tabulate_events(dpath, 150000)
 write_combined_events(dpath, data, steps, dname='averaged')
