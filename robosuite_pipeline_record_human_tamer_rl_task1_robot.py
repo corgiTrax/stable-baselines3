@@ -125,16 +125,10 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main():
-    with open("configs/robosuite/tamer_sac_record.yaml", "r") as f:
+    with open("configs/robosuite/tamer_sac_record_robot.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
-
-    robosuite_config = {
-        "env_name": "Reaching",
-        "robots": "Sawyer",
-        "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
-    }
 
     
     ### initialize environment ###

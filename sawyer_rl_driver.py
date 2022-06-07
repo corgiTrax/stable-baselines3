@@ -209,17 +209,17 @@ if __name__ == "__main__":
     # check_env(env)
 
     # record_state(env, axis=0)
-    calibrate_boundary_helper(env)
+    # calibrate_boundary_helper(env)
 
     ### Motion Test ####
     # for i in range(1500):
     #     action = np.random.uniform(-0.25, 0.25, 4)
     #     print("action", action)
     #     env.step(action)
-    # for i in range(1500):
-    #     print("step ", i)
-    #     action = np.array([0.04, 0, 0, 0])
-    #     env.step(action)
+    for i in range(1500):
+        print("step ", i)
+        action = np.array([0.25, 0, 0, 0])
+        env.step(action)
         
         # if driver.reward():
         #     print("----Target Reached-----")
