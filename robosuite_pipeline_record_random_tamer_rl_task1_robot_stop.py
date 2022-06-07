@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-
 import itertools
 import os
 import random
@@ -10,13 +9,7 @@ from typing import Callable
 from gevent import config
 import copy
 import math
-import argparse
-import pickle5 as pickle
-
-
 import gym
-from gym import spaces
-
 import numpy as np
 import torch
 import collections
@@ -24,15 +17,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import yaml
+import argparse
 
 # perls2 library path
-# sys.path.insert(1, '/home/robot')
 sys.path.insert(1, '/home/robot/perls2')
-# sys.path.insert(1, '/home/robot/perls2/perls2')
-# sys.path.insert(1, '/home/robot/perls2/perls2/demos')
 
-from stable_baselines3.active_tamer.human_tamerRL_sac_record import (
-    HumanTamerRLSACRecord,
+from stable_baselines3.active_tamer.tamerRL_sac_record_robot_stop_for_feedback import (
+    TamerRLSACRecordStop,
 )
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
@@ -44,14 +35,9 @@ import robosuite as suite
 from robosuite import wrappers
 from robosuite import load_controller_config
 
-# perls2 modules
-from demos.sawyer_osc_2d import OpSpaceLineXYZ
-
-from playsound import playsound
-import redis
-
+# For physical robot
 from real_sawyer_env import RealSawyerReachingEnv
-
+from demos.sawyer_osc_2d import OpSpaceLineXYZ
 
 class ReachingSceneGraph:
     agent = {'location': {'x': 0, 'y': 0}}
@@ -111,7 +97,6 @@ class ReachingSceneGraph:
         self.total_timesteps += 1
         return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
 
-
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(
         config_data["steps"],
@@ -123,15 +108,13 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
-
 def main():
     with open("configs/robosuite/tamer_sac_record_robot.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
-    
-    ### initialize environment ###
+    # Environment Initialization #
     parser = argparse.ArgumentParser(
         description="Test controllers and measure errors.")
     parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
@@ -178,7 +161,7 @@ def main():
 
     driver = OpSpaceLineXYZ(**kwargs)
 
-    env = RealSawyerReachingEnv(driver)
+    env = RealSawyerReachingEnv(driver)    
 
     # env.viewer.set_camera(camera_id=1)
     # env.reset()
@@ -207,11 +190,14 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
+    # trained_model = SAC.load(
+    #     config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
+    # )
 
     while os.path.exists(config_data['human_data_save_path']):
         config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
 
-    model = HumanTamerRLSACRecord(
+    model = TamerRLSACRecordStop(
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -229,8 +215,10 @@ def main():
         seed=config_data["seed"],
         experiment_save_dir=config_data['human_data_save_path'],
         render=True,
+        trained_model=None,
         scene_graph=ReachingSceneGraph(),
-        credit_assignment=config["credit_assignment"]
+        percent_feedback=0.25,
+        credit_assignment=config_data['credit_assignment'],
     )
 
     print(f"Model Policy = " + str(model.policy))
@@ -251,7 +239,7 @@ def main():
         train_model(model, config_data, feedback_gui, human_feedback, env)
     else:
         del model
-        model = HumanTamerRLSACRecord.load(f'models/{config_data["load_model"]}', env=env)
+        model = TamerRLSACRecordStop.load(f'models/{config_data["load_model"]}', env=env)
         print("Loaded pretrained model")
         print(model)
 
