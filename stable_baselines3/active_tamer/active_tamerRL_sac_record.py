@@ -123,6 +123,7 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
         prediction_threshold: float = 0.012,
         experiment_save_dir: str = "human_study/participant_default",
         scene_graph: Object = None,
+        credit_assignment: int = 0,
     ):
 
         super(ActiveTamerRLSACRecord, self).__init__(
@@ -177,6 +178,8 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
 
         if _init_setup_model:
             self._setup_model()
+        
+        self.credit_assignment = credit_assignment
 
     def _setup_model(self) -> None:
         super(ActiveTamerRLSACRecord, self)._setup_model()
@@ -655,9 +658,10 @@ class ActiveTamerRLSACRecord(OffPolicyAlgorithm):
                 )
 
                 # Can only do credit assignment for reward received from the environment
-                # self.apply_uniform_credit_assignment(
-                #     replay_buffer, float(human_reward), 0, min(35, self.curr_episode_timesteps)
-                # )
+                if self.credit_assignment > 0:
+                    self.apply_uniform_credit_assignment_human(
+                        replay_buffer, float(human_reward), 0, min(self.credit_assignment, self.curr_episode_timesteps)
+                    )
 
                 if human_feedback_gui:
                     human_feedback_gui.updateReward(episode_reward)

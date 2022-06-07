@@ -218,6 +218,7 @@ def main():
         trained_model=None,
         scene_graph=ReachingSceneGraph(),
         percent_feedback=0.25,
+        credit_assignment=config_data['credit_assignment'],
     )
 
     print(f"Model Policy = " + str(model.policy))

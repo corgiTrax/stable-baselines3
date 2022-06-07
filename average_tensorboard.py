@@ -25,12 +25,12 @@ def tabulate_events(dpath, target_len):
     for tag in tags:
         data[tag] = []
         for index, curr_iterator in enumerate(summary_iterators):
-            if tag == 'rollout/ep_rew_mean':
-                data[tag].append([(i.step, 0.1 * i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
-            else:
-                data[tag].append([(i.step, i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
-                if longest_iterator[1] < len(data[tag][-1]):
-                    longest_iterator = [index, len(data[tag][-1])]
+            # if tag == 'rollout/ep_rew_mean':
+            #     data[tag].append([(i.step, 0.1 * i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
+            # else:
+            data[tag].append([(i.step, i.value, iter_index) for iter_index, i in enumerate(curr_iterator.Scalars(tag)) if i.step < target_len])
+            if longest_iterator[1] < len(data[tag][-1]):
+                longest_iterator = [index, len(data[tag][-1])]
     
     for tag in tags:
         for index, i in enumerate(summary_iterators[longest_iterator[0]].Scalars(tag)):
@@ -57,7 +57,7 @@ def write_combined_events(dpath, d_combined, steps, dname='combined'):
             for i, mean in enumerate(means):
                 tf.summary.scalar(tag, mean, step=steps[tag][i])
 
-dpath = 'reaching_task_results_all/averaged_results/BC'
+dpath = 'ballbasket_task_results_all/averaged_results/Tamer100'
 
 data, steps = tabulate_events(dpath, 150000)
 write_combined_events(dpath, data, steps, dname='averaged')
