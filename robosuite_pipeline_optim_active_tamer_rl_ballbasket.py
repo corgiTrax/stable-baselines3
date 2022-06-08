@@ -30,7 +30,7 @@ from robosuite import wrappers
 from robosuite import load_controller_config
 
 class BallBasketSceneGraph:
-    agent = {'location': {'x': 0, 'y': 0, 'z': 0}}
+    agent = {'location': {'x': 0, 'y': 0, 'z': 0, 'g': 0}}
     num_feedback_given = collections.Counter()
     aRPE_average = collections.Counter()
     curr_graph = None
@@ -70,10 +70,17 @@ class BallBasketSceneGraph:
     
     
     def above(self, obj_a):
-        return obj_a['location']['z'] > 0
+        return obj_a['location']['z'] > 0.875
     
     def below(self, obj_a):
-        return obj_a['location']['z'] < 0
+        return obj_a['location']['z'] < 0.875
+
+    
+    def gripper_open(self, obj_a):
+        return obj_a['location']['g'] > 0
+    
+    def gripper_close(self, obj_a):
+        return obj_a['location']['g'] < 0
 
     # add a state of gripper open/close
     
@@ -86,13 +93,14 @@ class BallBasketSceneGraph:
 
     def getCurrGraph(self):
         self.curr_graph = [self.right(self.agent), self.center(self.agent), self.left(self.agent), self.top(self.agent), 
-                            self.middle(self.agent), self.bottom(self.agent), self.above(self.agent), self.below(self.agent)]
+                            self.middle(self.agent), self.bottom(self.agent), self.above(self.agent), self.below(self.agent),
+                            self.gripper_open(self.agent), self.gripper_close(self.agent)]
         
         return self.curr_graph
         
     def updateGraph(self, newState, action):
         prev_graph = copy.deepcopy(self.curr_graph)
-        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][1]}
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][2], 'g': newState[0][3]}
         self.total_timesteps += 1
         return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
 
