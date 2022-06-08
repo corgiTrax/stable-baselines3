@@ -1,6 +1,6 @@
 gamma: 0.99
 seed: 42
-tensorboard_log_dir: "log_dir"
+tensorboard_log_dir: "log_dir/sawyer_sac"
 policy_name: "MlpPolicy"
 verbose: 1
 steps: 1250
@@ -15,6 +15,7 @@ buffer_size: 1000000
 learning_starts: 0
 batch_size: 512
 tau: 0.01
+seed: 3
 train_freq: 1
 gradient_steps: 1
 data_save_path: "robot_experiment/run_1"
