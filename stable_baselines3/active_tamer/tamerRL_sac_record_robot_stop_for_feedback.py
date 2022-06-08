@@ -603,7 +603,7 @@ class TamerRLSACRecordStop(OffPolicyAlgorithm):
                     else:
                         raise "Must instantiate a human feedback object to collect human feedback."
                     
-
+                print(f"Time {self.num_timesteps} ({self.curr_episode_timesteps})")
                 self.q_val_threshold += 0.00000001
                 self.num_timesteps += 1
                 episode_timesteps += 1

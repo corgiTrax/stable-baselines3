@@ -18,11 +18,11 @@
 # trained_model: "trained-models/LunarLanderContinuous-v2.zip"
 
 gamma: 0.99
-seed: 42
-tensorboard_log_dir: "log_dir"
+seed: 33
+tensorboard_log_dir: "log_dir/sawyer_random"
 policy_name: "ActiveMlpPolicy"
 verbose: 1
-steps: 1000
+steps: 1250
 load_model: 0  
 save_every_steps: 100
 learning_rate: 0.00075
@@ -37,4 +37,4 @@ gradient_steps: 1
 human_data_save_path: "robot_experiment_randomTAMER/participant_1"
 # trained_model: "trained-models/RobosuiteReachingNew.zip"
 credit_assignment: 0
-percent_feedback: 1
+percent_feedback: 0.25

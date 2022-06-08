@@ -46,7 +46,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
 
-def main():
+def main(args):
     with open("configs/robosuite/sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
     
@@ -161,10 +161,9 @@ def main():
 
 
 if __name__ == "__main__":
-    # msg = "Overwrite config params"
-    # parser = argparse.ArgumentParser(description = msg)
-    # parser.add_argument("--seed", type=int, default=None)
+    msg = "Overwrite config params"
+    parser = argparse.ArgumentParser(description = msg)
+    parser.add_argument("--seed", type=int, default=None)
 
-    # args = parser.parse_args()
-    # main(args)
-    main()
+    args = parser.parse_args()
+    main(args)

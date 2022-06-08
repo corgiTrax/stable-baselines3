@@ -213,10 +213,10 @@ if __name__ == "__main__":
     # calibrate_boundary_helper(env)
 
     ### Motion Test ####
-    # for i in range(1500):
+    # for i in range(5):
     #     action = np.random.uniform(-0.25, 0.25, 4)
     #     print("action", action)
-    #     env.step(action)
+        # env.step(action)
     # for i in range(35):
     #     print("step ", i)
     #     action = np.array([0.25, 0, 0, 0])
@@ -228,9 +228,9 @@ if __name__ == "__main__":
         #     print("----Target Reached-----")
         #     break
 
-    # for i in range(50):
+    # for i in range(7):
     #     print("step ", i)
-    #     action = np.array([0, 0.075, 0, 0])
+    #     action = np.array([0, -0.25, 0, 0])
     #     env.step(action)
         
     #     if driver.reward():

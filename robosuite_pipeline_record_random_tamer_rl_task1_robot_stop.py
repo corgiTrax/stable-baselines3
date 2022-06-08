@@ -108,7 +108,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
-def main():
+def main(args):
     with open("configs/robosuite/tamer_sac_record_robot.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
@@ -117,7 +117,7 @@ def main():
     # Environment Initialization #
     parser = argparse.ArgumentParser(
         description="Test controllers and measure errors.")
-    parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
+    parser.add_argument('--world', default='Real', help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
     parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
     parser.add_argument('--ctrl_type',
                         default="EEImpedance",
@@ -217,7 +217,7 @@ def main():
         render=True,
         trained_model=None,
         scene_graph=ReachingSceneGraph(),
-        percent_feedback=0.25,
+        percent_feedback=config_data['percent_feedback'],
         credit_assignment=config_data['credit_assignment'],
     )
 
@@ -245,4 +245,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    msg = "Overwrite config params"
+    parser = argparse.ArgumentParser(description = msg)
+    parser.add_argument("--seed", type=int, default=None)
+
+    args = parser.parse_args()
+    main(args)

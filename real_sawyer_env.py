@@ -177,12 +177,12 @@ class RealSawyerReachingEnv(Env):
 
         # max time steps
         # self.max_steps = 500
-        self.max_steps = 50
+        self.max_steps = 125
         self.steps = 0 
 
         # scaling factor from action -> osc control command
         # self.ctrl_scale = 0.075
-        self.ctrl_scale = 0.75
+        self.ctrl_scale = 0.3
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
@@ -321,6 +321,7 @@ class RealSawyerReachingEnv(Env):
         self.step(np.zeros(2))
 
     def _near_joint_limits(self, safety_factor=1.0):
+        raise NotImplementedError
         # self.robot_interface.step()
         print("lower", self.joint_lim_lower)
         print("upper", self.joint_lim_upper)
@@ -335,10 +336,8 @@ class RealSawyerReachingEnv(Env):
     def reset(self):
 
         print("----------------Resetting-----------------")
-
         self._move_to_initial_pos()
-        time.sleep(5)
-        #self.driver.env.reset()
+        time.sleep(3)
         self.driver.connect_and_reset_robot()
         print("-----Moved to initial pos---------")
 
@@ -355,11 +354,11 @@ class RealSawyerReachingEnv(Env):
         #     for i in range(50):
         #         observation, _, _, _ = self.step(action)
         if self.random_init:
-            action_x = np.random.uniform(0, 0.035, 1)
-            action_y = np.random.uniform(-0.070, 0.070, 1)
+            action_x = np.random.uniform(0, 0.15, 1)
+            action_y = np.random.uniform(-0.25, 0.25, 1)
             action = np.concatenate([action_x, action_y, np.zeros(2)])
             print(f"-----Taking Random Action {action}------")
-            for i in range(5):
+            for i in range(7):
                 observation, _, _, _ = self.step(action)
         self.steps = 0
 
