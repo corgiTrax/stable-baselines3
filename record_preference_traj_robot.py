@@ -1,9 +1,150 @@
+import pyrealsense2 as rs
+import numpy as np
+import cv2
+import os
+import time
+import argparse
+import sys
 
-def record(txt_save_folder, img_save_folder):
+sys.path.insert(1, '/home/robot/perls2')
+from demos.sawyer_osc_2d import OpSpaceLineXYZ
+from real_sawyer_env import RealSawyerReachingEnv
+
+class RealsenseStreamer():
+    def __init__(self, device_name=None):
+        # Configure depth and color streams
+        self.pipeline = rs.pipeline()
+        self.config = rs.config()
+        ## enable device with serial number
+        ## 752112070904 (side view)
+        ## 832112071449 (overhead view)
+        if device_name is None:
+            print('using the default camera')
+           # self.config.enable_device('832112071449') ## serial number on the camera 752112070904
+        elif device_name == 'side_view':
+           self.config.enable_device('752112070904')
+        elif device_name == 'overhead_view':
+           self.config.enable_device('832112071449')
+        elif device_name == 'multimod_side':
+           self.config.enable_device('617203001978')
+        elif device_name == 'multimod_top':
+           self.config.enable_device('620201002802')
+        else:
+           raise NotImplementedError
+        if device_name == 'multimod_side' or device_name == 'multimod_top':
+            self.config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+        else:
+            self.config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+        self.config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+
+        self.align_to_color = rs.align(rs.stream.color)
+
+        # Start streaming
+        self.pipe_profile = self.pipeline.start(self.config)
+
+        # Intrinsics & Extrinsics
+        frames = self.pipeline.wait_for_frames()
+        frames = self.align_to_color.process(frames)
+        depth_frame = frames.get_depth_frame()
+        color_frame = frames.get_color_frame()
+        self.depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
+        self.color_intrin = color_frame.profile.as_video_stream_profile().intrinsics
+        self.depth_to_color_extrin = depth_frame.profile.get_extrinsics_to(
+            color_frame.profile)
+        self.colorizer = rs.colorizer()
+
+    def capture_rgb(self):
+        color_frame = None
+        while True:
+            frames = self.pipeline.wait_for_frames()
+            color_frame = frames.get_color_frame()
+            if color_frame is not None:
+                color_image = np.asanyarray(color_frame.get_data())
+                break
+        return color_image
+
+    def capture_rgbd(self):
+        frame_error = True
+        while frame_error:
+            try:
+                frames = self.align_to_color.process(frames)  
+                depth_frame = frames.get_depth_frame()
+                color_frame = frames.get_color_frame()
+                frame_error = False
+            except:
+                frames = self.pipeline.wait_for_frames()
+                continue
+        color_image = np.asanyarray(color_frame.get_data())
+        depth_image = np.asanyarray(self.colorizer.colorize(depth_frame).get_data())
+        return color_frame, color_image, depth_frame, depth_image
+
+    def stop_stream(self):
+        self.pipeline.stop()
+
+    def show_image(self, image):
+        cv2.imshow('img', image)
+        cv2.waitKey(0)
+
+
+def record_traj(
+    env,
+    txt_save_path = "preference_traj/data",
+    img_save_path = "preference_traj/images",
+    ):
+
+    realsense_streamer = RealsenseStreamer()
+    # for i in range (5):
+    #     frames = realsense_streamer.pipeline.wait_for_frames()
+    #     color_frame = frames.get_color_frame()
+    #     color_img_front = np.asanyarray(color_frame.get_data())
+    #     # realsense_streamer.show_image(color_img_front)
+    #     cv2.imwrite(f"{i}.jpg", color_img_front)
+
+    os.makedirs(txt_save_path, exist_ok=True)
+    txt_file = open(os.path.join(txt_save_path, "time_state_action.txt"), "w")
+
+    os.makedirs(img_save_path, exist_ok=True)
     
+    # reset environment to get initial state
+    state = env.reset()
+
+    test_action = [
+        np.array([0.25, 0, 0, 0]),
+        np.array([0.25, 0, 0, 0]),
+        np.array([-0.25, 0, 0, 0]),
+        np.array([0, 0.25, 0, 0]),
+        np.array([0, 0.25, 0, 0]),
+        np.array([0 -0.25, 0, 0]),
+        np.array([0 -0.25, 0, 0])
+    ]
+
+    start_time = time.time()
+
+    for timestep in range(len(test_action)):
+        # generate random action
+        # action = np.random.uniform(-0.25, 0.25, 4)
+        action = test_action[timestep]
+        print(f"time {timestep}: action {action}")
+
+        # record to txt
+        txt_file.write(
+            f"Timestep = {str(timestep)}, Time = {str(time.time()-start_time)} State = {str(state)}, Action = {str(action)}\n"
+        )
+
+        # save image
+        frame = realsense_streamer.pipeline.wait_for_frames()
+        color_frame = frame.get_color_frame()
+        color_img_front = np.asanyarray(color_frame.get_data())
+        cv2.imwrite(f"{img_save_path}/step{timestep}.jpg", color_img_front)
+
+        # take step
+        state, _, _, _ = env.step(action)
 
 
-if __name_ == "__main__":
+
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Test controllers and measure errors.")
     parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
@@ -51,4 +192,7 @@ if __name_ == "__main__":
 
     driver = OpSpaceLineXYZ(**kwargs)
 
-    env = RealSawyerReachingEnv(driver, random_init=True)
+    env = RealSawyerReachingEnv(driver, random_init=False)
+
+    record_traj(env)
+
