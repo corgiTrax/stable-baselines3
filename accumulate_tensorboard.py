@@ -60,6 +60,7 @@ def average_from_per_episode_rewards(dpath, target_len):
         for iter_index, i in enumerate(curr_iterator.Scalars(tag)):
             if i.step < target_len:
                 curr_rewards = i.value * len(rewards_buffer)
+                print(i.step)
                 curr_steps = i.step * len(steps_buffer)
                 
                 if len(rewards_buffer) == 25:
@@ -67,6 +68,8 @@ def average_from_per_episode_rewards(dpath, target_len):
                     steps_buffer.pop(0)
                 
                 curr_rewards -= sum(rewards_buffer)
+                if curr_rewards < 0:
+                    print(curr_rewards)
                 curr_steps -= sum(steps_buffer)
                 data[target_tag].append((curr_steps + data[target_tag][-1][0], curr_rewards + data[target_tag][-1][1], iter_index + 1))
 
@@ -95,12 +98,13 @@ def write_to_csv(data, steps, csv_name):
         writer.writerows(rows)
         
 
-dpath = 'lunar_lander_results_all/all_runs/Tamer100'
+dpath = 'reaching_task_results_all/all_runs/RPEActiveTamer'
 
 for dname in os.listdir(dpath):
     # data, steps = average_from_per_timestep_rewards(os.path.join(dpath, dname), 150000)
     # update_existing_tensorboard(os.path.join(dpath, dname), 'train/training_rewards_cumulative', steps, data)
-    print(dname)
-    data, steps = average_from_per_episode_rewards(os.path.join(dpath, dname), 150000)
-    write_to_csv(data['rollout/training_rewards_cumulative'], steps['rollout/training_rewards_cumulative'], os.path.join(dpath, dname+".csv"))
-    # update_existing_tensorboard(os.path.join(dpath, dname), 'rollout/training_rewards_cumulative', steps, data)
+    if ".csv" not in dname:
+        print(dname)
+        data, steps = average_from_per_episode_rewards(os.path.join(dpath, dname), 100000)
+        write_to_csv(data['rollout/training_rewards_cumulative'], steps['rollout/training_rewards_cumulative'], os.path.join(dpath, dname+".csv"))
+        # update_existing_tensorboard(os.path.join(dpath, dname), 'rollout/training_rewards_cumulative', steps, data)
