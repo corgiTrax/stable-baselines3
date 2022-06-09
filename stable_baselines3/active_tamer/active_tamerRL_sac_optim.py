@@ -601,9 +601,9 @@ class ActiveTamerRLSACOptim(OffPolicyAlgorithm):
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
                     simulated_human_reward = (
-                        1
+                        10
                         if self.q_val_threshold * teacher_q_val < student_q_val
-                        else -1
+                        else -10
                     )
                     self.total_feedback += 1
                     self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
