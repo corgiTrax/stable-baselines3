@@ -47,6 +47,8 @@ def main(args):
 
     if args.seed:
         config_data['seed'] = args.seed
+    if args.feedback:
+        config_data['percent_feedback'] = args.feedback
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
 
@@ -135,6 +137,7 @@ if __name__ == "__main__":
     msg = "Overwrite config params"
     parser = argparse.ArgumentParser(description = msg)
     parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--feedback", type=float, default=None)
 
     args = parser.parse_args()
     main(args)
