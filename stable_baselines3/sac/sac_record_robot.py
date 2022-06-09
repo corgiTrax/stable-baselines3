@@ -456,21 +456,6 @@ class SACRecord(OffPolicyAlgorithm):
                 self.feedback_file.write(
                     f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
                 )
-                # self.feedback_file.write(
-                #     f"Current timestep = {str(self.num_timesteps)}\n"
-                # )
-                # self.feedback_file.write(
-                #     f"Current episode timestep = {str(self.curr_episode_timesteps)}\n"
-                # )
-                # self.feedback_file.write(
-                #     f"State = {str(new_obs)}\n"
-                # )
-                # self.feedback_file.write(
-                #     f"Action = {str(action)}\n"
-                # )
-                # self.feedback_file.write(
-                #     f"Reward = {str(reward)}\n"
-                # )
 
                 curr_keyboard_feedback = None
                 if human_feedback:
@@ -482,7 +467,7 @@ class SACRecord(OffPolicyAlgorithm):
                     curr_keyboard_feedback and type(curr_keyboard_feedback) == int
                 )
 
-                print(f"time {self.num_timesteps} ({episode_timesteps})")
+                print(f"time {self.num_timesteps} ({self.curr_episode_timesteps})")
                 self.num_timesteps += 1
                 episode_timesteps += 1
                 num_collected_steps += 1

@@ -1,5 +1,5 @@
 gamma: 0.99
-seed: 42
+# seed: 42
 tensorboard_log_dir: "log_dir/sawyer_sac"
 policy_name: "MlpPolicy"
 verbose: 1
@@ -8,6 +8,8 @@ load_model: 0
 # save_every_steps: 14999
 save_every_steps: 100
 learning_rate: 0.00075
+# learning_rate: 0.00001
+
 
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000
@@ -15,7 +17,7 @@ buffer_size: 1000000
 learning_starts: 0
 batch_size: 512
 tau: 0.01
-seed: 3
+seed: 33
 train_freq: 1
 gradient_steps: 1
 data_save_path: "robot_experiment/run_1"
