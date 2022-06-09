@@ -272,11 +272,15 @@ class RealSawyerReachingEnv(Env):
         x_in_bounds = self.x_lim[0] < eef_xpos[0] + sf * new_action[0] < self.x_lim[1]
         y_in_bounds = self.y_lim[0] < eef_xpos[1] + sf * new_action[1] < self.y_lim[1]
         
+        out_of_bounds = not x_in_bounds or not y_in_bounds
+
         if boundary:
-            if not x_in_bounds or not y_in_bounds:
+            if out_of_bounds:
+            # if not x_in_bounds or not y_in_bounds:
                 # if next action will send eef out of boundary, ignore the action
                 print("action out of bounds")
                 new_action = np.zeros(self.action_dim)
+                
 
         self.driver.step_axis(new_action)
         # self.driver.step_axis(self.ctrl_scale * action) # take action - no interpolation
@@ -295,7 +299,7 @@ class RealSawyerReachingEnv(Env):
             # max steps is reached
             done = self.steps > self.max_steps # finish if reached maximum time steps
 
-        info = {} 
+        info = {'out_of_bounds': out_of_bounds} 
 
         self.steps += 1
         
