@@ -82,16 +82,16 @@ class RealSawyerBallBasketEnv(Env):
     def reward(self): # TODO
         
         # chack ball is released (gripper is opened) above hoop
-        # eef_xpos = self.get_state()
-        # x_in_target = self.target_x[0] < eef_xpos[0] < self.target_x[1]
-        # y_in_target = self.target_y[0] < eef_xpos[1] < self.target_y[1]
+        eef_xpos = self.get_state()
+        x_in_target = self.target_x[0] < eef_xpos[0] < self.target_x[1]
+        y_in_target = self.target_y[0] < eef_xpos[1] < self.target_y[1]
 
-        # return int(x_in_target and y_in_target)
-        return 0
+        return int(x_in_target and y_in_target)
+
 
     def get_state(self): # TODO
 
-        return self.driver.get_eef_xyz() - self.origin
+        return self.driver.get_eef_xy() - self.origin
 
 
     def step(self, action, boundary=True):
@@ -101,16 +101,16 @@ class RealSawyerBallBasketEnv(Env):
         sf = 1.5 # safety factor for boundary limit
         action = self.ctrl_scale * action[:3] # for 4d action space model
 
-        # # check workspace boundary condition
-        # eef_xpos = self.get_state()
-        # # print(f'Current position = {str(eef_xpos)}')
-        # x_in_bounds = self.x_lim[0] < eef_xpos[0] + action[0] < self.x_lim[1]
-        # y_in_bounds = self.y_lim[0] < eef_xpos[1] + action[1] < self.y_lim[1]
-        # if boundary:
-        #     if not x_in_bounds or not y_in_bounds:
-        #         # if next action will send eef out of boundary, ignore the action
-        #         print("action out of bounds")
-        #         action = np.zeros(self.action_dim)
+        # check workspace boundary condition
+        eef_xpos = self.get_state()
+        # print(f'Current position = {str(eef_xpos)}')
+        x_in_bounds = self.x_lim[0] < eef_xpos[0] + action[0] < self.x_lim[1]
+        y_in_bounds = self.y_lim[0] < eef_xpos[1] + action[1] < self.y_lim[1]
+        if boundary:
+            if not x_in_bounds or not y_in_bounds:
+                # if next action will send eef out of boundary, ignore the action
+                print("action out of bounds")
+                action = np.zeros(self.action_dim)
 
         self.driver.step_axis(action) # take action
         observation = self.get_state() # observation = [eef_x, eef_y]
@@ -191,6 +191,7 @@ class RealSawyerReachingEnv(Env):
         self.steps = 0 
 
         # scaling factor from action -> osc control command
+        # self.ctrl_scale = 0.075
         self.ctrl_scale = 0.3
 
         # world origin (table center)
@@ -301,11 +302,25 @@ class RealSawyerReachingEnv(Env):
         vec = self.init_state - self.get_state()
         while (abs(vec[0]) > thresh) or (abs(vec[1]) > thresh):
             action = self.init_state - self.get_state() # vector from current to initial position
+            # print("-----RESET ACTION", action)
             self._step_to_home(action) # ignore boundary when reseting to make sure robo can return to home position
             vec = self.init_state - self.get_state()
 
         self.step(np.zeros(2))
 
+    def _near_joint_limits(self, safety_factor=1.0):
+        raise NotImplementedError
+        # self.robot_interface.step()
+        print("lower", self.joint_lim_lower)
+        print("upper", self.joint_lim_upper)
+        print("joints", self.robot_interface.q)
+
+
+        return (
+            np.any(self.robot_interface.q < safety_factor * self.joint_lim_lower)
+            or np.any(self.robot_interface.q > safety_factor * self.joint_lim_upper)
+            )
+    
     def reset(self):
 
         print("----------------Resetting-----------------")

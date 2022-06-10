@@ -15,9 +15,10 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.active_tamer.sac import SAC
 
 # perls2 modules
-from demos.sawyer_osc_2d import OpSpaceLineXYZ
+# from demos.sawyer_osc_2d import OpSpaceLineXYZ 
+# from demos.sawyer_osc_3d import OpSpaceLineXYZ 
 
-from real_sawyer_env import RealSawyerReachingEnv, RealSawyerReachingEnv3d
+from real_sawyer_env import RealSawyerReachingEnv, RealSawyerBallBasketEnv
 
 def run_pretrained(env):
     ### Run pre-trained model ####
@@ -105,135 +106,161 @@ def calibrate_boundary_helper(env):
         print("raw", driver.get_eef_xy())
         print("calib", driver.get_eef_xy() - env.origin)
 
+def init_env(task=1):
+    if task == 1:
+
+        from demos.sawyer_osc_2d import OpSpaceLineXYZ 
+
+        parser = argparse.ArgumentParser(
+            description="Test controllers and measure errors.")
+        parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
+        parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
+        parser.add_argument('--ctrl_type',
+                            default="EEImpedance",
+                            help='Type of controller to test')
+        parser.add_argument('--demo_type',
+                            default="Line",
+                            help='Type of menu to run.')
+        parser.add_argument('--test_fn',
+                            default='set_ee_pose',
+                            help='Function to test',
+                            choices=['set_ee_pose', 'move_ee_delta', 'set_joint_delta', 'set_joint_positions', 'set_joint_torques', 'set_joint_velocities'])
+        parser.add_argument('--path_length', type=float,
+                            default=None, help='length in m of path')
+        parser.add_argument('--delta_val',
+                            default=[0.001, 0.001], type=float,
+                            help="Max step size (m or rad) to take for demo.")
+        parser.add_argument('--axis',
+                            default='x', type=str,
+                            choices=['x', 'y', 'z'],
+                            help='axis for demo. Position direction for Line or rotation axis for Rotation')
+        parser.add_argument('--num_steps', default=1, type=int,
+                            help="max steps for demo.")
+        parser.add_argument('--plot_pos', action="store_true",
+                            help="whether to plot positions of demo.")
+        parser.add_argument('--plot_error', action="store_true",
+                            help="whether to plot errors.")
+        parser.add_argument('--save', action="store_true",
+                            help="whether to store data to file")
+        parser.add_argument('--demo_name', default=None,
+                            type=str, help="Valid filename for demo.")
+        parser.add_argument('--save_fig', action="store_true",
+                            help="whether to save pngs of plots")
+        parser.add_argument('--fix_ori', action="store_true", default=True,
+                            help="fix orientation for move_ee_delta")
+        parser.add_argument('--fix_pos', action="store_true",
+                            help="fix position for move_ee_delta")
+        parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
+        parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
+        
+        args = parser.parse_args()
+        kwargs = vars(args)
+
+        driver = OpSpaceLineXYZ(**kwargs)
+
+        env = RealSawyerReachingEnv(driver, random_init=True)
+
+        return env
+
+    elif task == 2:
+
+        from demos.sawyer_osc_3d import OpSpaceLineXYZ 
+
+        parser = argparse.ArgumentParser(
+            description="Test controllers and measure errors.")
+        parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
+        parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
+        parser.add_argument('--ctrl_type',
+                            default="EEImpedance",
+                            help='Type of controller to test')
+        parser.add_argument('--demo_type',
+                            default="Line",
+                            help='Type of menu to run.')
+        parser.add_argument('--test_fn',
+                            default='set_ee_pose',
+                            help='Function to test',
+                            choices=['set_ee_pose', 'move_ee_delta', 'set_joint_delta', 'set_joint_positions', 'set_joint_torques', 'set_joint_velocities'])
+        parser.add_argument('--path_length', type=float,
+                            default=None, help='length in m of path')
+        parser.add_argument('--delta_val',
+                            default=[0.001, 0.001, 0.001], type=float,
+                            help="Max step size (m or rad) to take for demo.")
+        parser.add_argument('--axis',
+                            default='x', type=str,
+                            choices=['x', 'y', 'z'],
+                            help='axis for demo. Position direction for Line or rotation axis for Rotation')
+        parser.add_argument('--num_steps', default=1, type=int,
+                            help="max steps for demo.")
+        parser.add_argument('--plot_pos', action="store_true",
+                            help="whether to plot positions of demo.")
+        parser.add_argument('--plot_error', action="store_true",
+                            help="whether to plot errors.")
+        parser.add_argument('--save', action="store_true",
+                            help="whether to store data to file")
+        parser.add_argument('--demo_name', default=None,
+                            type=str, help="Valid filename for demo.")
+        parser.add_argument('--save_fig', action="store_true",
+                            help="whether to save pngs of plots")
+        parser.add_argument('--fix_ori', action="store_true", default=True,
+                            help="fix orientation for move_ee_delta")
+        parser.add_argument('--fix_pos', action="store_true",
+                            help="fix position for move_ee_delta")
+        parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
+        parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
+
+        args = parser.parse_args()
+        kwargs = vars(args)
+
+        driver = OpSpaceLineXYZ(**kwargs)
+
+        env = RealSawyerBallBasketEnv(driver, random_init=True)
+
+        return env
+
 
 if __name__ == "__main__":
 
-    print("\n\n-----------------[0]------------------")
-    
-    
-    # parser = argparse.ArgumentParser(
-    #     description="Test controllers and measure errors.")
-    # parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
-    # parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
-    # parser.add_argument('--ctrl_type',
-    #                     default="EEImpedance",
-    #                     help='Type of controller to test')
-    # parser.add_argument('--demo_type',
-    #                     default="Line",
-    #                     help='Type of menu to run.')
-    # parser.add_argument('--test_fn',
-    #                     default='set_ee_pose',
-    #                     help='Function to test',
-    #                     choices=['set_ee_pose', 'move_ee_delta', 'set_joint_delta', 'set_joint_positions', 'set_joint_torques', 'set_joint_velocities'])
-    # parser.add_argument('--path_length', type=float,
-    #                     default=None, help='length in m of path')
-    # parser.add_argument('--delta_val',
-    #                     default=[0.001, 0.001, 0.001], type=float,
-    #                     help="Max step size (m or rad) to take for demo.")
-    # parser.add_argument('--axis',
-    #                     default='x', type=str,
-    #                     choices=['x', 'y', 'z'],
-    #                     help='axis for demo. Position direction for Line or rotation axis for Rotation')
-    # parser.add_argument('--num_steps', default=1, type=int,
-    #                     help="max steps for demo.")
-    # parser.add_argument('--plot_pos', action="store_true",
-    #                     help="whether to plot positions of demo.")
-    # parser.add_argument('--plot_error', action="store_true",
-    #                     help="whether to plot errors.")
-    # parser.add_argument('--save', action="store_true",
-    #                     help="whether to store data to file")
-    # parser.add_argument('--demo_name', default=None,
-    #                     type=str, help="Valid filename for demo.")
-    # parser.add_argument('--save_fig', action="store_true",
-    #                     help="whether to save pngs of plots")
-    # parser.add_argument('--fix_ori', action="store_true", default=True,
-    #                     help="fix orientation for move_ee_delta")
-    # parser.add_argument('--fix_pos', action="store_true",
-    #                     help="fix position for move_ee_delta")
-    # parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
-    # parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
+    env = init_env(task=2)
+    for i in range(5):
+        env.step(np.array([0.1, 0, 0.1, 0]))
 
-    parser = argparse.ArgumentParser(
-        description="Test controllers and measure errors.")
-    parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
-    parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
-    parser.add_argument('--ctrl_type',
-                        default="EEImpedance",
-                        help='Type of controller to test')
-    parser.add_argument('--demo_type',
-                        default="Line",
-                        help='Type of menu to run.')
-    parser.add_argument('--test_fn',
-                        default='set_ee_pose',
-                        help='Function to test',
-                        choices=['set_ee_pose', 'move_ee_delta', 'set_joint_delta', 'set_joint_positions', 'set_joint_torques', 'set_joint_velocities'])
-    parser.add_argument('--path_length', type=float,
-                        default=None, help='length in m of path')
-    parser.add_argument('--delta_val',
-                        default=[0.001, 0.001], type=float,
-                        help="Max step size (m or rad) to take for demo.")
-    parser.add_argument('--axis',
-                        default='x', type=str,
-                        choices=['x', 'y', 'z'],
-                        help='axis for demo. Position direction for Line or rotation axis for Rotation')
-    parser.add_argument('--num_steps', default=1, type=int,
-                        help="max steps for demo.")
-    parser.add_argument('--plot_pos', action="store_true",
-                        help="whether to plot positions of demo.")
-    parser.add_argument('--plot_error', action="store_true",
-                        help="whether to plot errors.")
-    parser.add_argument('--save', action="store_true",
-                        help="whether to store data to file")
-    parser.add_argument('--demo_name', default=None,
-                        type=str, help="Valid filename for demo.")
-    parser.add_argument('--save_fig', action="store_true",
-                        help="whether to save pngs of plots")
-    parser.add_argument('--fix_ori', action="store_true", default=True,
-                        help="fix orientation for move_ee_delta")
-    parser.add_argument('--fix_pos', action="store_true",
-                        help="fix position for move_ee_delta")
-    parser.add_argument('--config_file', default='/home/robot/perls2/demos/demo_control_cfg.yaml', help='absolute filepath for config file.')
-    parser.add_argument('--cycles', type=int, default=1, help="num times to cycle path (only for square)")
-    
-    args = parser.parse_args()
-    kwargs = vars(args)
+    # env = init_env(task=1)
 
-    driver = OpSpaceLineXYZ(**kwargs)
+    # # print("DRIVER", env.driver)
 
-    env = RealSawyerReachingEnv(driver, random_init=True)
+    # print("robot interface", env.robot_interface)
+    # print("env", env)
+    # print("env.driver", env.driver)
+    # print("env.driver.env", env.driver.env)
+    # print("env.driver.env.robot_interface", env.driver.env.robot_interface)
 
-    # env = RealSawyerReachingEnv3d(driver)
+    # print("[0]")
+    # env.driver.env.robot_interface.close_gripper()
+    # print("[1]")
+    # env.robot_interface.close_gripper()
+    # print("[2]")
+    # env.driver.robot_interface.close_gripper()
 
-    # for i in range(5):
-    #     print(f"Reset {i}")
-    #     env.reset()
-    # check_env(env)
 
-    # record_state(env, axis=0)
-    # calibrate_boundary_helper(env)
-
-    ### Motion Test ####
-    # for i in range(5):
-    #     action = np.random.uniform(-0.25, 0.25, 4)
-    #     print("action", action)
-        # env.step(action)
-    # for i in range(35):
-    #     print("step ", i)
-    #     action = np.array([0.25, 0, 0, 0])
-    #     env.step(action)
-
-    # env.reset()
-        
-        # if driver.reward():
-        #     print("----Target Reached-----")
-        #     break
-
-    # for i in range(7):
-    #     print("step ", i)
-    #     action = np.array([0, -0.25, 0, 0])
-    #     env.step(action)
-        
-    #     if driver.reward():
-    #         print("----Target Reached-----")
+    # for i in range(50):
+    #     action = np.array([0.05, 0, 0, 0])
+    #     obs, _, done, _ = env.step(action)
+    #     if done:
     #         break
 
+    # import time
+    # env = LiftEnv()
+
+    # prev_time = time.time()
+    # open = False
+    # while True:
+    #     if time.time() - prev_time > 3:
+    #         if open:
+    #             print("open")
+    #             env.step(np.array([0.05, 0, 0, 0, 0, 0, -1]))
+    #             open = False
+    #         else:
+    #             print("close")
+    #             env.step(np.array([-0.05, 0, 0, 0, 0, 0, 1]))
+    #             open = True
+    #         prev_time = time.time()

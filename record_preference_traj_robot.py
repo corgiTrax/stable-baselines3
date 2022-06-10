@@ -5,7 +5,7 @@ import os
 import time
 import argparse
 import sys
-
+from moviepy.editor import ImageSequenceClip
 sys.path.insert(1, '/home/robot/perls2')
 from demos.sawyer_osc_2d import OpSpaceLineXYZ
 from real_sawyer_env import RealSawyerReachingEnv
@@ -90,6 +90,7 @@ def record_traj(
     env,
     txt_save_path = "preference_traj/data",
     img_save_path = "preference_traj/images",
+    video_save_path = "preference_traj/videos",
     ):
 
     realsense_streamer = RealsenseStreamer()
@@ -104,6 +105,7 @@ def record_traj(
     txt_file = open(os.path.join(txt_save_path, "time_state_action.txt"), "w")
 
     os.makedirs(img_save_path, exist_ok=True)
+    os.makedirs(video_save_path, exist_ok=True)
     
     # reset environment to get initial state
     state = env.reset()
@@ -111,7 +113,9 @@ def record_traj(
     test_action = [
         np.array([0.25, 0, 0, 0]),
         np.array([0.25, 0, 0, 0]),
+        np.array([0.25, 0, 0, 0]),
         np.array([-0.25, 0, 0, 0]),
+        np.array([0, 0.25, 0, 0]),
         np.array([0, 0.25, 0, 0]),
         np.array([0, 0.25, 0, 0]),
         np.array([0 -0.25, 0, 0]),
@@ -120,6 +124,7 @@ def record_traj(
 
     start_time = time.time()
 
+    frames = []
     for timestep in range(len(test_action)):
         # generate random action
         # action = np.random.uniform(-0.25, 0.25, 4)
@@ -134,11 +139,15 @@ def record_traj(
         # save image
         frame = realsense_streamer.pipeline.wait_for_frames()
         color_frame = frame.get_color_frame()
-        color_img_front = np.asanyarray(color_frame.get_data())
-        cv2.imwrite(f"{img_save_path}/step{timestep}.jpg", color_img_front)
+        color_img_front = cv2.cvtColor(np.asanyarray(color_frame.get_data()), cv2.COLOR_RGB2BGR)
+        frames.append(color_img_front)
+        # cv2.imwrite(f"{img_save_path}/step{timestep}.jpg", color_img_front)
 
         # take step
         state, _, _, _ = env.step(action)
+    
+    clip = ImageSequenceClip(frames, fps=10)
+    clip.write_videofile(video_save_path+"/traj1.mp4", audio=False)
 
 
 
