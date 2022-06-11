@@ -39,7 +39,7 @@ class ReachingSceneGraph:
     total_timesteps = 0
     
     def calculate_ucb(self, graph):
-        return self.aRPE_average[tuple(graph)] + 0.2 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
+        return self.aRPE_average[tuple(graph)] + 0.1 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
     
     def getUCBRank(self):
         curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
