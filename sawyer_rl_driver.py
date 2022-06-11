@@ -14,10 +14,6 @@ sys.path.insert(1, '/home/robot/perls2') # path to perls2 library
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.active_tamer.sac import SAC
 
-# perls2 modules
-# from demos.sawyer_osc_2d import OpSpaceLineXYZ 
-# from demos.sawyer_osc_3d import OpSpaceLineXYZ 
-
 from real_sawyer_env import RealSawyerReachingEnv, RealSawyerBallBasketEnv
 
 def run_pretrained(env):
@@ -103,10 +99,12 @@ def record_state(env, axis=0):
 
 def calibrate_boundary_helper(env):
     while True:
-        print("raw", driver.get_eef_xy())
-        print("calib", driver.get_eef_xy() - env.origin)
+        print("raw", env.driver.get_eef_xyz())
+        # print("calib", env.driver.get_eef_xy() - env.origin)
+        if env.reward() > 0:
+            print("IN TARGET")
 
-def init_env(task=1):
+def init_env(task=1, random_init=True):
     if task == 1:
 
         from demos.sawyer_osc_2d import OpSpaceLineXYZ 
@@ -158,7 +156,7 @@ def init_env(task=1):
 
         driver = OpSpaceLineXYZ(**kwargs)
 
-        env = RealSawyerReachingEnv(driver, random_init=True)
+        env = RealSawyerReachingEnv(driver, random_init=random_init)
 
         return env
 
@@ -213,31 +211,72 @@ def init_env(task=1):
 
         driver = OpSpaceLineXYZ(**kwargs)
 
-        env = RealSawyerBallBasketEnv(driver, random_init=True)
+        env = RealSawyerBallBasketEnv(driver, random_init=random_init)
 
         return env
 
+def redis_ctrl(env):
+    import redis
+    r = redis.Redis()
+
+    # read keys
+    ACTION_KEY = "action"
+    
+    while True:
+        # Reset environment
+        r.set("action", "0, 0, 0, 0") # reset action to neutral
+        prev_action = np.zeros(4)
+
+        while True:
+            # print("raw", env.driver.get_eef_xyz())
+            action = r.get(ACTION_KEY)
+
+            if action != prev_action:
+                new_action = str2ndarray(action, (env.action_dim, ))
+                obs, reward, done, info = env.step(new_action)
+                prev_action = action
+
+
+def str2ndarray(array_str, shape):
+    """
+    Helper function to convert action read from redis to np array
+    takes input array_str of form "[[a, b, c],...]"
+    returns nparray of specified shape
+    """
+    
+    # array_str = array_str.translate(str.maketrans('','','[]')) # remove brackets
+    output = np.fromstring(array_str, dtype=float, sep=',')
+    output = output.reshape(shape)
+    return output            
 
 if __name__ == "__main__":
 
-    env = init_env(task=2)
-    for i in range(5):
-        env.step(np.array([0.1, 0, 0.1, 0]))
+    env = init_env(task=2, random_init=True)
+    # for i in range(5):
+    #     env.reset()
 
-    # env = init_env(task=1)
+    # env.step(np.array([0, 0, 0.2, 0]))
+    # env.step(np.array([0, 0, 0.2, 0]))
 
-    # # print("DRIVER", env.driver)
+    # for i in range(10):
+    #     env.step(np.array([0.05, 0, 0, 0]))
 
-    # print("robot interface", env.robot_interface)
-    # print("env", env)
-    # print("env.driver", env.driver)
-    # print("env.driver.env", env.driver.env)
-    # print("env.driver.env.robot_interface", env.driver.env.robot_interface)
+    # calibrate_boundary_helper(env)
 
+    # redis_ctrl(env)
+    # for i in range(7):
+    #     action = np.array([0, 0, 0.07, 0])
+    #     env.step(action)
+    #     print(env.get_state())
+
+    # print("[1]", env.robot_interface.close_gripper())
+    #print("[2]", env.driver.env.robot_interface.close_gripper())
     # print("[0]")
     # env.driver.env.robot_interface.close_gripper()
     # print("[1]")
+    """
     # env.robot_interface.close_gripper()
+    """
     # print("[2]")
     # env.driver.robot_interface.close_gripper()
 
@@ -246,7 +285,10 @@ if __name__ == "__main__":
     #     action = np.array([0.05, 0, 0, 0])
     #     obs, _, done, _ = env.step(action)
     #     if done:
-    #         break
+    #         # break
+    #         pass
+
+
 
     # import time
     # env = LiftEnv()
