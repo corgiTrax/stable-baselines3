@@ -251,9 +251,12 @@ def str2ndarray(array_str, shape):
 
 if __name__ == "__main__":
 
+    np.random.seed(42)
     env = init_env(task=2, random_init=True)
-    # for i in range(5):
-    #     env.reset()
+    for i in range(5):
+        env.step(np.array([0.15, 0, 0.1, 0]))
+
+    env.reset()
 
     # env.step(np.array([0, 0, 0.2, 0]))
     # env.step(np.array([0, 0, 0.2, 0]))

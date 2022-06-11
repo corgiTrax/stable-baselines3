@@ -136,11 +136,11 @@ class RealSawyerBallBasketEnv(Env):
     def step(self, action):
 
         # scale input to controller
-        sf = 1.2 # safety factor for boundary limit
+        sf = 1.5 # safety factor for boundary limit
         cur_action_weight = 1.0 # how much weight current action carries in interpolation (1 means no interpolation)
 
         # new_action = self.ctrl_scale * (cur_action_weight * action[:3] + (1 - cur_action_weight) * self.prev_action) / 2 # interpolation
-        new_action = action
+        new_action = np.copy(action)
         new_action[:3] *= self.ctrl_scale
 
         # check workspace boundary condition
@@ -226,7 +226,7 @@ class RealSawyerBallBasketEnv(Env):
         # print(self.init_state - self.get_state()[:3])
 
         # if in position with possible collision, first move up
-        if self.get_states()[0] > self.noentry_xlim:
+        if self.get_state()[0] > self.noentry_xlim:
             waypoint = self.get_state()
             waypoint[2] = 0.3
             vec = waypoint - self.get_state()
@@ -237,7 +237,10 @@ class RealSawyerBallBasketEnv(Env):
 
         # move to home position
         vec = self.init_state - self.get_state()
-        while (abs(vec[0]) > thresh) or (abs(vec[1]) > thresh):
+        while (abs(vec[0]) > thresh or abs(vec[1] > thresh or abs(vec[2] > thresh))):
+            print("vec", vec)
+            print("init_state", self.init_state)
+            print("eef_xpos", self.get_state())
             # action = self.init_state - self.get_state()[:3] # vector from current to initial position
             self._step_to_home(vec[:3]) # ignore boundary when reseting to make sure robo can return to home position
             vec = self.init_state - self.get_state()
@@ -256,15 +259,16 @@ class RealSawyerBallBasketEnv(Env):
 
         # close gripper
         self.robot_interface.close_gripper()
+        self.gripper_state = 1
 
         # random initialization
-        if self.random_init: # TODO - tune this
+        if self.random_init: 
             action_y = np.random.uniform(-0.25, 0.25, 1)
             action_z = np.random.uniform(-0.1, 0.065, 1)
-            action = np.array([0, action_y[0], action_z[0], 1])
-            print(f"-----Taking Random Action {action}------")
+            random_action = np.array([0, action_y[0], action_z[0], 1])
             for i in range(7):
-                observation, _, _, _ = self.step(action)
+                print("random action", random_action)
+                observation, _, _, _ = self.step(random_action)
 
         self.steps = 0
 
