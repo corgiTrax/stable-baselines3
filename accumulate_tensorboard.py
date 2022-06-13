@@ -59,7 +59,7 @@ def average_from_per_episode_rewards(dpath, target_len):
     for index, curr_iterator in enumerate(summary_iterators):        
         for iter_index, i in enumerate(curr_iterator.Scalars(tag)):
             if i.step < target_len:
-                curr_rewards = i.value * len(rewards_buffer)
+                curr_rewards = i.value * len(rewards_buffer) * 0.1
                 curr_steps = i.step * len(steps_buffer)
                 
                 if len(rewards_buffer) == 25:
@@ -120,15 +120,15 @@ def write_to_csv(data, steps, csv_name):
         writer.writerows(rows)
         
 
-dpath = 'lunar_lander_results_all/all_runs/Tamer25'
+dpath = 'reaching_task_results_all/all_runs/Tamer25'
 
 for dname in os.listdir(dpath):
     # data, steps = average_from_per_timestep_rewards(os.path.join(dpath, dname), 150000)
     # update_existing_tensorboard(os.path.join(dpath, dname), 'train/training_rewards_cumulative', steps, data)
     if ".csv" not in dname:
-        data, steps = average_from_per_episode_rewards(os.path.join(dpath, dname), 150000)
+        data, steps = average_from_per_episode_rewards(os.path.join(dpath, dname), 100000)
         write_to_csv(data['rollout/training_rewards_cumulative'], steps['rollout/training_rewards_cumulative'], os.path.join(dpath, dname+".csv"))
         # update_existing_tensorboard(os.path.join(dpath, dname), 'rollout/training_rewards_cumulative', steps, data)
 
-        curr_feedback_data, steps = extract_feedback_curves(os.path.join(dpath, dname), 150000)
+        curr_feedback_data, steps = extract_feedback_curves(os.path.join(dpath, dname), 100000)
         write_to_csv(curr_feedback_data['train/feedback_percentage'], steps['train/feedback_percentage'], os.path.join(dpath, dname+"_feedback.csv"))

@@ -464,7 +464,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             # we assume that the policy uses tanh to scale the action
             # We use non-deterministic action in the case of SAC, for TD3, it does not matter
             unscaled_action, _ = self.predict(self._last_obs, deterministic=False)
-
+        # print("IN SAMPLE ACTION")
         # Rescale the action from [low, high] to [-1, 1]
         if isinstance(self.action_space, gym.spaces.Box):
             scaled_action = self.policy.scale_action(unscaled_action)
