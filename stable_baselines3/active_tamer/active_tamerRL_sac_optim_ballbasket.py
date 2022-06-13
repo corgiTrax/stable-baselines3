@@ -169,7 +169,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.total_feedback = 0
         self.model_training_index = 0
         self.model_training_order = [2, 1, 0, 3]
-        self.model_training_lengths = [1, 1, 1, 1250]
+        self.model_training_lengths = [100, 200, 300, 1250]
         self.total_rounds = 0
         self.actor_training = self.model_training_order[self.model_training_index]
 
