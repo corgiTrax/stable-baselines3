@@ -30,10 +30,10 @@ learning_rate: 0.00075
 #1000000
 buffer_size: 1000000
 learning_starts: 0
-batch_size: 100
+batch_size: 512
 tau: 0.01
 train_freq: 1
-gradient_steps: 1
+gradient_steps: 8
 human_data_save_path: "human_study/participant_1"
 trained_model: "trained-models/BallReaching.pt"
 percent_feedback: 1

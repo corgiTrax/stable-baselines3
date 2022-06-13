@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import gym
 import numpy as np
+from sympy import I
 import torch as th
 from git import Object
 from torch.nn import functional as F
@@ -167,8 +168,11 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.scene_graph = scene_graph
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
-        self.actor_training = 0
+        self.model_training_index = 0
+        self.model_training_order = [2, 1, 0, 3]
+        self.model_training_lengths = [50, 150, 200, 1250]
         self.total_rounds = 0
+        self.actor_training = self.model_training_order[self.model_training_index]
 
         if _init_setup_model:
             self._setup_model()
@@ -539,10 +543,9 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         callback.on_rollout_start()
         continue_training = True
 
-        if (self.num_timesteps + 1) % 50 == 0 and self.total_rounds < 11:
-            self.actor_training += 1
-            self.actor_training %= 4
-            self.total_rounds += 1
+        if (self.num_timesteps + 1) > self.model_training_lengths[self.model_training_index] and self.model_training_index < 3:
+            self.model_training_index += 1
+            self.actor_training = self.model_training_order[self.model_training_index]
 
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
@@ -563,7 +566,13 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 action, buffer_action = self._sample_action(
                     learning_starts, action_noise
                 )
-
+                # print(action)
+                for i in range(self.model_training_index + 1, len(self.model_training_order)):
+                    # print(i)
+                    action[0][self.model_training_order[i]] = 0
+                    if self.model_training_order[i] == 3:
+                        action[0][3] = 1 # set gripper to closed
+                # print(action)
                 # import pdb
                 # pdb.set_trace()
                 
