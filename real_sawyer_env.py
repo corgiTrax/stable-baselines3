@@ -52,7 +52,7 @@ class RealSawyerBallBasketEnv(Env):
 
         # max time steps
         # self.max_steps = 125
-        self.max_steps = 100
+        self.max_steps = 50
         self.steps = 0 
 
         # scaling factor from action -> osc control command
@@ -472,7 +472,9 @@ class RealSawyerReachingEnv(Env):
         if self.random_init:
             action_x = np.random.uniform(0, 0.15, 1)
             action_y = np.random.uniform(-0.25, 0.25, 1)
-            action = np.concatenate([action_x, action_y, np.zeros(2)])
+            # action = np.concatenate([action_x, action_y, np.zeros(2)])
+            action = np.concatenate([0, action_y, -0.3, 0])
+
             print(f"-----Taking Random Action {action}------")
             for i in range(7):
                 observation, _, _, _ = self.step(action)

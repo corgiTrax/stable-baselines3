@@ -169,7 +169,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.total_feedback = 0
         self.model_training_index = 0
         self.model_training_order = [2, 1, 0, 3]
-        self.model_training_lengths = [50, 150, 200, 1250]
+        self.model_training_lengths = [100, 200, 300, 1250]
         self.total_rounds = 0
         self.actor_training = self.model_training_order[self.model_training_index]
 
@@ -654,7 +654,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     # if self.actor_training == 3: simulated_human_reward = 0
                     if self.actor_training == 3:
                         if eef_should_open > 0 and action[0][self.actor_training] > 0:
-                            simulated_human_reward = 0.1
+                            simulated_human_reward = 1
                         if eef_should_open < 0 and action[0][self.actor_training] < 0:
                             simulated_human_reward = 10
                         if eef_should_open > 0 and action[0][self.actor_training] < 0:
@@ -666,6 +666,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     self.total_feedback += 1
                     self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
 
+                print(f"Time {self.num_timesteps} ({self.curr_episode_timesteps})")
                 self.q_val_threshold += 0.00000001
                 # self.rl_threshold += 1 / 500000
                 self.num_timesteps += 1
