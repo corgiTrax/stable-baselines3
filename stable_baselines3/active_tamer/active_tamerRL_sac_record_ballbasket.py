@@ -584,32 +584,32 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 if self.render:
                     env.render()
 
-                teacher_action, _ = self.trained_model.predict(self._last_obs)
-                teacher_q_val = self.trained_model.critic.forward(
-                    th.from_numpy(self._last_obs).to(self.device),
-                    th.from_numpy(teacher_action).to(self.device),
-                )
-                teacher_q_val, _ = th.min(
-                    th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
-                )
-                teacher_q_val = teacher_q_val.cpu()[0][0]
+                # teacher_action, _ = self.trained_model.predict(self._last_obs)
+                # teacher_q_val = self.trained_model.critic.forward(
+                #     th.from_numpy(self._last_obs).to(self.device),
+                #     th.from_numpy(teacher_action).to(self.device),
+                # )
+                # teacher_q_val, _ = th.min(
+                #     th.cat(teacher_q_val, dim=1), dim=1, keepdim=True
+                # )
+                # teacher_q_val = teacher_q_val.cpu()[0][0]
 
-                student_q_val = self.trained_model.critic.forward(
-                    th.from_numpy(self._last_obs).to(self.device),
-                    th.from_numpy(action).to(self.device),
-                )
-                student_q_val, _ = th.min(
-                    th.cat(student_q_val, dim=1), dim=1, keepdim=True
-                )
+                # student_q_val = self.trained_model.critic.forward(
+                #     th.from_numpy(self._last_obs).to(self.device),
+                #     th.from_numpy(action).to(self.device),
+                # )
+                # student_q_val, _ = th.min(
+                #     th.cat(student_q_val, dim=1), dim=1, keepdim=True
+                # )
 
-                student_q_val = student_q_val.cpu()[0][0]
+                # student_q_val = student_q_val.cpu()[0][0]
 
-                self.logger.record("train/teacher_q_value", teacher_q_val.item())
-                self.logger.record("train/student_q_value", student_q_val.item())
-                self.logger.record(
-                    "train/teacher-student_q_value",
-                    teacher_q_val.item() - student_q_val.item(),
-                )
+                # self.logger.record("train/teacher_q_value", teacher_q_val.item())
+                # self.logger.record("train/student_q_value", student_q_val.item())
+                # self.logger.record(
+                #     "train/teacher-student_q_value",
+                #     teacher_q_val.item() - student_q_val.item(),
+                # )
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
