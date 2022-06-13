@@ -120,7 +120,7 @@ def write_to_csv(data, steps, csv_name):
         writer.writerows(rows)
         
 
-dpath = 'reaching_task_results_all/all_runs/Tamer1.6'
+dpath = 'reaching_task_results_all/all_runs/Tamer25'
 
 for dname in os.listdir(dpath):
     # data, steps = average_from_per_timestep_rewards(os.path.join(dpath, dname), 150000)
