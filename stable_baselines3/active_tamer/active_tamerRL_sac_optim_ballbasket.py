@@ -643,8 +643,8 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     obs = self._last_obs[0]
                     curr_position = obs[self.actor_training]
                     curr_action = action[0][self.actor_training] * 0.01
-                    eef_should_open = -1 if obs[0] > -0.1 and obs[0] < 0.1 and obs[1] > -0.1 and obs[1] < 0.1 and obs[2] > 1.2 else 1
-                    goal_position = {0: 0, 1: 0, 2: 1.4, 3: eef_should_open}
+                    eef_should_open = -1 if obs[0] > -0.0963 and obs[0] < 0.0963 and obs[1] > -0.0665 and obs[1] < 0.0735 and obs[2] > 0.226 and obs[2] < 0.41 else 1
+                    goal_position = {0: 0, 1: 0, 2: 0.3, 3: eef_should_open}
                     simulated_human_reward = (
                         2
                         if abs(goal_position[self.actor_training] - curr_position) > abs(goal_position[self.actor_training] - (curr_position + curr_action))
