@@ -1,6 +1,7 @@
 import warnings
 from atexit import register
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from xml.sax.handler import feature_external_ges
 
 import gym
 import torch as th
@@ -1037,20 +1038,16 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
                 net_arch = [256, 256]
 
         self.actor_arch, self.critic_arch = get_actor_critic_arch(net_arch)
-
+        self.n_critics = n_critics
         self.net_arch = net_arch
         self.activation_fn = activation_fn
-        self.x_obs_space = Box(shape=(1,), low=self.observation_space.low[0], high=self.observation_space.high[0])
-        self.y_obs_space = Box(shape=(1,), low=self.observation_space.low[1], high=self.observation_space.high[1])
-        self.z_obs_space = Box(shape=(1,), low=self.observation_space.low[2], high=self.observation_space.high[2])
-        self.g_obs_space = Box(shape=(1,), low=self.observation_space.low[3], high=self.observation_space.high[3])
-        self.x_act_space = Box(shape=(1,), low=self.action_space.low[0], high=self.action_space.high[0])
-        self.y_act_space = Box(shape=(1,), low=self.action_space.low[1], high=self.action_space.high[1])
-        self.z_act_space = Box(shape=(1,), low=self.action_space.low[2], high=self.action_space.high[2])
-        self.g_act_space = Box(shape=(1,), low=self.action_space.low[3], high=self.action_space.high[3])
+        self.num_obs = self.observation_space.shape[0]
+        assert self.num_obs == self.action_space.shape[0]
+        self.share_features_extractor = share_features_extractor
 
-        # import pdb
-        # pdb.set_trace()
+        self.obs_spaces = [Box(shape=(1,), low=self.observation_space.low[i], high=self.observation_space.high[i]) for i in range(self.num_obs)]
+        self.act_spaces = [Box(shape=(1,), low=self.action_space.low[i], high=self.action_space.high[i]) for i in range(self.num_obs)]
+
         self.net_args = {
             "observation_space": self.observation_space,
             "action_space": self.action_space,
@@ -1065,7 +1062,12 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
                 "sde_net_arch is deprecated and will be removed in SB3 v2.4.0.",
                 DeprecationWarning,
             )
-
+        self.critic_kwargs = self.actor_kwargs.copy()
+        self.critic_kwargs.update({
+            "n_critics": self.n_critics,
+            "net_arch": self.critic_arch,
+            "share_features_extractor": self.share_features_extractor,
+        })
         sde_kwargs = {
             "use_sde": use_sde,
             "log_std_init": log_std_init,
@@ -1073,153 +1075,65 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
             "clip_mean": clip_mean,
         }
         self.actor_kwargs.update(sde_kwargs)
-        self.critic_kwargs = self.net_args.copy()
-        self.critic_kwargs.update(
-            {
-                "n_critics": n_critics,
-                "net_arch": self.critic_arch,
-                "share_features_extractor": share_features_extractor,
-            }
-        )
+        self.act_kwargs = []
+        self.crit_kwargs = []
+        for i in range(self.num_obs):
+            curr_kwargs = self.actor_kwargs.copy()
+            curr_kwargs.update({"observation_space": self.obs_spaces[i], "action_space": self.act_spaces[i], "features_dim": 1})
+            self.act_kwargs.append(curr_kwargs)
 
-        self.actor_x, self.actor_target_x = None, None
-        self.actor_y, self.actor_target_y = None, None
-        self.actor_z, self.actor_target_z = None, None
-        self.actor_g, self.actor_target_g = None, None
-        self.critic, self.critic_target = None, None
-        self.human_critic, self.human_critic_target = None, None
+            curr_critic_kwargs = self.critic_kwargs.copy()
+            curr_critic_kwargs.update({"observation_space": self.obs_spaces[i], "action_space": self.act_spaces[i], "features_dim": 1})
+            self.crit_kwargs.append(curr_critic_kwargs)
+            
+        self.actors = [None for _ in range(self.num_obs)]
+        self.critics = [None for _ in range(self.num_obs)]
+        self.critic_parameters = [None for _  in range(self.num_obs)]
+        self.critic_targets = [None for _ in range(self.num_obs)]
+        self.human_critics = [None for _ in range(self.num_obs)]
+        self.human_critic_parameters = [None for _  in range(self.num_obs)]
+        self.human_critic_targets = [None for _ in range(self.num_obs)]
         self.share_features_extractor = share_features_extractor
-
-        self.state_predictor_arch = self.critic_arch.copy()
-        self.state_predictor_kwargs = self.net_args.copy()
-        self.state_predictor_kwargs.update(
-            {
-                "net_arch": self.state_predictor_arch,
-                "share_features_extractor": share_features_extractor,
-            }
-        )
-        self.state_reconstruction_arch = [400, 150, 3, 150, 400]
-        self.state_reconstruction_kwargs = self.net_args.copy()
-        self.state_reconstruction_kwargs.update(
-            {
-                "net_arch": self.state_reconstruction_arch,
-                "share_features_extractor": share_features_extractor,
-            }
-        )
 
         self._build(lr_schedule)
 
     def _build(self, lr_schedule: Schedule) -> None:
-        self.actor_kwargs.update({"observation_space": self.x_obs_space, "action_space": self.x_act_space, "features_dim": 1})
-        self.actor_x = self.make_actor(actor_kwargs=self.actor_kwargs)
-        self.actor_x.optimizer = self.optimizer_class(
-            self.actor_x.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
-        )
 
-        self.actor_kwargs.update({"observation_space": self.y_obs_space, "action_space": self.y_act_space, "features_dim": 1})
-        self.actor_y = self.make_actor(actor_kwargs=self.actor_kwargs)
-        self.actor_y.optimizer = self.optimizer_class(
-            self.actor_y.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
-        )
-
-        self.actor_kwargs.update({"observation_space": self.z_obs_space, "action_space": self.z_act_space, "features_dim": 1})
-        self.actor_z = self.make_actor(actor_kwargs=self.actor_kwargs)
-        self.actor_z.optimizer = self.optimizer_class(
-            self.actor_z.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
-        )
-
-        self.actor_kwargs.update({"observation_space": self.g_obs_space, "action_space": self.g_act_space, "features_dim": 1})
-        self.actor_g = self.make_actor(actor_kwargs=self.actor_kwargs)
-        self.actor_g.optimizer = self.optimizer_class(
-            self.actor_g.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
-        )
+        for i in range(self.num_obs):
+            self.actors[i] = self.make_actor(actor_kwargs=self.act_kwargs[i])
+            self.actors[i].optimizer = self.optimizer_class(
+                self.actors[i].parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
+            )
 
         if self.share_features_extractor:
-            self.critic = self.make_critic(
-                features_extractor=self.actor_x.features_extractor
-            )
-            # Do not optimize the shared features extractor with the critic loss
-            # otherwise, there are gradient computation issues
-            critic_parameters = [
-                param
-                for name, param in self.critic.named_parameters()
-                if "features_extractor" not in name
-            ]
-
-            self.human_critic = self.make_critic(
-                features_extractor=self.actor_x.features_extractor
-            )
-            # Do not optimize the shared features extractor with the critic loss
-            # otherwise, there are gradient computation issues
-            human_critic_parameters = [
-                param
-                for name, param in self.human_critic.named_parameters()
-                if "features_extractor" not in name
-            ]
-
-            self.state_predictor = self.make_state_predictor(
-                features_extractor=self.actor_x.features_extractor
-            )
-            # Do not optimize the shared features extractor with the critic loss
-            # otherwise, there are gradient computation issues
-            predictor_parameters = [
-                param
-                for name, param in self.state_predictor.named_parameters()
-                if "features_extractor" not in name
-            ]
-
-            self.state_reconstructor = self.make_state_reconstructor(
-                features_extractor=self.actor_x.features_extractor
-            )
-            # Do not optimize the shared features extractor with the critic loss
-            # otherwise, there are gradient computation issues
-            reconstructor_parameters = [
-                param
-                for name, param in self.state_reconstructor.named_parameters()
-                if "features_extractor" not in name
-            ]
-
+            for i in range(self.num_obs):
+                self.critics[i] = self.make_critic(critic_kwargs=self.crit_kwargs[i] ,features_extractor=self.actors[i].features_extractor)
+                self.critic_parameters[i] = [param for name, param in self.critics[i].named_parameters() if "features_extractor" not in name]
+                self.human_critics[i] = self.make_critic(critic_kwargs=self.crit_kwargs[i],features_extractor=self.actors[i].features_extractor)
+                self.human_critic_parameters[i] = [param for name, param in self.human_critics[i].named_parameters() if "features_extractor" not in name]
         else:
-            # Create a separate features extractor for the critic
-            # this requires more memory and computation
-            self.critic = self.make_critic(features_extractor=None)
-            critic_parameters = self.critic.parameters()
-
-            self.human_critic = self.make_critic(features_extractor=None)
-            human_critic_parameters = self.critic.parameters()
-
-            self.state_predictor = self.make_state_predictor(feature_extractor=None)
-            predictor_parameters = self.state_predictor.parameters()
-
-            self.state_reconstructor = self.make_state_reconstructor(feature_extractor=None)
-            reconstructor_parameters = self.state_reconstructor.parameters()
+            for i in range(self.num_obs):
+                self.critics[i] = self.make_critic(critic_kwargs=self.crit_kwargs[i], features_extractor=None)
+                self.critic_parameters[i] = self.critics[i].named_parameters()
+                self.human_critics[i] = self.make_critic(critic_kwargs=self.crit_kwargs[i],features_extractor=None)
+                self.human_critic_parameters[i] = self.human_critics[i].named_parameters()
 
         # Critic target should not share the features extractor with critic
-        self.critic_target = self.make_critic(features_extractor=None)
-        self.critic_target.load_state_dict(self.critic.state_dict())
-
-        self.human_critic_target = self.make_critic(features_extractor=None)
-        self.human_critic_target.load_state_dict(self.human_critic.state_dict())
-
-        self.critic.optimizer = self.optimizer_class(
-            critic_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
-        )
-
-        self.human_critic.optimizer = self.optimizer_class(
-            human_critic_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
-        )
-
-        self.state_predictor.optimizer = self.optimizer_class(
-            predictor_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
-        )
-
-        self.state_reconstructor.optimizer = self.optimizer_class(
-            reconstructor_parameters, lr=lr_schedule(1), **self.optimizer_kwargs
-        )
-
-        # Target networks should always be in eval mode
-        self.critic_target.set_training_mode(False)
-        self.human_critic_target.set_training_mode(False)
+        for i in range(self.num_obs):
+            self.critic_targets[i] = self.make_critic(critic_kwargs=self.crit_kwargs[i], features_extractor=None)
+            self.critic_targets[i].load_state_dict(self.critics[i].state_dict())
+            self.human_critic_targets[i] = self.make_critic(critic_kwargs=self.crit_kwargs[i], features_extractor=None)
+            self.human_critic_targets[i].load_state_dict(self.human_critics[i].state_dict())
+        
+            self.critics[i].optimizer = self.optimizer_class(
+                self.critic_parameters[i], lr=lr_schedule(1), **self.optimizer_kwargs
+            )
+            self.human_critics[i].optimizer = self.optimizer_class(
+                self.human_critic_parameters[i], lr=lr_schedule(1), **self.optimizer_kwargs
+            )
+            
+            self.critic_targets[i].set_training_mode(False)
+            self.human_critic_targets[i].set_training_mode(False)
 
     def _get_constructor_parameters(self) -> Dict[str, Any]:
         data = super()._get_constructor_parameters()
@@ -1263,28 +1177,13 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         return Actor(**actor_kwargs).to(self.device)
 
     def make_critic(
-        self, features_extractor: Optional[BaseFeaturesExtractor] = None
+        self, critic_kwargs, features_extractor: Optional[BaseFeaturesExtractor] = None
     ) -> ContinuousCritic:
         critic_kwargs = self._update_features_extractor(
-            self.critic_kwargs, features_extractor
+            critic_kwargs, features_extractor
         )
+        critic_kwargs['features_dim'] = 1
         return ContinuousCritic(**critic_kwargs).to(self.device)
-
-    def make_state_predictor(
-        self, features_extractor: Optional[BaseFeaturesExtractor] = None
-    ) -> StatePredictor:
-        state_predictor_kwargs = self._update_features_extractor(
-            self.state_predictor_kwargs, features_extractor
-        )
-        return StatePredictor(**state_predictor_kwargs).to(self.device)
-    
-    def make_state_reconstructor(
-        self, features_extractor: Optional[BaseFeaturesExtractor] = None
-    ) -> StateReconstructor:
-        state_reconstructor_kwargs = self._update_features_extractor(
-            self.state_reconstruction_kwargs, features_extractor
-        )
-        return StateReconstructor(**state_reconstructor_kwargs).to(self.device)
 
     def forward(self, obs: th.Tensor, deterministic: bool = False) -> th.Tensor:
         return self._predict(obs, deterministic=deterministic)
@@ -1292,11 +1191,10 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
     def _predict(
         self, observation: th.Tensor, deterministic: bool = False
     ) -> th.Tensor:
-        x_pred = self.actor_x(observation[:, 0].unsqueeze(1), deterministic)
-        y_pred = self.actor_y(observation[:, 1].unsqueeze(1), deterministic)
-        z_pred = self.actor_z(observation[:, 2].unsqueeze(1), deterministic)
-        g_pred = self.actor_g(observation[:, 3].unsqueeze(1), deterministic)
-        return torch.cat((x_pred, y_pred, z_pred, g_pred)).view(1, -1)
+        predictions = []
+        for i in range(self.num_obs):
+            predictions.append(self.actors[i](observation[:, i].unsqueeze(1), deterministic))
+        return torch.cat(predictions).view(1, -1)
 
     def set_training_mode(self, mode: bool) -> None:
         """
@@ -1306,13 +1204,11 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
 
         :param mode: if true, set to training mode, else set to evaluation mode
         """
-        self.actor_x.set_training_mode(mode)
-        self.actor_y.set_training_mode(mode)
-        self.actor_z.set_training_mode(mode)
-        self.actor_g.set_training_mode(mode)
-        self.critic.set_training_mode(mode)
-        self.human_critic.set_training_mode(mode)
-        self.state_predictor.set_training_mode(mode)
+        for i in range(self.num_obs):
+            self.actors[i].set_training_mode(mode)
+            self.critics[i].set_training_mode(mode)
+            self.human_critics[i].set_training_mode(mode)
+        
         self.training = mode
 
 ActiveMlpPolicyBallBasket = ActiveSACHPolicyBallBasket

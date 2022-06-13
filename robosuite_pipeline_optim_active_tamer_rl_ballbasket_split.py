@@ -102,7 +102,7 @@ class BallBasketSceneGraph:
         prev_graph = copy.deepcopy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][2], 'g': newState[0][3]}
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 100
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -135,7 +135,7 @@ def main(args):
 
     env = wrappers.GymWrapper(suite.make(
         **robosuite_config,
-        has_renderer=False,
+        has_renderer=True,
         has_offscreen_renderer=False,
         render_camera="agentview",
         ignore_done=False,
@@ -144,14 +144,16 @@ def main(args):
         reward_scale=100,
         hard_reset=False,
         prehensile=False,
+        horizon=100,
     ), keys=['eef_xyz_gripper'])
 
     print(env)
+    env.viewer.set_camera(camera_id=1)
 
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[128, 128],
+        net_arch=[32, 32],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -186,7 +188,7 @@ def main(args):
         train_freq=config_data["train_freq"],
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
-        render=False,
+        render=True,
         trained_model=trained_model,
         scene_graph=BallBasketSceneGraph(),
     )

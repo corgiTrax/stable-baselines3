@@ -22,6 +22,7 @@ from stable_baselines3.common.type_aliases import (
 )
 from stable_baselines3.common.utils import polyak_update, should_collect_more_steps
 from stable_baselines3.common.vec_env import VecEnv
+import copy
 
 
 class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
@@ -210,18 +211,15 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
             # this will throw an error if a malformed string (different from 'auto')
             # is passed
             self.ent_coef_tensor = th.tensor(float(self.ent_coef)).to(self.device)
+        
+        self.replay_buffers = [copy.deepcopy(self.replay_buffer) for _ in range(4)]
 
     def _create_aliases(self) -> None:
-        self.actor_x = self.policy.actor_x
-        self.actor_y = self.policy.actor_y
-        self.actor_z = self.policy.actor_z
-        self.actor_g = self.policy.actor_g
-        self.critic = self.policy.critic
-        self.critic_target = self.policy.critic_target
-        self.human_critic = self.policy.human_critic
-        self.human_critic_target = self.policy.human_critic_target
-        self.state_predictor = self.policy.state_predictor
-        self.state_reconstructor = self.policy.state_reconstructor
+        self.actors = self.policy.actors
+        self.critics = self.policy.critics
+        self.critic_targets = self.policy.critic_targets
+        self.human_critics = self.policy.human_critics
+        self.human_critic_targets = self.policy.human_critic_targets
 
     def train(
         self,
@@ -232,14 +230,14 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizers learning rate
-        optimizers = [
-            self.actor_x.optimizer,
-            self.actor_y.optimizer,
-            self.actor_z.optimizer,
-            self.actor_g.optimizer,
-            self.critic.optimizer,
-            self.human_critic.optimizer,
-        ]
+        optimizers = []
+        for i in range(len(self.actors)):
+            optimizers.append(self.actors[i].optimizer)
+        for i in range(len(self.critics)):
+            optimizers.append(self.critics[i].optimizer)
+        for i in range(len(self.human_critics)):
+            optimizers.append(self.human_critics[i].optimizer)
+        
         if self.ent_coef_optimizer is not None:
             optimizers += [self.ent_coef_optimizer]
 
@@ -247,49 +245,28 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self._update_learning_rate(optimizers)
 
         ent_coef_losses, ent_coefs = [], []
-        actor_losses, critic_losses, human_critic_losses, state_prediction_losses, state_recontructor_losses = (
+        actor_losses, critic_losses, human_critic_losses = (
             [],
             [],
             [],
-            [],
-            []
         )
-
-        model_mappings = {
-            0: self.actor_x,
-            1: self.actor_y,
-            2: self.actor_z,
-            3: self.actor_g
-        }
 
         for gradient_step in range(gradient_steps):
             # Sample replay buffer
-            replay_data = self.replay_buffer.sample(
+            replay_data = self.replay_buffers[self.actor_training].sample(
                 batch_size, env=self._vec_normalize_env
             )
 
             # We need to sample because `log_std` may have changed between two gradient steps
             if self.use_sde:
-                self.actor_x.reset_noise()
-                self.actor_y.reset_noise()
-                self.actor_z.reset_noise()
-                self.actor_g.reset_noise()
+                for actor in self.actors:
+                    actor.reset_noise()
 
             # Action by the current actor for the sampled state
             # import pdb
             # pdb.set_trace()
-            model_being_trained = model_mappings[self.actor_training]
-            trainable_actions, trainable_log_prob = model_being_trained.action_log_prob(replay_data.observations[:, 0].reshape(-1, 1))
+            trainable_actions, trainable_log_prob = self.actors[self.actor_training].action_log_prob(replay_data.observations[:, self.actor_training].reshape(-1, 1))
             trainable_log_prob = trainable_log_prob.reshape(-1, 1)
-            predicted_actions = []
-
-            for i in range(4):
-                with th.no_grad():
-                    action, _ = model_mappings[i].action_log_prob(replay_data.observations[:, i].reshape(-1, 1))
-                    predicted_actions.append(action)
-            
-            predicted_actions[self.actor_training] = trainable_actions
-            predicted_actions = th.cat(predicted_actions).view(-1, 4)
 
             ent_coef_loss = None
             if self.ent_coef_optimizer is not None:
@@ -315,19 +292,10 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
 
             with th.no_grad():
                 # Select action according to policy
-                next_actions = []
-                next_log_prob = []
-                for i in range(4):
-                    with th.no_grad():
-                        action, log_prob = model_mappings[i].action_log_prob(replay_data.observations[:, i].reshape(-1, 1))
-                        next_actions.append(action)
-                        next_log_prob.append(log_prob.reshape(-1, 1))
-                
-                next_actions = th.cat(next_actions).view(-1, 4)
-                next_log_prob = th.cat(next_log_prob).view(-1, 4)[:, self.actor_training].view(-1, 1)
+                next_actions, next_log_prob = self.actors[self.actor_training].action_log_prob(replay_data.next_observations[:, self.actor_training].reshape(-1, 1))
                 # Compute the next Q values: min over all critics targets
                 next_q_values = th.cat(
-                    self.critic_target(replay_data.next_observations, next_actions),
+                    self.critic_targets[self.actor_training](replay_data.next_observations[:, self.actor_training].reshape(-1, 1), next_actions),
                     dim=1,
                 )
                 next_q_values, _ = th.min(next_q_values, dim=1, keepdim=True)
@@ -343,9 +311,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
 
             # Get current Q-values estimates for each critic network
             # using action from the replay buffer
-            current_q_values = self.critic(
-                replay_data.observations, replay_data.actions
-            )
+            current_q_values = self.critics[self.actor_training](replay_data.observations[:, self.actor_training].reshape(-1, 1), replay_data.actions[:, self.actor_training].reshape(-1, 1))
 
             # Compute critic loss
             critic_loss = 0.5 * sum(
@@ -357,15 +323,13 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
             critic_losses.append(critic_loss.item())
 
             # Optimize the critic
-            self.critic.optimizer.zero_grad()
+            self.critics[self.actor_training].optimizer.zero_grad()
             critic_loss.backward()
-            self.critic.optimizer.step()
+            self.critics[self.actor_training].optimizer.step()
 
             # Get current Q-values estimates for human critic network
             # using action from the replay buffer
-            current_human_q_values = self.human_critic(
-                replay_data.observations, replay_data.actions
-            )
+            current_human_q_values = self.human_critics[self.actor_training](replay_data.observations[:, self.actor_training].reshape(-1, 1), replay_data.actions[:, self.actor_training].reshape(-1, 1))
 
             # Compute critic loss
             human_critic_loss = 0.5 * sum(
@@ -377,19 +341,19 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
             human_critic_losses.append(human_critic_loss.item())
 
             # Optimize the critic
-            self.human_critic.optimizer.zero_grad()
+            self.human_critics[self.actor_training].optimizer.zero_grad()
             human_critic_loss.backward()
-            self.human_critic.optimizer.step()
+            self.human_critics[self.actor_training].optimizer.step()
 
             # Compute actor loss
             # Alternative: actor_loss = th.mean(log_prob - qf1_pi)
             # Mean over all critic networks
             q_values_pi_critic = th.cat(
-                self.critic.forward(replay_data.observations, predicted_actions), dim=1
+                self.critics[self.actor_training].forward(replay_data.observations[:, self.actor_training].reshape(-1, 1), trainable_actions), dim=1
             )
 
             q_values_pi_human = th.cat(
-                self.human_critic.forward(replay_data.observations, predicted_actions), dim=1
+                self.human_critics[self.actor_training].forward(replay_data.observations[:, self.actor_training].reshape(-1, 1), trainable_actions), dim=1
             )
 
             q_values_pi = (
@@ -405,39 +369,18 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 human_feedback_gui.updateLoss(actor_loss.item())
 
             # Optimize the actor
-            model_mappings[self.actor_training].optimizer.zero_grad()
+            self.actors[self.actor_training].optimizer.zero_grad()
             actor_loss.backward()
-            model_mappings[self.actor_training].optimizer.step()
-
-            # predicted_states = self.state_predictor.forward(
-            #     replay_data.observations, predicted_actions.detach()
-            # )
-            # state_prediction_loss = F.mse_loss(
-            #     predicted_states, replay_data.next_observations
-            # )
-            # self.state_predictor.optimizer.zero_grad()
-            # state_prediction_loss.backward()
-            # self.state_predictor.optimizer.step()
-            # state_prediction_losses.append(state_prediction_loss.item())
-
-
-            # reconstructed_state = self.state_reconstructor.forward(replay_data.observations)
-            # state_reconstructor_loss = F.mse_loss(
-            #     reconstructed_state, replay_data.observations
-            # )
-            # self.state_reconstructor.optimizer.zero_grad()
-            # state_reconstructor_loss.backward()
-            # self.state_reconstructor.optimizer.step()
-            # state_recontructor_losses.append(state_reconstructor_loss.item())
+            self.actors[self.actor_training].optimizer.step()
 
             # Update target networks
             if gradient_step % self.target_update_interval == 0:
                 polyak_update(
-                    self.critic.parameters(), self.critic_target.parameters(), self.tau
+                    self.critics[self.actor_training].parameters(), self.critic_targets[self.actor_training].parameters(), self.tau
                 )
                 polyak_update(
-                    self.human_critic.parameters(),
-                    self.human_critic_target.parameters(),
+                    self.human_critics[self.actor_training].parameters(),
+                    self.human_critic_targets[self.actor_training].parameters(),
                     self.tau,
                 )
 
@@ -473,20 +416,63 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
 
-        return super(ActiveTamerRLSACOptimBallBasket, self).learn(
-            total_timesteps=total_timesteps,
-            human_feedback_gui=human_feedback_gui,
-            human_feedback=human_feedback,
-            callback=callback,
-            log_interval=log_interval,
-            eval_env=eval_env,
-            eval_freq=eval_freq,
-            n_eval_episodes=n_eval_episodes,
-            tb_log_name=tb_log_name,
-            eval_log_path=eval_log_path,
-            reset_num_timesteps=reset_num_timesteps,
+        total_timesteps, callback = self._setup_learn(
+            total_timesteps,
+            eval_env,
+            callback,
+            eval_freq,
+            n_eval_episodes,
+            eval_log_path,
+            reset_num_timesteps,
+            tb_log_name,
         )
 
+        callback.on_training_start(locals(), globals())
+
+        while self.num_timesteps < total_timesteps:
+            rollout = self.collect_rollouts(
+                self.env,
+                train_freq=self.train_freq,
+                action_noise=self.action_noise,
+                callback=callback,
+                learning_starts=self.learning_starts,
+                replay_buffer=self.replay_buffers[self.actor_training],
+                log_interval=log_interval,
+                human_feedback_gui=human_feedback_gui,
+                human_feedback=human_feedback,
+            )
+
+            if rollout.continue_training is False:
+                break
+
+            if self.num_timesteps > 0 and self.num_timesteps > self.learning_starts and self.replay_buffers[self.actor_training].pos > 0:
+                # If no `gradient_steps` is specified,
+                # do as many gradients steps as steps performed during the rollout
+                gradient_steps = (
+                    self.gradient_steps
+                    if self.gradient_steps >= 0
+                    else rollout.episode_timesteps
+                )
+                # Special case when the user passes `gradient_steps=0`
+                if gradient_steps > 0:
+                    if human_feedback_gui:
+                        self.train(
+                            batch_size=self.batch_size,
+                            gradient_steps=gradient_steps,
+                            human_feedback_gui=human_feedback_gui,
+                        )
+                    else:
+                        self.train(
+                            batch_size=self.batch_size,
+                            gradient_steps=gradient_steps,
+                        )
+            if self.num_timesteps % self.save_every == 0:
+                #pass
+                self.save(f"models/{self.model_name}_{self.num_timesteps}.pt")
+
+        callback.on_training_end()
+
+        return self
     def _excluded_save_params(self) -> List[str]:
         return super(ActiveTamerRLSACOptimBallBasket, self)._excluded_save_params() + [
             "actor",
@@ -497,7 +483,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         ]
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
-        state_dicts = ["policy", "actor_x.optimizer", "actor_y.optimizer", "actor_z.optimizer", "actor_g.optimizer", "critic.optimizer"]
+        state_dicts = ["policy"]
         if self.ent_coef_optimizer is not None:
             saved_pytorch_variables = ["log_ent_coef"]
             state_dicts.append("ent_coef_optimizer")
@@ -547,16 +533,14 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         assert train_freq.frequency > 0, "Should at least collect one step or episode."
 
         if self.use_sde:
-            self.actor_x.reset_noise()
-            self.actor_y.reset_noise()
-            self.actor_z.reset_noise()
-            self.actor_g.reset_noise()
+            for actor in self.actors: actor.reset_noise()
 
         callback.on_rollout_start()
         continue_training = True
 
-        if (self.num_timesteps + 1) % 2000 == 0 and self.actor_training < 3:
+        if (self.num_timesteps + 1) % 100 == 0:
             self.actor_training += 1
+            self.actor_training %= 4
 
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
@@ -571,10 +555,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     and num_collected_steps % self.sde_sample_freq == 0
                 ):
                     # Sample a new noise matrix
-                    self.actor_x.reset_noise()
-                    self.actor_y.reset_noise()
-                    self.actor_z.reset_noise()
-                    self.actor_g.reset_noise()
+                    for actor in self.actors: actor.reset_noise()
 
                 # Select action randomly or according to policy
                 action, buffer_action = self._sample_action(
@@ -619,27 +600,28 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 new_obs, reward, done, infos = env.step(action)
                 self.logger.record("train/training_rewards", reward[0])
                 simulated_human_reward = 0
-
-                human_critic_qval_estimate = self.human_critic.forward(
-                    th.from_numpy(self._last_obs).to(self.device),
-                    th.from_numpy(action).to(self.device),
+                # print(self._last_obs[:, self.actor_training].reshape(-1, 1))
+                # print(action[:, self.actor_training].reshape(-1, 1))
+                human_critic_qval_estimate = self.human_critics[self.actor_training].forward(
+                    th.from_numpy(self._last_obs[:, self.actor_training].reshape(-1, 1)).to(self.device),
+                    th.from_numpy(action[:, self.actor_training].reshape(-1, 1)).to(self.device),
                 )
                 human_critic_qval_estimate, _ = th.min(
                     th.cat(human_critic_qval_estimate, dim=1), dim=1, keepdim=True
                 )
                 
                 scene_graph_updated, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action)
-                state_prediction_err = F.mse_loss(
-                    self.state_predictor(
-                        th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
-                        th.from_numpy(action).to(self.device).reshape(1, -1),
-                    ),
-                    th.from_numpy(new_obs).to(self.device).reshape(1, -1),
-                )
-                state_reconstructor_err = F.mse_loss(
-                    self.state_reconstructor(th.from_numpy(prev_obs).to(self.device).reshape(1, -1)),
-                    th.from_numpy(prev_obs).to(self.device).reshape(1, -1)
-                )
+                # state_prediction_err = F.mse_loss(
+                #     self.state_predictor(
+                #         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
+                #         th.from_numpy(action).to(self.device).reshape(1, -1),
+                #     ),
+                #     th.from_numpy(new_obs).to(self.device).reshape(1, -1),
+                # )
+                # state_reconstructor_err = F.mse_loss(
+                #     self.state_reconstructor(th.from_numpy(prev_obs).to(self.device).reshape(1, -1)),
+                #     th.from_numpy(prev_obs).to(self.device).reshape(1, -1)
+                # )
                 if (
                     # scene_graph_updated
                     # random.random() < curr_state_prob  
@@ -648,11 +630,20 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
+                    obs = self._last_obs[0]
+                    curr_position = obs[self.actor_training]
+                    curr_action = action[0][self.actor_training] * 0.01
+                    eef_should_open = -1 if obs[0] > -0.1 and obs[0] < 0.1 and obs[1] > -0.1 and obs[1] < 0.1 and obs[2] > 1.2 else 1
+                    goal_position = {0: 0, 1: 0, 2: 1.4, 3: eef_should_open}
                     simulated_human_reward = (
-                        1
-                        if self.q_val_threshold * teacher_q_val < student_q_val
-                        else -1
+                        2
+                        if abs(goal_position[self.actor_training] - curr_position) > abs(goal_position[self.actor_training] - (curr_position + curr_action))
+                        else -2
                     )
+                    # if self.actor_training == 3: simulated_human_reward = 0.5 if (eef_should_open > 0 and action[0][self.actor_training] > 0) or (eef_should_open < 0 and action[0][self.actor_training] < 0) else -0.5 
+                    if self.actor_training == 3: simulated_human_reward = 0
+                    print(f'Goal position = {str(goal_position[self.actor_training])} Curr position = {str(curr_position)} curr reward = {str(simulated_human_reward)}')
+                    print(f'Action = {str(curr_action)} lhs = {abs(goal_position[self.actor_training] - curr_position)} rhs = {abs(goal_position[self.actor_training] - (curr_position + curr_action))}')
                     self.total_feedback += 1
                     self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
 
