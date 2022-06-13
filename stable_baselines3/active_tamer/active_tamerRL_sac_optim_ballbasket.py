@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import gym
 import numpy as np
-from sympy import I
 import torch as th
 from git import Object
 from torch.nn import functional as F
