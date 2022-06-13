@@ -38,8 +38,8 @@ class RealSawyerBallBasketEnv(Env):
         self.action_space = spaces.Box(
             # low=np.array([-0.25, -0.25, -0.25, -1.0]),
             # high=np.array([0.25, 0.25, 0.25, 1.0]),
-            low=np.array([-1.0, -1.0, -1.0, -1.0]),
-            high=np.array([1.0, 1.0, 1.0, 1.0]),
+            low=np.array([-1.0, -1.0, -2.0, -1.0]),
+            high=np.array([1.0, 1.0, 2.0, 1.0]),
     
             shape=(4,),
             dtype=np.float32)

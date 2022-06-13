@@ -665,7 +665,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                                 human_feedback.return_human_keyboard_feedback()
                             ) # stall till you get human feedback
                             # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
-                        human_reward = curr_keyboard_feedback
+                        human_reward = curr_keyboard_feedback * 5
                         self.total_feedback += 1
                         self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
                         # self.feedback_file.write(
