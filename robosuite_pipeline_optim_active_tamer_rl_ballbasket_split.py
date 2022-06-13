@@ -153,7 +153,7 @@ def main(args):
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[32, 32],
+        net_arch=[64, 64],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
