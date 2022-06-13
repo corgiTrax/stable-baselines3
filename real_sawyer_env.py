@@ -5,6 +5,7 @@ import argparse
 import sys
 import torch
 import time
+from playsound import playsound
 
 import pickle5 as pickle
 
@@ -35,8 +36,11 @@ class RealSawyerBallBasketEnv(Env):
 
         # define action space
         self.action_space = spaces.Box(
-            low=np.array([-0.25, -0.25, -0.25, -1.0]),
-            high=np.array([0.25, 0.25, 0.25, 1.0]),
+            # low=np.array([-0.25, -0.25, -0.25, -1.0]),
+            # high=np.array([0.25, 0.25, 0.25, 1.0]),
+            low=np.array([-1.0, -1.0, -1.0, -1.0]),
+            high=np.array([1.0, 1.0, 1.0, 1.0]),
+    
             shape=(4,),
             dtype=np.float32)
 
@@ -47,11 +51,14 @@ class RealSawyerBallBasketEnv(Env):
         self.driver = driver
 
         # max time steps
-        self.max_steps = 125
+        # self.max_steps = 125
+        self.max_steps = 100
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.3
+        # self.ctrl_scale = 0.2
+        self.ctrl_scale = 0.04
+        # self.ctrl_scale = 0.1
 
         # world origin (table center) = raw [0.7003086084665489, 0.15554348938582682, -0.016173555136203836]
         self.origin = np.array([0.7003, 0.1555, -0.0162]) # x,y = 0 at center of hoop. z=0 is gripper barely touching table
@@ -81,9 +88,9 @@ class RealSawyerBallBasketEnv(Env):
         self.y_lim = np.array([-0.160, 0.455]) - self.origin[1]
         """
 
-        self.workspace_xlim = np.array([0.430, 0.775]) - self.origin[0]
-        self.workspace_ylim = np.array([-0.105, 0.388]) - self.origin[1]
-        self.workspace_zlim = np.array([0.01, 0.39])- self.origin[2]
+        self.workspace_xlim = np.array([0.43, 0.800]) - self.origin[0]
+        self.workspace_ylim = np.array([-0.155, 0.450]) - self.origin[1]
+        self.workspace_zlim = np.array([0.01, 0.40])- self.origin[2]
 
         # no entry zone
         """
@@ -94,7 +101,7 @@ class RealSawyerBallBasketEnv(Env):
         """
         self.noentry_xlim = 0.53 - self.origin[0] # lower limit (upper limit is workspace limit)
         self.noentry_ylim = np.array([-0.024, 0.315]) - self.origin[1]
-        self.noentry_zlim = 0.21 - self.origin[2] # lower limit (upper limit is workspace limit)
+        self.noentry_zlim = 0.22 - self.origin[2] # lower limit (upper limit is workspace limit)
 
         # region above hoop
         """
@@ -103,7 +110,9 @@ class RealSawyerBallBasketEnv(Env):
         y low [0.7809624586, 0.0889054314911561, 0.23799245666]
         y high [0.60075, 0.230271532, 0.2329407]
         """
-        self.hoop_xlim = np.array([0.620, 0.765]) - self.origin[0]
+
+        # self.hoop_xlim = np.array([0.620, 0.765]) - self.origin[0]
+        self.hoop_xlim = np.array([0.604, 0.780]) - self.origin[0]
         self.hoop_ylim = np.array([0.0890, 0.229]) - self.origin[1]
         self.hoop_zlim = 0.21 - self.origin[2] # lower limit 
 
@@ -112,7 +121,13 @@ class RealSawyerBallBasketEnv(Env):
         
         # check ball is released (gripper is opened) above hoop
         if self._check_is_above_hoop() and self.gripper_state == -1:
-            return 100
+            return 1000
+
+        # elif self.gripper_state == 1 and not self._check_is_above_hoop():
+        #     return 10
+
+        # elif not self._check_is_above_hoop() and self.gripper_state == -1:
+        #     return -1
 
         return 0
 
@@ -136,37 +151,40 @@ class RealSawyerBallBasketEnv(Env):
     def step(self, action):
 
         # scale input to controller
-        sf = 1.5 # safety factor for boundary limit
+        sf_boundary = 1.3 # safety factor for boundary limit
+        sf_noentry = 1.15 # safety factor for noentry zone
         cur_action_weight = 1.0 # how much weight current action carries in interpolation (1 means no interpolation)
 
         # new_action = self.ctrl_scale * (cur_action_weight * action[:3] + (1 - cur_action_weight) * self.prev_action) / 2 # interpolation
         new_action = np.copy(action)
+        # print("action",action)
         new_action[:3] *= self.ctrl_scale
 
         # check workspace boundary condition
         eef_xpos = self.get_state()[:3]
-        print("eef_xpos", eef_xpos) #############################
-        x_in_bounds = self.workspace_xlim[0] < eef_xpos[0] + sf * new_action[0] < self.workspace_xlim[1]
-        y_in_bounds = self.workspace_ylim[0] < eef_xpos[1] + sf * new_action[1] < self.workspace_ylim[1]
-        z_in_bounds = self.workspace_zlim[0] < eef_xpos[2] + sf * new_action[2] < self.workspace_zlim[1]
+        # print("eef_xpos", eef_xpos) #############################
+        # print("new action", new_action)
+        x_in_bounds = self.workspace_xlim[0] < eef_xpos[0] + sf_boundary * new_action[0] < self.workspace_xlim[1]
+        y_in_bounds = self.workspace_ylim[0] < eef_xpos[1] + sf_boundary * new_action[1] < self.workspace_ylim[1]
+        z_in_bounds = self.workspace_zlim[0] < eef_xpos[2] + sf_boundary * new_action[2] < self.workspace_zlim[1]
         
         out_of_bounds = not x_in_bounds or not y_in_bounds or not z_in_bounds
 
         # check no entry zone
-        x_in_noentry =  self.noentry_xlim < eef_xpos[0] + sf * new_action[0]
-        y_in_noentry = self.noentry_ylim[0] < eef_xpos[1] + sf * new_action[1] < self.noentry_ylim[1]
-        z_in_noentry = eef_xpos[2] < self.noentry_zlim
+        x_in_noentry =  self.noentry_xlim < eef_xpos[0] + sf_noentry * new_action[0]
+        y_in_noentry = self.noentry_ylim[0] < eef_xpos[1] + sf_noentry * new_action[1] < self.noentry_ylim[1]
+        z_in_noentry = eef_xpos[2] + sf_noentry * new_action[2] < self.noentry_zlim
 
         in_no_entry = x_in_noentry and y_in_noentry and z_in_noentry
 
         if out_of_bounds:
             # if next action will send eef out of boundary, ignore the action
-            print("action out of bounds")
+            print(f"action out of bounds: {x_in_bounds} {y_in_bounds} {z_in_bounds}")
             new_action = np.zeros(self.action_dim)
 
         elif in_no_entry:
             # or if next action will send eef into no entry zone, ignore the action
-            print("not allowed in this area")
+            print(f"not allowed in this area: {x_in_noentry} {y_in_noentry} {z_in_noentry}")
             new_action = np.zeros(self.action_dim)
 
         # take gripper action
@@ -195,20 +213,31 @@ class RealSawyerBallBasketEnv(Env):
         if reward > 0:
             # task is completed
             print("---------COMPLETED TASK!-----------")
+            playsound("success.wav", block=False)
             done = True
+
+        # if reward == 100:
+        #     # task is completed
+        #     print("---------COMPLETED TASK!-----------")
+        #     playsound("success.wav", block=False)
+        #     done = True
 
         if self.steps > self.max_steps:
             # max steps is reached
             done = self.steps > self.max_steps # finish if reached maximum time steps
 
-        if self.gripper_state == -1 and not self._check_is_above_hoop():
-            # ball got dropped outside the hoop
-            print("--------DROPPED BALL...----------")
-            done = True
+        if self.gripper_state == -1:
+            print("Gripper opened")
+            if not self._check_is_above_hoop():
+                # ball got dropped outside the hoop
+                print("--------DROPPED BALL...----------")
+                # playsound("fail.wav", block=False)
+                done = True
 
         info = {}
         info['out_of_bounds'] = out_of_bounds
         info['in_noentry'] = in_no_entry
+        info['above_hoop'] = self._check_is_above_hoop()
 
         self.steps += 1
 
@@ -218,7 +247,9 @@ class RealSawyerBallBasketEnv(Env):
         return observation, reward, done, info
     
     def _step_to_home(self, action):
-        self.driver.step_axis(self.ctrl_scale * action)
+        # self.driver.step_axis(self.ctrl_scale * action)
+        self.driver.step_axis(self.ctrl_scale * 4 * action)
+
 
     def _move_to_initial_pos(self):
 
@@ -227,6 +258,7 @@ class RealSawyerBallBasketEnv(Env):
 
         # if in position with possible collision, first move up
         if self.get_state()[0] > self.noentry_xlim:
+            # print("WAYPOINT RESET")
             waypoint = self.get_state()
             waypoint[2] = 0.3
             vec = waypoint - self.get_state()
@@ -237,10 +269,7 @@ class RealSawyerBallBasketEnv(Env):
 
         # move to home position
         vec = self.init_state - self.get_state()
-        while (abs(vec[0]) > thresh or abs(vec[1] > thresh or abs(vec[2] > thresh))):
-            print("vec", vec)
-            print("init_state", self.init_state)
-            print("eef_xpos", self.get_state())
+        while (abs(vec[0]) > thresh or abs(vec[1]) > thresh or abs(vec[2]) > thresh):
             # action = self.init_state - self.get_state()[:3] # vector from current to initial position
             self._step_to_home(vec[:3]) # ignore boundary when reseting to make sure robo can return to home position
             vec = self.init_state - self.get_state()
@@ -262,18 +291,20 @@ class RealSawyerBallBasketEnv(Env):
         self.gripper_state = 1
 
         # random initialization
-        if self.random_init: 
-            action_y = np.random.uniform(-0.25, 0.25, 1)
-            action_z = np.random.uniform(-0.1, 0.065, 1)
-            random_action = np.array([0, action_y[0], action_z[0], 1])
+        if self.random_init:
+            # action_y = np.random.uniform(-0.15, 0.15, 1)
+            # action_z = np.random.uniform(-0.1, 0.065, 1) 
+            action_y = np.random.uniform(-0.75, 0.75, 1)
+            # action_z = np.random.uniform(-0.5, 0.325, 1) 
+            random_action = np.array([0.02, action_y[0], -0.5, 1]) # random initializaation in y only (fixed x-home and fixed z-below hoop)
+            print("Random Init Action", random_action)
             for i in range(7):
-                print("random action", random_action)
                 observation, _, _, _ = self.step(random_action)
 
         self.steps = 0
 
-        print("--------------Finished Resetting. Starting in 2 sec-----------")
-        time.sleep(2)
+        print("--------------Finished Resetting. Starting in 1 sec-----------")
+        time.sleep(1)
 
         return observation
 

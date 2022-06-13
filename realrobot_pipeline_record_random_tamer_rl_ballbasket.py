@@ -22,7 +22,7 @@ import argparse
 # perls2 library path
 sys.path.insert(1, '/home/robot/perls2')
 
-from stable_baselines3.active_tamer.tamerRL_sac_record_robot_stop_for_feedback import (
+from stable_baselines3.active_tamer.tamerRL_sac_record_robot_ballbasket import (
     TamerRLSACRecordStop,
 )
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -36,15 +36,15 @@ from robosuite import wrappers
 from robosuite import load_controller_config
 
 # For physical robot
-from real_sawyer_env import RealSawyerReachingEnv
-from demos.sawyer_osc_2d import OpSpaceLineXYZ
+from real_sawyer_env import RealSawyerBallBasketEnv
+from demos.sawyer_osc_3d import OpSpaceLineXYZ
 
-class ReachingSceneGraph:
-    agent = {'location': {'x': 0, 'y': 0}}
+class BallBasketSceneGraph:
+    agent = {'location': {'x': 0, 'y': 0, 'z': 0, 'g': 0}}
     num_feedback_given = collections.Counter()
     aRPE_average = collections.Counter()
     curr_graph = None
-    total_feedback = 250000 #200000 for frequency based scene graph
+    total_feedback = 50000 #200000 for frequency based scene graph
     given_feedback = 0
     total_timesteps = 0
     
@@ -78,6 +78,22 @@ class ReachingSceneGraph:
     def bottom(self, obj_a):
         return obj_a['location']['y'] > 0.125
     
+    
+    def above(self, obj_a):
+        return obj_a['location']['z'] > 0.875
+    
+    def below(self, obj_a):
+        return obj_a['location']['z'] < 0.875
+
+    
+    def gripper_open(self, obj_a):
+        return obj_a['location']['g'] > 0
+    
+    def gripper_close(self, obj_a):
+        return obj_a['location']['g'] < 0
+
+    # add a state of gripper open/close
+    
 
     def updateRPE(self, human_feedback, human_critic_prediction):
         self.num_feedback_given[tuple(self.curr_graph)] += 1
@@ -87,13 +103,14 @@ class ReachingSceneGraph:
 
     def getCurrGraph(self):
         self.curr_graph = [self.right(self.agent), self.center(self.agent), self.left(self.agent), self.top(self.agent), 
-                            self.middle(self.agent), self.bottom(self.agent)]
+                            self.middle(self.agent), self.bottom(self.agent), self.above(self.agent), self.below(self.agent),
+                            self.gripper_open(self.agent), self.gripper_close(self.agent)]
         
         return self.curr_graph
         
     def updateGraph(self, newState, action):
         prev_graph = copy.deepcopy(self.curr_graph)
-        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1]}
+        self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][2], 'g': newState[0][3]}
         self.total_timesteps += 1
         return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4
 
@@ -108,8 +125,8 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
     )
     print(f"After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}")
 
-def main(args):
-    with open("configs/robosuite/tamer_sac_record_robot.yaml", "r") as f:
+def main():
+    with open("configs/real_robot/tamer_sac_record_robot.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
@@ -117,7 +134,7 @@ def main(args):
     # Environment Initialization #
     parser = argparse.ArgumentParser(
         description="Test controllers and measure errors.")
-    parser.add_argument('--world', default='Real', help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
+    parser.add_argument('--world', default=None, help='World type for the demo, uses config file if not specified', choices=['Bullet', 'Real'])
     parser.add_argument('--robot', default='sawyer', help='Robot type overrides config', choices=['panda', 'sawyer'])
     parser.add_argument('--ctrl_type',
                         default="EEImpedance",
@@ -132,7 +149,7 @@ def main(args):
     parser.add_argument('--path_length', type=float,
                         default=None, help='length in m of path')
     parser.add_argument('--delta_val',
-                        default=[0.001, 0.001], type=float,
+                        default=[0.001, 0.001, 0.001], type=float,
                         help="Max step size (m or rad) to take for demo.")
     parser.add_argument('--axis',
                         default='x', type=str,
@@ -161,11 +178,8 @@ def main(args):
 
     driver = OpSpaceLineXYZ(**kwargs)
 
-    env = RealSawyerReachingEnv(driver)    
+    env = RealSawyerBallBasketEnv(driver)    
 
-    # env.viewer.set_camera(camera_id=1)
-    # env.reset()
-    # env.render()
     import time
     time.sleep(1)
 
@@ -175,7 +189,7 @@ def main(args):
     np.set_printoptions(threshold=np.inf)
 
     policy_kwargs = dict(
-        net_arch=[64, 64],
+        net_arch=[128, 128],
     )
     os.makedirs(tensorboard_log_dir, exist_ok=True)
 
@@ -216,7 +230,7 @@ def main(args):
         experiment_save_dir=config_data['human_data_save_path'],
         render=True,
         trained_model=None,
-        scene_graph=ReachingSceneGraph(),
+        scene_graph=BallBasketSceneGraph(),
         percent_feedback=config_data['percent_feedback'],
         credit_assignment=config_data['credit_assignment'],
     )
@@ -245,9 +259,10 @@ def main(args):
 
 
 if __name__ == "__main__":
-    msg = "Overwrite config params"
-    parser = argparse.ArgumentParser(description = msg)
-    parser.add_argument("--seed", type=int, default=None)
+    # msg = "Overwrite config params"
+    # parser = argparse.ArgumentParser(description = msg)
+    # parser.add_argument("--seed", type=int, default=None)
 
-    args = parser.parse_args()
-    main(args)
+    # args = parser.parse_args()
+    # main(args)
+    main()

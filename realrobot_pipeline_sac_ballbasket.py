@@ -16,7 +16,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import yaml
 
-from stable_baselines3.sac.sac_record_robot import SACRecord # CHANGED
+from stable_baselines3.sac.sac_record_robot_ballbasket import SACRecord # CHANGED
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
@@ -100,7 +100,8 @@ def main():
 
     driver = OpSpaceLineXYZ(**kwargs)
 
-    env = RealSawyerBallBasketEnv(driver)
+    # env = RealSawyerBallBasketEnv(driver, random_init=False)
+    env = RealSawyerBallBasketEnv(driver, random_init=True)
 
     np.set_printoptions(threshold=np.inf)
 

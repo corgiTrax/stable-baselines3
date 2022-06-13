@@ -228,7 +228,7 @@ def redis_ctrl(env):
         prev_action = np.zeros(4)
 
         while True:
-            # print("raw", env.driver.get_eef_xyz())
+            print("raw", env.driver.get_eef_xyz())
             action = r.get(ACTION_KEY)
 
             if action != prev_action:
@@ -253,10 +253,11 @@ if __name__ == "__main__":
 
     np.random.seed(42)
     env = init_env(task=2, random_init=True)
-    for i in range(5):
-        env.step(np.array([0.15, 0, 0.1, 0]))
+    # for i in range(5):
+    #     env.step(np.array([0.15, 0, 0.1, 0]))
 
-    env.reset()
+    for i in range(10):
+        env.reset()
 
     # env.step(np.array([0, 0, 0.2, 0]))
     # env.step(np.array([0, 0, 0.2, 0]))

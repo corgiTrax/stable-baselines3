@@ -1,0 +1,1178 @@
+Current timestep = 0. State = [[-0.23538645 -0.00554951  0.24757789  1.        ]]. Action = [[ 0.67526174 -0.29347336  0.8604927   0.00108552]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 0 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 0 is tensor(0.3909, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 0 of 1
+Current timestep = 1. State = [[-0.22009626 -0.01488687  0.2701071   1.        ]]. Action = [[-0.5950494   0.05286765 -0.1839732   0.49449182]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 1 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 1 is tensor(0.3762, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 1 of -1
+Current timestep = 2. State = [[-0.22898918 -0.01257635  0.2670371   1.        ]]. Action = [[-0.97113293  0.68047535  0.8616452   0.14713812]]. Reward = [0.]
+Curr episode timestep = 2
+Action ignored: Workspace boundary
+Scene graph at timestep 2 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 2 is tensor(0.3470, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 2 of -1
+Current timestep = 3. State = [[-0.25032613  0.00231272  0.2324493   1.        ]]. Action = [[-0.67394847  0.44764888 -0.6831022  -0.7500283 ]]. Reward = [0.]
+Curr episode timestep = 3
+Current timestep = 4. State = [[-0.2506487   0.00171287  0.23085813  1.        ]]. Action = [[-0.52113116 -0.16712534 -0.3016106  -0.5833618 ]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 4 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 4 is tensor(0.2804, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 4 of 0
+Current timestep = 5. State = [[-0.25076523  0.0013282   0.23056918  1.        ]]. Action = [[-0.7929256   0.23672497 -0.01271391  0.22829843]]. Reward = [0.]
+Curr episode timestep = 1
+Action ignored: Workspace boundary
+Scene graph at timestep 5 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 5 is tensor(0.2687, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 5 of 0
+Current timestep = 6. State = [[-0.25076523  0.0013282   0.23056918  1.        ]]. Action = [[-0.5672788  -0.9292522   0.06770635 -0.7183373 ]]. Reward = [0.]
+Curr episode timestep = 2
+Action ignored: Workspace boundary
+Scene graph at timestep 6 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 6 is tensor(0.2082, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 6 of 0
+Current timestep = 7. State = [[-0.25076523  0.0013282   0.23056918  1.        ]]. Action = [[-0.78236014 -0.9764168  -0.7665512  -0.34062147]]. Reward = [0.]
+Curr episode timestep = 3
+Action ignored: Workspace boundary
+Scene graph at timestep 7 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 7 is tensor(0.1945, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 7 of 0
+Current timestep = 8. State = [[-0.25076523  0.0013282   0.23056918  1.        ]]. Action = [[-0.80585045 -0.4483471  -0.07642353 -0.4553498 ]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: Workspace boundary
+Scene graph at timestep 8 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 8 is tensor(0.1823, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 8 of 0
+Current timestep = 9. State = [[-0.2505478   0.00243828  0.23246491  1.        ]]. Action = [[ 0.18155551 -0.6273516  -0.59603775 -0.7871845 ]]. Reward = [0.]
+Curr episode timestep = 5
+Current timestep = 10. State = [[-0.23533662  0.00170071  0.23293445  1.        ]]. Action = [[ 0.90946114  0.12552035 -0.20497745  0.29881287]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 10 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 10 is tensor(0.1278, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 10 of 1
+Current timestep = 11. State = [[-0.200519    0.00283691  0.23099643  1.        ]]. Action = [[ 0.68448496 -0.03193784  0.0692637   0.64296067]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 11 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 11 is tensor(0.1141, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 11 of 1
+Current timestep = 12. State = [[-0.25122416  0.00237876  0.23222741  1.        ]]. Action = [[ 0.6758864  0.9775299  0.5250964 -0.8560611]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 13. State = [[-0.2520783   0.00148063  0.23235291  1.        ]]. Action = [[-0.619878   -0.5006815   0.18296194  0.82255745]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 13 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 13 is tensor(0.0830, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 13 of -1
+Current timestep = 14. State = [[-0.25295016 -0.00334875  0.24417137  1.        ]]. Action = [[-0.14233845 -0.18827277  0.9149525   0.7305943 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 14 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 14 is tensor(0.0584, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 14 of 0
+Current timestep = 15. State = [[-0.25102037  0.00248481  0.23231182  1.        ]]. Action = [[ 0.6476505   0.922611   -0.05628449 -0.13080227]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 16. State = [[-0.24044518 -0.00951832  0.24401647  1.        ]]. Action = [[ 0.35783827 -0.62411475  0.87069464  0.98837304]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 16 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 16 is tensor(0.0318, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 16 of 1
+Current timestep = 17. State = [[-0.22044748 -0.01499179  0.25620428  1.        ]]. Action = [[ 0.925899   0.6073793 -0.9184327  0.0937804]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 17 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 17 is tensor(0.0357, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 17 of 1
+Current timestep = 18. State = [[-0.2510679   0.00222288  0.2324456   1.        ]]. Action = [[-0.47975206  0.27699256 -0.20715857 -0.67542315]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 19. State = [[-0.25121245  0.00233137  0.23245923  1.        ]]. Action = [[-0.8303259  -0.86116093  0.23350978  0.0215956 ]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 19 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 19 is tensor(0.0235, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 19 of -1
+Current timestep = 20. State = [[-0.25079     0.00214965  0.23357382  1.        ]]. Action = [[-0.2019192  -0.85263556  0.40492988 -0.419477  ]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 21. State = [[-0.24412575 -0.00400757  0.24318422  1.        ]]. Action = [[ 0.3348441  -0.23923129  0.7265949   0.95937216]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 21 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 21 is tensor(0.0205, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 21 of 1
+Current timestep = 22. State = [[-0.23802915  0.00290426  0.25951663  1.        ]]. Action = [[-0.10475439  0.81225705  0.08201718  0.26669955]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 22 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 22 is tensor(0.0425, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 22 of -1
+Current timestep = 23. State = [[-0.2507864   0.00257113  0.23265621  1.        ]]. Action = [[ 0.5819155 -0.5157874 -0.7795162 -0.3554443]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 24. State = [[-2.5096354e-01  7.4898300e-04  2.3272790e-01  1.0000000e+00]]. Action = [[-0.82709867  0.8719505  -0.04806072 -0.17956138]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 24 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 24 is tensor(0.0353, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 24 of 0
+Current timestep = 25. State = [[-0.2487319  -0.01143191  0.24459472  1.        ]]. Action = [[ 0.11655736 -0.51335263  0.97767496  0.5485624 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 25 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 25 is tensor(0.0233, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 25 of 1
+Current timestep = 26. State = [[-0.24478212 -0.02528661  0.26130792  1.        ]]. Action = [[ 0.63811684  0.04956019 -0.58984756  0.24069   ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 26 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 26 is tensor(0.0428, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 26 of 1
+Current timestep = 27. State = [[-0.25119674  0.00240791  0.2322246   1.        ]]. Action = [[-0.49582517  0.39322042  0.7358148  -0.441625  ]]. Reward = [0.]
+Curr episode timestep = 3
+Current timestep = 28. State = [[-0.25137258  0.00264288  0.23215899  1.        ]]. Action = [[-0.36607277 -0.34713018  0.04210174  0.9385364 ]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 28 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 28 is tensor(0.0462, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 28 of -1
+Current timestep = 29. State = [[-0.25503644 -0.0121416   0.22520521  1.        ]]. Action = [[-0.25363362 -0.77290684 -0.5057965   0.8164178 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 29 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 29 is tensor(0.0431, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 29 of -1
+Current timestep = 30. State = [[-0.2506196  -0.03254365  0.2120323   1.        ]]. Action = [[ 0.80435586  0.01645184 -0.22438955  0.33933282]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 30 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 30 is tensor(0.0632, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 30 of 0
+Current timestep = 31. State = [[-0.21676189 -0.03325876  0.21238813  1.        ]]. Action = [[0.93361926 0.05228114 0.83918357 0.25987053]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 31 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 31 is tensor(0.0549, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 31 of 1
+Current timestep = 32. State = [[-0.18803777 -0.03317947  0.23038483  1.        ]]. Action = [[0.3630538  0.50434005 0.05023658 0.7671504 ]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: No entry zone
+Scene graph at timestep 32 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 32 is tensor(0.0706, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 32 of 0
+Current timestep = 33. State = [[-0.25119072  0.00234881  0.23225987  1.        ]]. Action = [[-0.4133402   0.40251684  0.9242617  -0.712339  ]]. Reward = [0.]
+Curr episode timestep = 5
+Current timestep = 34. State = [[-0.25162306  0.00120609  0.23235472  1.        ]]. Action = [[-0.4278503  -0.71099204 -0.87629277 -0.81798506]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 34 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 34 is tensor(0.0584, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 34 of -1
+Current timestep = 35. State = [[-0.24694535 -0.01426345  0.23557335  1.        ]]. Action = [[ 0.43538237 -0.75857556  0.2160101   0.8180826 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 35 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 35 is tensor(0.0726, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 35 of 1
+Current timestep = 36. State = [[-0.24161884 -0.03352228  0.24058929  1.        ]]. Action = [[-0.50870794  0.3296944   0.8112906   0.72964644]]. Reward = [0.]
+Curr episode timestep = 2
+Action ignored: Workspace boundary
+Scene graph at timestep 36 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 36 is tensor(0.0708, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 36 of -1
+Current timestep = 37. State = [[-0.23958309 -0.05375271  0.23455507  1.        ]]. Action = [[ 0.17646527 -0.9976884  -0.570877    0.3207804 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 37 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 37 is tensor(0.0752, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 37 of 1
+Current timestep = 38. State = [[-0.25019562  0.00265277  0.23260349  1.        ]]. Action = [[-0.00324345 -0.8041851  -0.18227226 -0.36654305]]. Reward = [0.]
+Curr episode timestep = 4
+Current timestep = 39. State = [[-0.25065923  0.00240818  0.23365158  1.        ]]. Action = [[ 0.50668263 -0.32503188  0.61350083 -0.8044482 ]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 40. State = [[-0.23826136 -0.0079606   0.23099253  1.        ]]. Action = [[ 0.92141247 -0.51421696 -0.20130008  0.0838567 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 40 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 40 is tensor(0.0828, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 40 of 1
+Current timestep = 41. State = [[-0.22554822 -0.01251989  0.21826905  1.        ]]. Action = [[-0.45614713  0.4847188  -0.4502201   0.980747  ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 41 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 41 is tensor(0.0843, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 41 of -1
+Current timestep = 42. State = [[-0.25070706  0.00241588  0.23247716  1.        ]]. Action = [[-0.04748601 -0.3876639  -0.44575477 -0.4795137 ]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 43. State = [[-0.24211259  0.00177279  0.2253666   1.        ]]. Action = [[ 0.95957994  0.12687254 -0.80386907  0.41921377]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 43 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 43 is tensor(0.0826, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 43 of 1
+Current timestep = 44. State = [[-0.25052673  0.0024999   0.23251091  1.        ]]. Action = [[ 0.65881515 -0.69585663 -0.62747884 -0.35405672]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 45. State = [[-0.2511124   0.00236141  0.23225583  1.        ]]. Action = [[ 0.79006207  0.9005947   0.56536996 -0.72475684]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 46. State = [[-0.25103813  0.00242411  0.22194265  1.        ]]. Action = [[ 0.02569664  0.02855301 -0.8243829   0.38981318]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 46 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 46 is tensor(0.0991, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 46 of -1
+Current timestep = 47. State = [[-0.25080228  0.00252502  0.23237626  1.        ]]. Action = [[ 0.07875299 -0.36807954  0.66059804 -0.24315989]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 48. State = [[-0.25135592  0.00227326  0.23216559  1.        ]]. Action = [[ 0.80354595  0.7238667   0.4889264  -0.6923226 ]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 49. State = [[-0.24807496 -0.00764998  0.23607144  1.        ]]. Action = [[ 0.12770653 -0.47647965  0.41881943  0.6446717 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 49 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 49 is tensor(0.1074, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 49 of 1
+Current timestep = 50. State = [[-0.2506737   0.00244881  0.23265934  1.        ]]. Action = [[ 0.82428956 -0.6074844  -0.28312194 -0.49178147]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 51. State = [[-0.2507631   0.00240813  0.23244064  1.        ]]. Action = [[-0.22769624 -0.7796345  -0.39966518 -0.3678221 ]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 52. State = [[-0.24183232 -0.01088105  0.23861577  1.        ]]. Action = [[ 0.55342746 -0.6260439   0.5472388   0.18290126]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 52 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 52 is tensor(0.1071, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 52 of 1
+Current timestep = 53. State = [[-0.21117653 -0.03133246  0.26264372  1.        ]]. Action = [[ 0.96349883 -0.11681187  0.6738119   0.12332213]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 53 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 53 is tensor(0.1039, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 53 of 1
+Current timestep = 54. State = [[-0.25112143  0.0023033   0.2324478   1.        ]]. Action = [[-0.23843944  0.77199936 -0.7437988  -0.17712396]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 55. State = [[-2.4080700e-01 -4.8834708e-04  2.4541904e-01  1.0000000e+00]]. Action = [[ 0.6555201  -0.15242791  0.9381838   0.7945385 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 55 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 55 is tensor(0.1012, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 55 of 1
+Current timestep = 56. State = [[-0.22631226 -0.00419404  0.26467395  1.        ]]. Action = [[-0.798701   0.4567076  0.6872306  0.8260081]]. Reward = [0.]
+Curr episode timestep = 1
+Action ignored: Workspace boundary
+Scene graph at timestep 56 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 56 is tensor(0.0993, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 56 of 0
+Current timestep = 57. State = [[-0.22686872 -0.01255546  0.2785582   1.        ]]. Action = [[-0.19809598 -0.3957708   0.9011979   0.7877004 ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 57 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 57 is tensor(0.1110, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 57 of 0
+Current timestep = 58. State = [[-0.25119787  0.00242496  0.23225178  1.        ]]. Action = [[ 0.24812496 -0.8324338  -0.46079367 -0.6897832 ]]. Reward = [0.]
+Curr episode timestep = 3
+Current timestep = 59. State = [[-0.25111538  0.00280799  0.23224455  1.        ]]. Action = [[ 0.91848254  0.3931582   0.8873385  -0.24613124]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 60. State = [[-0.25122818  0.00185705  0.23222715  1.        ]]. Action = [[-0.7217428  -0.57103145 -0.08563381  0.88680434]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 60 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 60 is tensor(0.1156, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 60 of -1
+Current timestep = 61. State = [[-0.25054148  0.00278195  0.2325495   1.        ]]. Action = [[ 0.6339859  -0.8590806   0.32295585 -0.19901025]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 62. State = [[-0.23820145 -0.00634981  0.22763328  1.        ]]. Action = [[ 0.86480415 -0.32802677 -0.45720416  0.5764973 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 62 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 62 is tensor(0.1170, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 62 of 1
+Current timestep = 63. State = [[-0.25054058  0.00230083  0.2323823   1.        ]]. Action = [[-0.5561248   0.7554748  -0.26443923 -0.3642264 ]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 64. State = [[-0.23991057  0.00938753  0.23824833  1.        ]]. Action = [[0.86518455 0.3856721  0.34389973 0.833246  ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 64 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 64 is tensor(0.1211, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 64 of 1
+Current timestep = 65. State = [[-0.23149882  0.02222684  0.23869443  1.        ]]. Action = [[-0.35468507  0.2342416  -0.6473408   0.6899135 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 65 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 65 is tensor(0.1209, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 65 of -1
+Current timestep = 66. State = [[-0.25039282  0.00234609  0.2324531   1.        ]]. Action = [[ 0.10056138  0.9270922  -0.32114673 -0.07377642]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 67. State = [[-0.24512671  0.01686383  0.22903347  1.        ]]. Action = [[ 0.6492212   0.6614733  -0.4108206   0.95589805]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 67 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 67 is tensor(0.1175, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 67 of 1
+Current timestep = 68. State = [[-0.21847674  0.03457334  0.22028953  1.        ]]. Action = [[ 0.8194318   0.14059651 -0.09524924  0.30504072]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 68 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 68 is tensor(0.1330, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 68 of 1
+Current timestep = 69. State = [[-0.19079374  0.03934063  0.21276642  1.        ]]. Action = [[ 0.6655834  -0.22319937  0.04106748  0.7779734 ]]. Reward = [0.]
+Curr episode timestep = 2
+Action ignored: No entry zone
+Scene graph at timestep 69 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 69 is tensor(0.1359, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 69 of 0
+Current timestep = 70. State = [[-0.1992238   0.02443146  0.21511662  1.        ]]. Action = [[-0.96910274 -0.8776788   0.3357612   0.46541965]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 70 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 70 is tensor(0.1114, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 70 of -1
+Current timestep = 71. State = [[-0.21865985  0.00249251  0.22060724  1.        ]]. Action = [[ 0.98789406 -0.03984433 -0.8966211   0.73999023]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: No entry zone
+Scene graph at timestep 71 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 71 is tensor(0.1142, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 71 of 0
+Current timestep = 72. State = [[-0.22633682 -0.01092452  0.23299754  1.        ]]. Action = [[-0.6106347  -0.6093832   0.79228854  0.85622   ]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 72 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 72 is tensor(0.1174, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 72 of -1
+Current timestep = 73. State = [[-0.24597947 -0.0331699   0.25180873  1.        ]]. Action = [[ 0.5238383  -0.34669733 -0.8776736   0.5490383 ]]. Reward = [0.]
+Curr episode timestep = 6
+Scene graph at timestep 73 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 73 is tensor(0.1230, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 73 of 0
+Current timestep = 74. State = [[-0.23940088 -0.03996636  0.22967911  1.        ]]. Action = [[-0.57837     0.5754689  -0.00449818  0.2764982 ]]. Reward = [0.]
+Curr episode timestep = 7
+Action ignored: Workspace boundary
+Scene graph at timestep 74 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 74 is tensor(0.1335, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 74 of 0
+Current timestep = 75. State = [[-0.23181939 -0.03545468  0.224233    1.        ]]. Action = [[ 0.60999537  0.33537436 -0.38508046  0.50929916]]. Reward = [0.]
+Curr episode timestep = 8
+Scene graph at timestep 75 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 75 is tensor(0.1295, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 75 of 1
+Current timestep = 76. State = [[-0.21230812 -0.02922517  0.20949294  1.        ]]. Action = [[ 0.8973025  -0.8264377  -0.22569907  0.63006425]]. Reward = [0.]
+Curr episode timestep = 9
+Action ignored: No entry zone
+Scene graph at timestep 76 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 76 is tensor(0.1105, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 76 of 0
+Current timestep = 77. State = [[-0.21472505 -0.04734764  0.20867316  1.        ]]. Action = [[-0.3677231  -0.9748562  -0.12808067  0.20388436]]. Reward = [0.]
+Curr episode timestep = 10
+Scene graph at timestep 77 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 77 is tensor(0.1207, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 77 of -1
+Current timestep = 78. State = [[-0.22015084 -0.09013122  0.20751484  1.        ]]. Action = [[-0.09618747 -0.95796144 -0.13151073  0.7119825 ]]. Reward = [0.]
+Curr episode timestep = 11
+Scene graph at timestep 78 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 78 is tensor(0.1189, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 78 of -1
+Current timestep = 79. State = [[-0.24993175  0.00250285  0.23268226  1.        ]]. Action = [[ 0.59466696 -0.3013491  -0.6399755  -0.14573717]]. Reward = [0.]
+Curr episode timestep = 12
+Current timestep = 80. State = [[-0.25137895  0.00251738  0.23215808  1.        ]]. Action = [[ 0.99544024 -0.49265313  0.67266893 -0.5114712 ]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 81. State = [[-0.24052419 -0.01118432  0.24122664  1.        ]]. Action = [[ 0.58939755 -0.69152975  0.73884964  0.8012874 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 81 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 81 is tensor(0.1033, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 81 of 1
+Current timestep = 82. State = [[-0.21519835 -0.04584641  0.25555903  1.        ]]. Action = [[ 0.7202754  -0.71452934 -0.35170746  0.8655741 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 82 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 82 is tensor(0.0929, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 82 of 1
+Current timestep = 83. State = [[-0.18681833 -0.05594782  0.25685441  1.        ]]. Action = [[0.48972082 0.4857248  0.4035449  0.05769396]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 83 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 83 is tensor(0.1196, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 83 of 1
+Current timestep = 84. State = [[-0.17957635 -0.05588552  0.2689271   1.        ]]. Action = [[-0.7971087  -0.43415356  0.08244586  0.8191018 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 84 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 84 is tensor(0.1013, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 84 of -1
+Current timestep = 85. State = [[-0.25079152  0.00249605  0.23253089  1.        ]]. Action = [[ 0.50947475  0.75669885  0.32176304 -0.4615994 ]]. Reward = [0.]
+Curr episode timestep = 4
+Current timestep = 86. State = [[-0.2507167   0.00260018  0.23264258  1.        ]]. Action = [[ 0.17598963 -0.6866155   0.175928   -0.54259014]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 87. State = [[-0.25064847  0.00225728  0.23381244  1.        ]]. Action = [[-0.30454218 -0.5144756   0.62535715 -0.6248638 ]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 88. State = [[-0.23898543 -0.0121392   0.26267347  1.        ]]. Action = [[0.86301064 0.23302484 0.733788   0.78368723]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 88 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 88 is tensor(0.0870, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 88 of 1
+Current timestep = 89. State = [[-0.25110888  0.00222287  0.23229401  1.        ]]. Action = [[ 0.25936615 -0.8818776  -0.45297587 -0.7002809 ]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 90. State = [[-0.23480396 -0.01156859  0.24201792  1.        ]]. Action = [[ 0.9467437  -0.64834833  0.830632    0.48949802]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 90 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 90 is tensor(0.0852, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 90 of 1
+Current timestep = 91. State = [[-0.19453673 -0.03760646  0.278368    1.        ]]. Action = [[ 0.8546579  -0.36240268  0.98210716  0.90099406]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 91 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 91 is tensor(0.0812, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 91 of 1
+Current timestep = 92. State = [[-0.25066957  0.00270957  0.23267668  1.        ]]. Action = [[ 0.78177404  0.13148046 -0.18013972 -0.08556068]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 93. State = [[-0.2477749  -0.00162445  0.2437088   1.        ]]. Action = [[ 0.33416212 -0.17646527  0.95155144  0.8720796 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 93 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 93 is tensor(0.0907, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 93 of 1
+Current timestep = 94. State = [[-0.23481417 -0.01197586  0.2817471   1.        ]]. Action = [[ 0.6792793 -0.2829101  0.8766546  0.8968322]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 94 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 94 is tensor(0.0921, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 94 of 1
+Current timestep = 95. State = [[-0.21461022 -0.03276811  0.3245827   1.        ]]. Action = [[-0.2268368  -0.6480846   0.7850864   0.93195224]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 95 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 95 is tensor(0.0989, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 95 of 1
+Current timestep = 96. State = [[-0.20717004 -0.06806048  0.37000465  1.        ]]. Action = [[ 0.70814466 -0.74529904  0.7781298   0.76110816]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 96 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 96 is tensor(0.1024, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 96 of 0
+Current timestep = 97. State = [[-0.18832794 -0.09717431  0.38746148  1.        ]]. Action = [[ 0.37732363 -0.43705857 -0.96527684  0.47850597]]. Reward = [0.]
+Curr episode timestep = 4
+Scene graph at timestep 97 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 97 is tensor(0.1152, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 97 of 0
+Current timestep = 98. State = [[-0.250633    0.00255406  0.23267367  1.        ]]. Action = [[-0.7990445   0.66713166  0.9368861  -0.02584529]]. Reward = [0.]
+Curr episode timestep = 5
+Current timestep = 99. State = [[-0.2459422   0.00420447  0.22285798  1.        ]]. Action = [[ 0.8156202   0.10863686 -0.6829522   0.83772707]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 99 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 99 is tensor(0.1041, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 99 of 0
+Current timestep = 100. State = [[-0.2504763   0.00226835  0.23239692  1.        ]]. Action = [[ 0.614553   -0.9756221   0.45101476 -0.5733974 ]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 101. State = [[-0.24156849  0.00111532  0.2264468   1.        ]]. Action = [[ 0.8838508   0.05085504 -0.7417202   0.9109117 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 101 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 101 is tensor(0.1041, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 101 of 1
+Current timestep = 102. State = [[-0.2506714   0.00230179  0.23243822  1.        ]]. Action = [[-0.50196296  0.5316386  -0.8716092  -0.7337731 ]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 103. State = [[-0.25076172  0.00233092  0.23256026  1.        ]]. Action = [[-0.38358963  0.5159879  -0.08218533  0.66512203]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 103 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 103 is tensor(0.1206, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 103 of -1
+Current timestep = 104. State = [[-0.25076637  0.00227597  0.23256235  1.        ]]. Action = [[-0.83616006 -0.9034555  -0.22823513  0.86120415]]. Reward = [0.]
+Curr episode timestep = 1
+Action ignored: Workspace boundary
+Scene graph at timestep 104 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 104 is tensor(0.1070, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 104 of -1
+Current timestep = 105. State = [[-0.25229323 -0.01054131  0.23708633  1.        ]]. Action = [[-0.2610531  -0.6301671   0.32911265  0.75034106]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 105 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 105 is tensor(0.1231, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 105 of 0
+Current timestep = 106. State = [[-0.2508771   0.00255523  0.23243909  1.        ]]. Action = [[ 0.5757611   0.10581017 -0.53552717 -0.76732314]]. Reward = [0.]
+Curr episode timestep = 3
+Current timestep = 107. State = [[-0.24836099  0.00220559  0.23072663  1.        ]]. Action = [[-0.33364093 -0.8789281   0.9109278   0.9425938 ]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 107 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 107 is tensor(0.1033, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 107 of 0
+Current timestep = 108. State = [[-0.23661366  0.01702929  0.22611952  1.        ]]. Action = [[ 0.86111546  0.880689   -0.41615367  0.8159168 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 108 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 108 is tensor(0.1097, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 108 of 1
+Current timestep = 109. State = [[-0.20897044  0.0366086   0.21050064  1.        ]]. Action = [[ 0.87448454  0.5862858  -0.7680855   0.62109864]]. Reward = [0.]
+Curr episode timestep = 2
+Action ignored: No entry zone
+Scene graph at timestep 109 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 109 is tensor(0.1125, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 109 of 0
+Current timestep = 110. State = [[-0.21252877  0.03261049  0.20120327  1.        ]]. Action = [[-0.27800786 -0.35917032 -0.8365218   0.8038609 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 110 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 110 is tensor(0.1229, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 110 of -1
+Current timestep = 111. State = [[-0.2137531   0.02654114  0.17324379  1.        ]]. Action = [[ 0.93340385 -0.00641125  0.8362601   0.95764303]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: No entry zone
+Scene graph at timestep 111 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 111 is tensor(0.1121, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 111 of -1
+Current timestep = 112. State = [[-0.2041239   0.01290867  0.18471557  1.        ]]. Action = [[ 0.5247116 -0.6157344  0.9737303  0.7939882]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 112 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 112 is tensor(0.1114, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 112 of 1
+Current timestep = 113. State = [[-0.19339949 -0.00339316  0.20171055  1.        ]]. Action = [[0.71212816 0.05189145 0.09968555 0.96278095]]. Reward = [0.]
+Curr episode timestep = 6
+Action ignored: No entry zone
+Scene graph at timestep 113 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 113 is tensor(0.1228, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 113 of 0
+Current timestep = 114. State = [[-0.1924249 -0.0042304  0.2024282  1.       ]]. Action = [[ 0.6222495  -0.38814163 -0.15520114  0.54570055]]. Reward = [0.]
+Curr episode timestep = 7
+Action ignored: No entry zone
+Scene graph at timestep 114 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 114 is tensor(0.1281, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 114 of 0
+Current timestep = 115. State = [[-0.19201133 -0.00436816  0.202647    1.        ]]. Action = [[ 0.9759109   0.41880655 -0.8208411   0.03022003]]. Reward = [0.]
+Curr episode timestep = 8
+Action ignored: No entry zone
+Scene graph at timestep 115 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 115 is tensor(0.1067, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 115 of 0
+Current timestep = 116. State = [[-0.19919585 -0.00102445  0.19424011  1.        ]]. Action = [[-0.47196847  0.21747136 -0.72830176  0.26617956]]. Reward = [0.]
+Curr episode timestep = 9
+Scene graph at timestep 116 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 116 is tensor(0.1153, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 116 of -1
+Current timestep = 117. State = [[-0.20739129  0.00945555  0.1872573   1.        ]]. Action = [[-0.00236058  0.29773724  0.35116625  0.42575693]]. Reward = [0.]
+Curr episode timestep = 10
+Scene graph at timestep 117 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 117 is tensor(0.1264, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 117 of 0
+Current timestep = 118. State = [[-0.20934574  0.01643921  0.18793237  1.        ]]. Action = [[ 0.9181428   0.7972853  -0.13299912  0.2896042 ]]. Reward = [0.]
+Curr episode timestep = 11
+Action ignored: No entry zone
+Scene graph at timestep 118 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 118 is tensor(0.1100, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 118 of -1
+Current timestep = 119. State = [[-0.21431975  0.02972404  0.18671076  1.        ]]. Action = [[-0.36767215  0.6779721  -0.07446885  0.1729728 ]]. Reward = [0.]
+Curr episode timestep = 12
+Scene graph at timestep 119 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 119 is tensor(0.1156, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 119 of -1
+Current timestep = 120. State = [[-0.22459793  0.0476502   0.19076547  1.        ]]. Action = [[-0.1372261  -0.23212981  0.26190245  0.84937406]]. Reward = [0.]
+Curr episode timestep = 13
+Scene graph at timestep 120 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 120 is tensor(0.1103, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 120 of 1
+Current timestep = 121. State = [[-0.25092825  0.00260121  0.232681    1.        ]]. Action = [[ 0.43786132  0.8490498   0.3071351  -0.32458186]]. Reward = [0.]
+Curr episode timestep = 14
+Current timestep = 122. State = [[-0.25130728  0.00234039  0.23223072  1.        ]]. Action = [[ 0.95752716  0.91427803  0.17990458 -0.16522372]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 123. State = [[-0.25035477 -0.01335403  0.24349773  1.        ]]. Action = [[-0.28627706 -0.86298925  0.9231174   0.90948606]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 123 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 123 is tensor(0.0811, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 123 of 1
+Current timestep = 124. State = [[-0.24493203 -0.0545385   0.26778877  1.        ]]. Action = [[ 0.89152    -0.9185852  -0.15234697  0.63556385]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 124 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 124 is tensor(0.0876, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 124 of 1
+Current timestep = 125. State = [[-0.21897918 -0.07275148  0.27833202  1.        ]]. Action = [[0.36722994 0.3306744  0.7021698  0.94042206]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 125 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 125 is tensor(0.0860, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 125 of 1
+Current timestep = 126. State = [[-0.19221745 -0.05546825  0.28989777  1.        ]]. Action = [[ 0.9004011   0.70474434 -0.7739633   0.8852451 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 126 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 126 is tensor(0.0866, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 126 of 1
+Current timestep = 127. State = [[-0.25088227  0.00271066  0.23259415  1.        ]]. Action = [[ 0.419286   -0.64123756  0.6464397  -0.7103565 ]]. Reward = [0.]
+Curr episode timestep = 4
+Current timestep = 128. State = [[-0.25221503  0.00396484  0.22130862  1.        ]]. Action = [[ 0.45548737  0.24229586 -0.91548264  0.46590137]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 128 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 128 is tensor(0.0900, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 128 of -1
+Current timestep = 129. State = [[-0.25065303  0.01685869  0.18645896  1.        ]]. Action = [[ 0.02414799  0.42341232 -0.51776105  0.8776512 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 129 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 129 is tensor(0.0851, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 129 of -1
+Current timestep = 130. State = [[-0.233769    0.02434244  0.17752436  1.        ]]. Action = [[ 0.9721503  -0.23091215  0.7863375   0.74667263]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 130 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 130 is tensor(0.0775, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 130 of 1
+Current timestep = 131. State = [[-0.20293206  0.02115686  0.19404832  1.        ]]. Action = [[ 0.8633108  -0.8566383   0.14689171  0.5309001 ]]. Reward = [0.]
+Curr episode timestep = 3
+Action ignored: No entry zone
+Scene graph at timestep 131 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 131 is tensor(0.0809, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 131 of -1
+Current timestep = 132. State = [[-0.20124443  0.03150622  0.18571854  1.        ]]. Action = [[ 0.43014586  0.6102189  -0.9813778   0.7500942 ]]. Reward = [0.]
+Curr episode timestep = 4
+Scene graph at timestep 132 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 132 is tensor(0.0745, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 132 of -1
+Current timestep = 133. State = [[-0.18272002  0.04512208  0.15907902  1.        ]]. Action = [[0.3231312  0.716249   0.93470216 0.7038171 ]]. Reward = [0.]
+Curr episode timestep = 5
+Action ignored: No entry zone
+Scene graph at timestep 133 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 133 is tensor(0.0706, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 133 of -1
+Current timestep = 134. State = [[-0.18271396  0.04629046  0.15907578  1.        ]]. Action = [[ 0.6100662  -0.8647014  -0.00610763  0.5647595 ]]. Reward = [0.]
+Curr episode timestep = 6
+Action ignored: No entry zone
+Scene graph at timestep 134 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 134 is tensor(0.0882, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 134 of -1
+Current timestep = 135. State = [[-0.18268299  0.04714134  0.15908143  1.        ]]. Action = [[ 0.7550249 -0.8955897 -0.6201117  0.5195224]]. Reward = [0.]
+Curr episode timestep = 7
+Action ignored: No entry zone
+Scene graph at timestep 135 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 135 is tensor(0.0797, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 135 of -1
+Current timestep = 136. State = [[-0.18269916  0.04781024  0.15906306  1.        ]]. Action = [[ 0.91576624 -0.9976825   0.2541356   0.02056026]]. Reward = [0.]
+Curr episode timestep = 8
+Action ignored: No entry zone
+Scene graph at timestep 136 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 136 is tensor(0.0818, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 136 of -1
+Current timestep = 137. State = [[-0.1827008   0.04787637  0.15906128  1.        ]]. Action = [[ 0.8144535  -0.36027205  0.8304031   0.98088515]]. Reward = [0.]
+Curr episode timestep = 9
+Action ignored: No entry zone
+Scene graph at timestep 137 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 137 is tensor(0.0708, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 137 of -1
+Current timestep = 138. State = [[-0.18270245  0.0479425   0.1590595   1.        ]]. Action = [[ 0.6545471  -0.8606371   0.9232341  -0.28756773]]. Reward = [0.]
+Curr episode timestep = 10
+Action ignored: No entry zone
+Scene graph at timestep 138 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 138 is tensor(0.0856, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 138 of -1
+Current timestep = 139. State = [[-0.18543176  0.05955195  0.16309075  1.        ]]. Action = [[-0.29661226  0.54630685  0.43902743  0.7920234 ]]. Reward = [0.]
+Curr episode timestep = 11
+Scene graph at timestep 139 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 139 is tensor(0.0764, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 139 of -1
+Current timestep = 140. State = [[-0.19253789  0.068644    0.16075182  1.        ]]. Action = [[ 0.00228798 -0.35538948 -0.5154343   0.04918873]]. Reward = [0.]
+Curr episode timestep = 12
+Scene graph at timestep 140 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 140 is tensor(0.1011, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 140 of -1
+Current timestep = 141. State = [[-0.19383493  0.06056796  0.1561279   1.        ]]. Action = [[ 0.84492254 -0.49908757  0.78963375  0.8303423 ]]. Reward = [0.]
+Curr episode timestep = 13
+Action ignored: No entry zone
+Scene graph at timestep 141 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 141 is tensor(0.0719, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 141 of -1
+Current timestep = 142. State = [[-0.1938245   0.06037004  0.15613617  1.        ]]. Action = [[ 0.63060725  0.6620188  -0.46373844  0.5717908 ]]. Reward = [0.]
+Curr episode timestep = 14
+Action ignored: No entry zone
+Scene graph at timestep 142 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 142 is tensor(0.0759, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 142 of -1
+Current timestep = 143. State = [[-0.18782501  0.05606137  0.16528179  1.        ]]. Action = [[ 0.22995925 -0.20903814  0.7539911   0.33186054]]. Reward = [0.]
+Curr episode timestep = 15
+Scene graph at timestep 143 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 143 is tensor(0.0898, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 143 of 1
+Current timestep = 144. State = [[-0.18148094  0.04888197  0.17843445  1.        ]]. Action = [[0.9513252  0.61728454 0.17055285 0.7960386 ]]. Reward = [0.]
+Curr episode timestep = 16
+Action ignored: No entry zone
+Scene graph at timestep 144 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 144 is tensor(0.0672, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 144 of -1
+Current timestep = 145. State = [[-0.18081562  0.04886747  0.17926699  1.        ]]. Action = [[ 0.8135747  -0.41226703  0.7656338   0.9562259 ]]. Reward = [0.]
+Curr episode timestep = 17
+Action ignored: No entry zone
+Scene graph at timestep 145 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 145 is tensor(0.0650, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 145 of -1
+Current timestep = 146. State = [[-0.1792704   0.0338699   0.18540756  1.        ]]. Action = [[-0.04030722 -0.7274234   0.36401606  0.22823441]]. Reward = [0.]
+Curr episode timestep = 18
+Scene graph at timestep 146 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 146 is tensor(0.0889, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 146 of 1
+Current timestep = 147. State = [[-0.24987546  0.00276167  0.23294774  1.        ]]. Action = [[-0.5765361  -0.45794427 -0.28542662 -0.64714223]]. Reward = [0.]
+Curr episode timestep = 19
+Current timestep = 148. State = [[-0.25075743  0.00268441  0.23355745  1.        ]]. Action = [[ 0.6781993  -0.38876927  0.58545196 -0.28669846]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 149. State = [[-0.23322862 -0.01214789  0.2465147   1.        ]]. Action = [[-0.4669881  -0.03358716 -0.00956631  0.75044155]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 149 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 149 is tensor(0.0768, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 149 of 1
+Current timestep = 150. State = [[-0.22567105 -0.01313201  0.24409701  1.        ]]. Action = [[ 0.27696073  0.3507533  -0.72507703  0.93085194]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 150 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 150 is tensor(0.0605, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 150 of 0
+Current timestep = 151. State = [[-0.22099695  0.00699794  0.23099864  1.        ]]. Action = [[-0.41614032  0.6665989   0.06732666  0.48384535]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 151 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 151 is tensor(0.0742, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 151 of -1
+Current timestep = 152. State = [[-0.2257608   0.03634205  0.22242883  1.        ]]. Action = [[ 0.55283856  0.50555134 -0.91332066  0.28636408]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 152 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 152 is tensor(0.0603, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 152 of -1
+Current timestep = 153. State = [[-0.21246935  0.04757919  0.19204888  1.        ]]. Action = [[ 0.9679396   0.974602    0.11390483 -0.40714872]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: No entry zone
+Scene graph at timestep 153 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 153 is tensor(0.0582, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 153 of -1
+Current timestep = 154. State = [[-0.25067034  0.00264635  0.23256686  1.        ]]. Action = [[ 0.71103156 -0.9212159   0.71970093 -0.3802125 ]]. Reward = [0.]
+Curr episode timestep = 5
+Current timestep = 155. State = [[-0.2380354   0.0139405   0.24788599  1.        ]]. Action = [[0.92010117 0.67308223 0.931213   0.9266596 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 155 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 155 is tensor(0.0431, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 155 of 1
+Current timestep = 156. State = [[-0.21093614  0.02374752  0.2785028   1.        ]]. Action = [[ 0.20574379 -0.40652084  0.15632486  0.93249846]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 156 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 156 is tensor(0.0708, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 156 of 1
+Current timestep = 157. State = [[-0.2138349   0.02178253  0.29716235  1.        ]]. Action = [[-0.9019407   0.27392888  0.69736874  0.35970843]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 157 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 157 is tensor(0.0681, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 157 of -1
+Current timestep = 158. State = [[-0.23275115  0.01655327  0.3108308   1.        ]]. Action = [[ 0.56860125 -0.5265654  -0.83326805  0.6157167 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 158 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 158 is tensor(0.0625, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 158 of 1
+Current timestep = 159. State = [[-0.2232033   0.00463653  0.29479375  1.        ]]. Action = [[-0.88423955 -0.06216651  0.23263884  0.36771572]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: Workspace boundary
+Scene graph at timestep 159 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 159 is tensor(0.0720, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 159 of -1
+Current timestep = 160. State = [[-0.21309999 -0.0110253   0.2891651   1.        ]]. Action = [[ 0.7813487  -0.7284664  -0.5539505   0.69090116]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 160 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 160 is tensor(0.0575, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 160 of 1
+Current timestep = 161. State = [[-0.1980708  -0.01986936  0.2561394   1.        ]]. Action = [[-0.9330085  0.6294894 -0.481857   0.9650662]]. Reward = [0.]
+Curr episode timestep = 6
+Scene graph at timestep 161 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 161 is tensor(0.0500, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 161 of -1
+Current timestep = 162. State = [[-2.1343449e-01  4.9430941e-04  2.3693204e-01  1.0000000e+00]]. Action = [[ 0.28805685  0.3572117  -0.48013896  0.63580966]]. Reward = [0.]
+Curr episode timestep = 7
+Scene graph at timestep 162 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 162 is tensor(0.0746, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 162 of -1
+Current timestep = 163. State = [[-0.21096213  0.00843332  0.21051934  1.        ]]. Action = [[ 0.15948892 -0.06060821 -0.7091339   0.89151764]]. Reward = [0.]
+Curr episode timestep = 8
+Scene graph at timestep 163 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 163 is tensor(0.0664, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 163 of -1
+Current timestep = 164. State = [[-0.20470573  0.00729445  0.18516037  1.        ]]. Action = [[ 0.1977297  -0.11243385  0.17066264  0.43307054]]. Reward = [0.]
+Curr episode timestep = 9
+Scene graph at timestep 164 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 164 is tensor(0.0859, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 164 of 0
+Current timestep = 165. State = [[-0.20156935  0.00673116  0.1869349   1.        ]]. Action = [[ 0.7582445  -0.29461324  0.80347025  0.8372848 ]]. Reward = [0.]
+Curr episode timestep = 10
+Action ignored: No entry zone
+Scene graph at timestep 165 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 165 is tensor(0.0612, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 165 of -1
+Current timestep = 166. State = [[-0.20156935  0.00673116  0.1869349   1.        ]]. Action = [[ 0.74844694 -0.4264922  -0.03327316  0.87097263]]. Reward = [0.]
+Curr episode timestep = 11
+Action ignored: No entry zone
+Scene graph at timestep 166 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 166 is tensor(0.0649, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 166 of -1
+Current timestep = 167. State = [[-0.20102073 -0.00188799  0.18890752  1.        ]]. Action = [[-0.197505   -0.4326712   0.20664358  0.9415549 ]]. Reward = [0.]
+Curr episode timestep = 12
+Scene graph at timestep 167 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 167 is tensor(0.0691, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 167 of 0
+Current timestep = 168. State = [[-0.20149806 -0.01236857  0.19083287  1.        ]]. Action = [[0.59928167 0.74304986 0.78722    0.9300523 ]]. Reward = [0.]
+Curr episode timestep = 13
+Action ignored: No entry zone
+Scene graph at timestep 168 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 168 is tensor(0.0481, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 168 of -1
+Current timestep = 169. State = [[-0.20149806 -0.01236857  0.19083287  1.        ]]. Action = [[ 0.6709049  -0.54369307  0.26479852  0.98203576]]. Reward = [0.]
+Curr episode timestep = 14
+Action ignored: No entry zone
+Scene graph at timestep 169 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 169 is tensor(0.0577, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 169 of -1
+Current timestep = 170. State = [[-2.1208021e-01  9.4430451e-04  2.0270023e-01  1.0000000e+00]]. Action = [[-0.8035177   0.72657967  0.7627518   0.4848255 ]]. Reward = [0.]
+Curr episode timestep = 15
+Scene graph at timestep 170 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 170 is tensor(0.0535, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 170 of -1
+Current timestep = 171. State = [[-0.23663224  0.01035602  0.21830598  1.        ]]. Action = [[-0.0206356 -0.4494996 -0.6123854  0.6436173]]. Reward = [0.]
+Curr episode timestep = 16
+Scene graph at timestep 171 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 171 is tensor(0.0646, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 171 of -1
+Current timestep = 172. State = [[-0.2275554   0.00235616  0.21642937  1.        ]]. Action = [[0.92357826 0.03424633 0.292583   0.86744   ]]. Reward = [0.]
+Curr episode timestep = 17
+Scene graph at timestep 172 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 172 is tensor(0.0540, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 172 of 1
+Current timestep = 173. State = [[-0.25000814  0.00263615  0.232779    1.        ]]. Action = [[ 0.79788065 -0.2997166  -0.87170625 -0.18100464]]. Reward = [0.]
+Curr episode timestep = 18
+Current timestep = 174. State = [[-2.5170395e-01 -3.9552175e-04  2.3532178e-01  1.0000000e+00]]. Action = [[-0.22952247 -0.05505466  0.16764402  0.4847448 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 174 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 174 is tensor(0.0711, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 174 of 0
+Current timestep = 175. State = [[-0.24383831  0.01222258  0.2493318   1.        ]]. Action = [[0.9266666  0.84387183 0.7835196  0.8501663 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 175 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 175 is tensor(0.0386, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 175 of 1
+Current timestep = 176. State = [[-0.25110623  0.00243805  0.23239969  1.        ]]. Action = [[ 0.34206533  0.59886694  0.36700654 -0.37069666]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 177. State = [[-0.2430637  -0.00754783  0.22447595  1.        ]]. Action = [[ 0.7191267 -0.5363535 -0.5934212  0.7774043]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 177 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 177 is tensor(0.0490, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 177 of -1
+Current timestep = 178. State = [[-0.21932922 -0.01129895  0.20011549  1.        ]]. Action = [[ 0.44432938  0.4813155  -0.32505405  0.6489792 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 178 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 178 is tensor(0.0622, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 178 of -1
+Current timestep = 179. State = [[-0.25130484  0.00235027  0.23251933  1.        ]]. Action = [[-0.2534114  -0.61975455  0.9824772  -0.3007257 ]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 180. State = [[-2.5126594e-01 -4.1053153e-04  2.3420025e-01  1.0000000e+00]]. Action = [[-0.4809029  -0.8343947  -0.78134835  0.90657973]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 180 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 180 is tensor(0.0461, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 180 of -1
+Current timestep = 181. State = [[-2.3771554e-01 -7.8949850e-04  2.4413441e-01  1.0000000e+00]]. Action = [[0.91268814 0.15546179 0.5250709  0.7157458 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 181 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 181 is tensor(0.0566, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 181 of 1
+Current timestep = 182. State = [[-0.25103292  0.00229925  0.23228587  1.        ]]. Action = [[-0.76761943  0.62835217  0.9445317  -0.26906866]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 183. State = [[-2.5127649e-01  8.4741310e-05  2.3233764e-01  1.0000000e+00]]. Action = [[ 0.01023519 -0.0598923   0.08138442  0.9828154 ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 183 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 183 is tensor(0.0604, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 183 of -1
+Current timestep = 184. State = [[-0.2515382  -0.00271669  0.23245373  1.        ]]. Action = [[-0.4373623 -0.8096159 -0.1714778  0.9659157]]. Reward = [0.]
+Curr episode timestep = 1
+Action ignored: Workspace boundary
+Scene graph at timestep 184 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 184 is tensor(0.0529, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 184 of -1
+Current timestep = 185. State = [[-0.24146654 -0.00334743  0.24462543  1.        ]]. Action = [[ 0.60267675 -0.03459686  0.8897381   0.9196725 ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 185 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 185 is tensor(0.0497, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 185 of 1
+Current timestep = 186. State = [[-0.22510187  0.01117529  0.2784352   1.        ]]. Action = [[0.05863035 0.8062048  0.84138286 0.3005333 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 186 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 186 is tensor(0.0593, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 186 of 1
+Current timestep = 187. State = [[-0.22000742  0.02939957  0.30316225  1.        ]]. Action = [[ 0.14704227 -0.23983371 -0.47939777  0.74829304]]. Reward = [0.]
+Curr episode timestep = 4
+Scene graph at timestep 187 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 187 is tensor(0.0655, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 187 of 1
+Current timestep = 188. State = [[-0.25107816  0.00236145  0.23225117  1.        ]]. Action = [[-0.20192736 -0.02333248  0.76212335 -0.05992359]]. Reward = [0.]
+Curr episode timestep = 5
+Current timestep = 189. State = [[-0.25117046  0.0014569   0.23227185  1.        ]]. Action = [[-0.7771576  -0.4846666   0.48348868  0.9315883 ]]. Reward = [0.]
+Curr episode timestep = 0
+Action ignored: Workspace boundary
+Scene graph at timestep 189 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 189 is tensor(0.0529, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 189 of -1
+Current timestep = 190. State = [[-0.24394387 -0.00715664  0.22606488  1.        ]]. Action = [[ 0.6556783  -0.3764398  -0.42090237  0.5571523 ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 190 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 190 is tensor(0.0613, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 190 of 0
+Current timestep = 191. State = [[-0.22950049 -0.01513225  0.20580406  1.        ]]. Action = [[-0.07268238  0.15459096 -0.58625734  0.5991335 ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 191 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 191 is tensor(0.0669, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 191 of -1
+Current timestep = 192. State = [[-0.21886288 -0.02214043  0.18247171  1.        ]]. Action = [[ 0.7563734  -0.46130586 -0.26417994  0.9116416 ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 192 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 192 is tensor(0.0560, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 192 of 0
+Current timestep = 193. State = [[-0.20012985 -0.0297395   0.17268321  1.        ]]. Action = [[0.91366196 0.825655   0.25215006 0.96835566]]. Reward = [0.]
+Curr episode timestep = 4
+Action ignored: No entry zone
+Scene graph at timestep 193 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 193 is tensor(0.0486, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 193 of -1
+Current timestep = 194. State = [[-0.1912821  -0.02895586  0.17674777  1.        ]]. Action = [[0.4086311  0.19486475 0.39169455 0.83425236]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 194 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 194 is tensor(0.0656, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 194 of 1
+Current timestep = 195. State = [[-0.17830466 -0.02785832  0.18255109  1.        ]]. Action = [[ 0.26070547 -0.43539304  0.64359283  0.8514494 ]]. Reward = [0.]
+Curr episode timestep = 6
+Action ignored: No entry zone
+Scene graph at timestep 195 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 195 is tensor(0.0666, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 195 of -1
+Current timestep = 196. State = [[-0.17813161 -0.02779907  0.18266177  1.        ]]. Action = [[ 0.96914387 -0.8072393   0.55357456  0.5675267 ]]. Reward = [0.]
+Curr episode timestep = 7
+Action ignored: No entry zone
+Scene graph at timestep 196 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 196 is tensor(0.0541, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 196 of -1
+Current timestep = 197. State = [[-0.17799349 -0.02780524  0.18272254  1.        ]]. Action = [[0.3272004  0.12950623 0.642262   0.9453089 ]]. Reward = [0.]
+Curr episode timestep = 8
+Action ignored: No entry zone
+Scene graph at timestep 197 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 197 is tensor(0.0612, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 197 of -1
+Current timestep = 198. State = [[-0.17939709 -0.0216633   0.19619116  1.        ]]. Action = [[-0.32549202  0.25190806  0.91962075  0.86057234]]. Reward = [0.]
+Curr episode timestep = 9
+Scene graph at timestep 198 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 198 is tensor(0.0593, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 198 of 1
+Current timestep = 199. State = [[-0.17777745 -0.02483363  0.23000315  1.        ]]. Action = [[ 0.37841654 -0.54421914  0.41941094  0.12983751]]. Reward = [0.]
+Curr episode timestep = 10
+Scene graph at timestep 199 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 199 is tensor(0.0757, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 199 of 1
+Current timestep = 200. State = [[-0.16834545 -0.03682994  0.24227555  1.        ]]. Action = [[ 0.06466258  0.9105787  -0.19551337  0.6804118 ]]. Reward = [0.]
+Curr episode timestep = 11
+Action ignored: No entry zone
+Scene graph at timestep 200 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 200 is tensor(0.0607, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 200 of -1
+Current timestep = 201. State = [[-0.16738829 -0.03790001  0.24327119  1.        ]]. Action = [[ 0.801219    0.06502771 -0.8026186   0.81087196]]. Reward = [0.]
+Curr episode timestep = 12
+Action ignored: No entry zone
+Scene graph at timestep 201 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 201 is tensor(0.0557, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 201 of -1
+Current timestep = 202. State = [[-0.16342872 -0.02450442  0.24576691  1.        ]]. Action = [[ 0.32458556  0.7057333  -0.01077533  0.46133375]]. Reward = [0.]
+Curr episode timestep = 13
+Scene graph at timestep 202 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 202 is tensor(0.0705, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 202 of 1
+Current timestep = 203. State = [[-0.15099768 -0.00742836  0.2573173   1.        ]]. Action = [[0.50394464 0.16157281 0.4706074  0.18123817]]. Reward = [0.]
+Curr episode timestep = 14
+Scene graph at timestep 203 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 203 is tensor(0.0754, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 203 of 1
+Current timestep = 204. State = [[-0.1340032  -0.01767119  0.28113168  1.        ]]. Action = [[-0.5351518  -0.89182454  0.37820864  0.5849495 ]]. Reward = [0.]
+Curr episode timestep = 15
+Scene graph at timestep 204 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 204 is tensor(0.0569, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 204 of 1
+Current timestep = 205. State = [[-0.14259456 -0.0580102   0.28057277  1.        ]]. Action = [[-0.01404405 -0.84787613 -0.78018975  0.86549914]]. Reward = [0.]
+Curr episode timestep = 16
+Scene graph at timestep 205 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 205 is tensor(0.0496, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 205 of -1
+Current timestep = 206. State = [[-0.15473619 -0.09006081  0.25949287  1.        ]]. Action = [[-0.5477655  -0.52166736 -0.53572136  0.91044426]]. Reward = [0.]
+Curr episode timestep = 17
+Scene graph at timestep 206 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 206 is tensor(0.0596, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 206 of -1
+Current timestep = 207. State = [[-0.17571032 -0.10211521  0.24679054  1.        ]]. Action = [[-0.41992033  0.15672112  0.49126434  0.39846218]]. Reward = [0.]
+Curr episode timestep = 18
+Scene graph at timestep 207 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 207 is tensor(0.0772, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 207 of -1
+Current timestep = 208. State = [[-0.18596265 -0.09854341  0.26252413  1.        ]]. Action = [[-0.2343598   0.16422856  0.454453    0.9205651 ]]. Reward = [0.]
+Curr episode timestep = 19
+Scene graph at timestep 208 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 208 is tensor(0.0656, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 208 of -1
+Current timestep = 209. State = [[-0.20834953 -0.10651527  0.2853725   1.        ]]. Action = [[-0.76296574 -0.45742714  0.88608587  0.8158953 ]]. Reward = [0.]
+Curr episode timestep = 20
+Scene graph at timestep 209 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 209 is tensor(0.0555, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 209 of -1
+Current timestep = 210. State = [[-0.23927838 -0.131549    0.3103587   1.        ]]. Action = [[-0.19134933 -0.6373963  -0.8625322   0.5699121 ]]. Reward = [0.]
+Curr episode timestep = 21
+Scene graph at timestep 210 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 210 is tensor(0.0644, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 210 of -1
+Current timestep = 211. State = [[-0.24623072 -0.15120858  0.2855114   1.        ]]. Action = [[ 0.39535236 -0.23446071 -0.4581452   0.5423131 ]]. Reward = [0.]
+Curr episode timestep = 22
+Scene graph at timestep 211 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 211 is tensor(0.0803, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 211 of -1
+Current timestep = 212. State = [[-0.24248436 -0.16760242  0.25595155  1.        ]]. Action = [[-0.3905136 -0.4526865 -0.8967351  0.4994223]]. Reward = [0.]
+Curr episode timestep = 23
+Scene graph at timestep 212 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 212 is tensor(0.0687, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 212 of -1
+Current timestep = 213. State = [[-0.25098687 -0.18147188  0.22613963  1.        ]]. Action = [[-0.80740494  0.90528536  0.42139626  0.43323815]]. Reward = [0.]
+Curr episode timestep = 24
+Action ignored: Workspace boundary
+Scene graph at timestep 213 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 213 is tensor(0.0710, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 213 of -1
+Current timestep = 214. State = [[-0.25329563 -0.17259564  0.2249377   1.        ]]. Action = [[-0.23383766  0.629215    0.07569861  0.948843  ]]. Reward = [0.]
+Curr episode timestep = 25
+Scene graph at timestep 214 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 214 is tensor(0.0734, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 214 of 1
+Current timestep = 215. State = [[-0.24572682 -0.17005758  0.23369598  1.        ]]. Action = [[ 0.84777    -0.6095878   0.798342    0.91108274]]. Reward = [0.]
+Curr episode timestep = 26
+Scene graph at timestep 215 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 215 is tensor(0.0612, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 215 of 1
+Current timestep = 216. State = [[-0.23576185 -0.17024504  0.23559815  1.        ]]. Action = [[-0.2121368   0.4728973  -0.9965752   0.77086806]]. Reward = [0.]
+Curr episode timestep = 27
+Scene graph at timestep 216 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 216 is tensor(0.0619, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 216 of -1
+Current timestep = 217. State = [[-0.23721243 -0.16205618  0.21830812  1.        ]]. Action = [[-0.77611923  0.87195516  0.3052802   0.14155304]]. Reward = [0.]
+Curr episode timestep = 28
+Action ignored: Workspace boundary
+Scene graph at timestep 217 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 217 is tensor(0.0723, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 217 of -1
+Current timestep = 218. State = [[-0.23707055 -0.16161203  0.21813935  1.        ]]. Action = [[-0.68890804 -0.5254189  -0.21691823  0.67396307]]. Reward = [0.]
+Curr episode timestep = 29
+Action ignored: Workspace boundary
+Scene graph at timestep 218 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 218 is tensor(0.0705, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 218 of -1
+Current timestep = 219. State = [[-0.22543816 -0.16309188  0.22080237  1.        ]]. Action = [[ 0.8438444  -0.18952352  0.17685568  0.7987771 ]]. Reward = [0.]
+Curr episode timestep = 30
+Scene graph at timestep 219 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 219 is tensor(0.0771, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 219 of 1
+Current timestep = 220. State = [[-0.19226353 -0.17125764  0.2157287   1.        ]]. Action = [[ 0.8922447  -0.30683672 -0.28594136  0.41654384]]. Reward = [0.]
+Curr episode timestep = 31
+Scene graph at timestep 220 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 220 is tensor(0.0761, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 220 of 1
+Current timestep = 221. State = [[-0.15261705 -0.18377782  0.196926    1.        ]]. Action = [[ 0.86174774 -0.32054996 -0.8357749   0.55848455]]. Reward = [0.]
+Curr episode timestep = 32
+Scene graph at timestep 221 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 221 is tensor(0.0655, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 221 of -1
+Current timestep = 222. State = [[-0.12231352 -0.19394986  0.16653089  1.        ]]. Action = [[0.93146014 0.343238   0.8925283  0.72243476]]. Reward = [0.]
+Curr episode timestep = 33
+Action ignored: No entry zone
+Scene graph at timestep 222 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 222 is tensor(0.0737, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 222 of -1
+Current timestep = 223. State = [[-0.12185462 -0.19402286  0.16676745  1.        ]]. Action = [[-0.12940866  0.6489668   0.0679884   0.92996156]]. Reward = [0.]
+Curr episode timestep = 34
+Action ignored: No entry zone
+Scene graph at timestep 223 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 223 is tensor(0.0739, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 223 of -1
+Current timestep = 224. State = [[-0.10989606 -0.19888741  0.16386843  1.        ]]. Action = [[ 0.8134904  -0.3011647  -0.25967836  0.4523741 ]]. Reward = [0.]
+Curr episode timestep = 35
+Scene graph at timestep 224 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 224 is tensor(0.0820, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 224 of -1
+Current timestep = 225. State = [[-0.08864129 -0.22320831  0.15927632  1.        ]]. Action = [[-0.34543693 -0.8057283   0.43013906  0.58896255]]. Reward = [0.]
+Curr episode timestep = 36
+Scene graph at timestep 225 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 225 is tensor(0.0763, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 225 of -1
+Current timestep = 226. State = [[-0.10777857 -0.2522648   0.15506203  1.        ]]. Action = [[-0.8671873  -0.17639446 -0.8874838   0.32225096]]. Reward = [0.]
+Curr episode timestep = 37
+Scene graph at timestep 226 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 226 is tensor(0.0716, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 226 of -1
+Current timestep = 227. State = [[-0.12472496 -0.26896405  0.13965592  1.        ]]. Action = [[ 0.03782558 -0.3128369  -0.05465376  0.83309674]]. Reward = [0.]
+Curr episode timestep = 38
+Scene graph at timestep 227 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 227 is tensor(0.0898, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 227 of -1
+Current timestep = 228. State = [[-0.14006026 -0.2658473   0.1292764   1.        ]]. Action = [[-0.9512814   0.83170414 -0.30960977  0.97613454]]. Reward = [0.]
+Curr episode timestep = 39
+Scene graph at timestep 228 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 228 is tensor(0.0585, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 228 of -1
+Current timestep = 229. State = [[-0.15970759 -0.25349876  0.10465099  1.        ]]. Action = [[ 0.60399914 -0.4804793  -0.52242726  0.6758282 ]]. Reward = [0.]
+Curr episode timestep = 40
+Scene graph at timestep 229 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 229 is tensor(0.0732, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 229 of -1
+Current timestep = 230. State = [[-0.13613676 -0.23987499  0.08594259  1.        ]]. Action = [[ 0.9814224   0.98590255 -0.57417583  0.6147275 ]]. Reward = [0.]
+Curr episode timestep = 41
+Scene graph at timestep 230 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 230 is tensor(0.0620, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 230 of -1
+Current timestep = 231. State = [[-0.10520758 -0.2272282   0.07036023  1.        ]]. Action = [[ 0.07461548 -0.7627127   0.55283594  0.45069885]]. Reward = [0.]
+Curr episode timestep = 42
+Scene graph at timestep 231 is [True, False, False, True, False, False, False, True, True, False]
+State prediction error at timestep 231 is tensor(0.0775, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 231 of -1
+Current timestep = 232. State = [[-0.25046504  0.00274075  0.23290499  1.        ]]. Action = [[ 0.24516487  0.7615187   0.764536   -0.1883024 ]]. Reward = [0.]
+Curr episode timestep = 43
+Current timestep = 233. State = [[-0.2506259   0.00612397  0.23792756  1.        ]]. Action = [[0.16953635 0.13807929 0.86596036 0.86112106]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 233 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 233 is tensor(0.0317, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 233 of 1
+Current timestep = 234. State = [[-0.25064805  0.00926447  0.2485084   1.        ]]. Action = [[-0.50193584 -0.16629207  0.5072019   0.8139496 ]]. Reward = [0.]
+Curr episode timestep = 1
+Action ignored: Workspace boundary
+Scene graph at timestep 234 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 234 is tensor(0.0375, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 234 of -1
+Current timestep = 235. State = [[-2.4548322e-01  1.4664533e-05  2.5148901e-01  1.0000000e+00]]. Action = [[ 0.37490058 -0.5697486   0.09980977  0.6459625 ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 235 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 235 is tensor(0.0356, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 235 of 1
+Current timestep = 236. State = [[-0.22513285 -0.01225043  0.27436924  1.        ]]. Action = [[0.6738038  0.16601753 0.9742613  0.97512937]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 236 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 236 is tensor(0.0234, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 236 of 1
+Current timestep = 237. State = [[-0.18948217  0.00515779  0.31550446  1.        ]]. Action = [[0.7529068  0.79510283 0.43400526 0.8672643 ]]. Reward = [0.]
+Curr episode timestep = 4
+Scene graph at timestep 237 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 237 is tensor(0.0327, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 237 of 1
+Current timestep = 238. State = [[-0.15667108  0.03523722  0.34080637  1.        ]]. Action = [[0.7748585  0.4175768  0.22904384 0.1535697 ]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 238 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 238 is tensor(0.0530, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 238 of 1
+Current timestep = 239. State = [[-0.14077066  0.05060255  0.3394251   1.        ]]. Action = [[-0.7582436   0.10559607 -0.6869755   0.47516572]]. Reward = [0.]
+Curr episode timestep = 6
+Scene graph at timestep 239 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 239 is tensor(0.0439, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 239 of 0
+Current timestep = 240. State = [[-0.14167786  0.06034657  0.3271413   1.        ]]. Action = [[0.7570772  0.2602744  0.05554497 0.23515844]]. Reward = [0.]
+Curr episode timestep = 7
+Scene graph at timestep 240 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 240 is tensor(0.0555, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 240 of 1
+Current timestep = 241. State = [[-0.1240072   0.05622445  0.32379866  1.        ]]. Action = [[ 0.36126113 -0.5289395   0.02373171  0.129807  ]]. Reward = [0.]
+Curr episode timestep = 8
+Scene graph at timestep 241 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 241 is tensor(0.0532, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 241 of 1
+Current timestep = 242. State = [[-0.10158948  0.04215133  0.32225543  1.        ]]. Action = [[ 0.8821025  -0.11672539 -0.08949327  0.5473368 ]]. Reward = [0.]
+Curr episode timestep = 9
+Scene graph at timestep 242 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 242 is tensor(0.0526, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 242 of 1
+Current timestep = 243. State = [[-0.06599256  0.0199145   0.3300845   1.        ]]. Action = [[ 0.06830692 -0.8676122   0.80471516  0.14937723]]. Reward = [0.]
+Curr episode timestep = 10
+Above hoop
+Scene graph at timestep 243 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 243 is tensor(0.0482, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 243 of 0
+Current timestep = 244. State = [[-0.06409441  0.00906474  0.3698671   1.        ]]. Action = [[-0.42308748  0.6345985   0.9732349   0.8913001 ]]. Reward = [0.]
+Curr episode timestep = 11
+Above hoop
+Scene graph at timestep 244 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 244 is tensor(0.0489, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 244 of 0
+Current timestep = 245. State = [[-0.06864951  0.00794339  0.40275615  1.        ]]. Action = [[ 0.7268001  -0.82783854  0.08919203  0.79662573]]. Reward = [0.]
+Curr episode timestep = 12
+Above hoop
+Scene graph at timestep 245 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 245 is tensor(0.0547, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 245 of 0
+Current timestep = 246. State = [[-0.0534226  -0.00999783  0.40970406  1.        ]]. Action = [[ 0.38100183 -0.40963095  0.22252226  0.17025232]]. Reward = [0.]
+Curr episode timestep = 13
+Action ignored: Workspace boundary
+Above hoop
+Scene graph at timestep 246 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 246 is tensor(0.0723, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 246 of 0
+Current timestep = 247. State = [[-0.0534226  -0.00999783  0.40970406  1.        ]]. Action = [[0.08045018 0.60225713 0.6998155  0.46817756]]. Reward = [0.]
+Curr episode timestep = 14
+Action ignored: Workspace boundary
+Above hoop
+Scene graph at timestep 247 is [True, False, False, False, True, False, False, True, True, False]
+State prediction error at timestep 247 is tensor(0.0676, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 247 of 0
+Current timestep = 248. State = [[-0.04901331  0.00225725  0.40376383 -1.        ]]. Action = [[ 0.9089943   0.67325747 -0.5277438  -0.06161994]]. Reward = [1000.]
+Curr episode timestep = 15
+Above hoop
+Scene graph at timestep 248 is [False, True, False, False, True, False, False, True, False, True]
+State prediction error at timestep 248 is tensor(0.6328, grad_fn=<MseLossBackward0>)
+Human Feedback received at timestep 248 of 1
+Current timestep = 249. State = [[-0.00203753  0.03536338  0.3823177   1.        ]]. Action = [[ 0.488981    0.96764314 -0.12173182  0.5310607 ]]. Reward = [0.]
+Curr episode timestep = 16
+Above hoop
+Scene graph at timestep 249 is [False, True, False, False, True, False, False, True, True, False]
+State prediction error at timestep 249 is tensor(0.1212, grad_fn=<MseLossBackward0>)

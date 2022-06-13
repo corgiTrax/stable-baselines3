@@ -11,8 +11,10 @@ class HumanFeedback:
         self.keyboard_feedback_dictionary = {
             # keyboard.KeyCode.from_char("3"): 0,
             keyboard.KeyCode.from_char("t"): -1,
+            # keyboard.KeyCode.from_char("t"): -10,
             keyboard.KeyCode.from_char("y"): 0,
             keyboard.KeyCode.from_char("u"): 1,
+            # keyboard.KeyCode.from_char("u"): 10,
         }
 
         if robot:

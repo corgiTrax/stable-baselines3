@@ -456,6 +456,15 @@ class SACRecord(OffPolicyAlgorithm):
                 self.feedback_file.write(
                     f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
                 )
+
+                if infos[0]['out_of_bounds']:
+                    self.feedback_file.write(
+                        "Action ignored: Workspace boundary\n"
+                    )
+                if infos[0]['in_noentry']:
+                    self.feedback_file.write(
+                        "Action ignored: No entry zone\n"
+                    )
                 
 
                 curr_keyboard_feedback = None
