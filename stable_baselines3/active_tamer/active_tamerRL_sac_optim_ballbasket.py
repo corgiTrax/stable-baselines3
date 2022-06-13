@@ -169,7 +169,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.total_feedback = 0
         self.model_training_index = 0
         self.model_training_order = [2, 1, 0, 3]
-        self.model_training_lengths = [100, 200, 300, 1250]
+        self.model_training_lengths = [1, 1, 1, 1250]
         self.total_rounds = 0
         self.actor_training = self.model_training_order[self.model_training_index]
 
@@ -269,7 +269,8 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
             # Action by the current actor for the sampled state
             # import pdb
             # pdb.set_trace()
-            trainable_actions, trainable_log_prob = self.actors[self.actor_training].action_log_prob(replay_data.observations[:, self.actor_training].reshape(-1, 1))
+            model_input = replay_data.observations[:, 0:-1].reshape(-1, 3) if self.actor_training == 3 else replay_data.observations[:, self.actor_training].reshape(-1, 1)
+            trainable_actions, trainable_log_prob = self.actors[self.actor_training].action_log_prob(model_input)
             trainable_log_prob = trainable_log_prob.reshape(-1, 1)
 
             ent_coef_loss = None
@@ -296,10 +297,11 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
 
             with th.no_grad():
                 # Select action according to policy
-                next_actions, next_log_prob = self.actors[self.actor_training].action_log_prob(replay_data.next_observations[:, self.actor_training].reshape(-1, 1))
+                model_input = replay_data.next_observations[:, 0:-1].reshape(-1, 3) if self.actor_training == 3 else replay_data.next_observations[:, self.actor_training].reshape(-1, 1)
+                next_actions, next_log_prob = self.actors[self.actor_training].action_log_prob(model_input)
                 # Compute the next Q values: min over all critics targets
                 next_q_values = th.cat(
-                    self.critic_targets[self.actor_training](replay_data.next_observations[:, self.actor_training].reshape(-1, 1), next_actions),
+                    self.critic_targets[self.actor_training](model_input, next_actions),
                     dim=1,
                 )
                 next_q_values, _ = th.min(next_q_values, dim=1, keepdim=True)
@@ -315,7 +317,8 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
 
             # Get current Q-values estimates for each critic network
             # using action from the replay buffer
-            current_q_values = self.critics[self.actor_training](replay_data.observations[:, self.actor_training].reshape(-1, 1), replay_data.actions[:, self.actor_training].reshape(-1, 1))
+            model_input = replay_data.observations[:, 0:-1].reshape(-1, 3) if self.actor_training == 3 else replay_data.next_observations[:, self.actor_training].reshape(-1, 1)
+            current_q_values = self.critics[self.actor_training](model_input, replay_data.actions[:, self.actor_training].reshape(-1, 1))
 
             # Compute critic loss
             critic_loss = 0.5 * sum(
@@ -333,7 +336,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
 
             # Get current Q-values estimates for human critic network
             # using action from the replay buffer
-            current_human_q_values = self.human_critics[self.actor_training](replay_data.observations[:, self.actor_training].reshape(-1, 1), replay_data.actions[:, self.actor_training].reshape(-1, 1))
+            current_human_q_values = self.human_critics[self.actor_training](model_input, replay_data.actions[:, self.actor_training].reshape(-1, 1))
 
             # Compute critic loss
             human_critic_loss = 0.5 * sum(
@@ -353,11 +356,11 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
             # Alternative: actor_loss = th.mean(log_prob - qf1_pi)
             # Mean over all critic networks
             q_values_pi_critic = th.cat(
-                self.critics[self.actor_training].forward(replay_data.observations[:, self.actor_training].reshape(-1, 1), trainable_actions), dim=1
+                self.critics[self.actor_training].forward(model_input, trainable_actions), dim=1
             )
 
             q_values_pi_human = th.cat(
-                self.human_critics[self.actor_training].forward(replay_data.observations[:, self.actor_training].reshape(-1, 1), trainable_actions), dim=1
+                self.human_critics[self.actor_training].forward(model_input, trainable_actions), dim=1
             )
 
             q_values_pi = (
@@ -612,8 +615,9 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 simulated_human_reward = 0
                 # print(self._last_obs[:, self.actor_training].reshape(-1, 1))
                 # print(action[:, self.actor_training].reshape(-1, 1))
+                model_input = self._last_obs[:, 0:-1].reshape(-1, 3) if self.actor_training == 3 else self._last_obs[:, self.actor_training].reshape(-1, 1)
                 human_critic_qval_estimate = self.human_critics[self.actor_training].forward(
-                    th.from_numpy(self._last_obs[:, self.actor_training].reshape(-1, 1)).to(self.device),
+                    th.from_numpy(model_input).to(self.device),
                     th.from_numpy(action[:, self.actor_training].reshape(-1, 1)).to(self.device),
                 )
                 human_critic_qval_estimate, _ = th.min(

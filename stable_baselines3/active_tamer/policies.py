@@ -1046,6 +1046,7 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         self.share_features_extractor = share_features_extractor
 
         self.obs_spaces = [Box(shape=(1,), low=self.observation_space.low[i], high=self.observation_space.high[i]) for i in range(self.num_obs)]
+        self.obs_spaces[-1] = Box(shape=(3,), low=self.observation_space.low[3], high=self.observation_space.high[3])
         self.act_spaces = [Box(shape=(1,), low=self.action_space.low[i], high=self.action_space.high[i]) for i in range(self.num_obs)]
 
         self.net_args = {
@@ -1173,7 +1174,7 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         actor_kwargs = self._update_features_extractor(
             actor_kwargs, features_extractor
         )
-        actor_kwargs['features_dim'] = 1
+        actor_kwargs['features_dim'] = actor_kwargs['observation_space'].shape[0]
         return Actor(**actor_kwargs).to(self.device)
 
     def make_critic(
@@ -1182,7 +1183,7 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         critic_kwargs = self._update_features_extractor(
             critic_kwargs, features_extractor
         )
-        critic_kwargs['features_dim'] = 1
+        critic_kwargs['features_dim'] = critic_kwargs['observation_space'].shape[0]
         return ContinuousCritic(**critic_kwargs).to(self.device)
 
     def forward(self, obs: th.Tensor, deterministic: bool = False) -> th.Tensor:
@@ -1192,8 +1193,9 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         self, observation: th.Tensor, deterministic: bool = False
     ) -> th.Tensor:
         predictions = []
-        for i in range(self.num_obs):
+        for i in range(self.num_obs - 1):
             predictions.append(self.actors[i](observation[:, i].unsqueeze(1), deterministic))
+        predictions.append(self.actors[-1](observation[:, 0:-1].reshape(-1, 3), deterministic))
         return torch.cat(predictions).view(1, -1)
 
     def set_training_mode(self, mode: bool) -> None:
