@@ -168,6 +168,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
         self.actor_training = 0
+        self.total_rounds = 0
 
         if _init_setup_model:
             self._setup_model()
@@ -538,9 +539,10 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         callback.on_rollout_start()
         continue_training = True
 
-        if (self.num_timesteps + 1) % 100 == 0:
+        if (self.num_timesteps + 1) % 50 == 0 and self.total_rounds < 11:
             self.actor_training += 1
             self.actor_training %= 4
+            self.total_rounds += 1
 
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
@@ -641,7 +643,16 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                         else -2
                     )
                     # if self.actor_training == 3: simulated_human_reward = 0.5 if (eef_should_open > 0 and action[0][self.actor_training] > 0) or (eef_should_open < 0 and action[0][self.actor_training] < 0) else -0.5 
-                    if self.actor_training == 3: simulated_human_reward = 0
+                    # if self.actor_training == 3: simulated_human_reward = 0
+                    if self.actor_training == 3:
+                        if eef_should_open > 0 and action[0][self.actor_training] > 0:
+                            simulated_human_reward = 0.1
+                        if eef_should_open < 0 and action[0][self.actor_training] < 0:
+                            simulated_human_reward = 10
+                        if eef_should_open > 0 and action[0][self.actor_training] < 0:
+                            simulated_human_reward = -10
+                        if eef_should_open < 0 and action[0][self.actor_training] > 0:
+                            simulated_human_reward = -1
                     print(f'Goal position = {str(goal_position[self.actor_training])} Curr position = {str(curr_position)} curr reward = {str(simulated_human_reward)}')
                     print(f'Action = {str(curr_action)} lhs = {abs(goal_position[self.actor_training] - curr_position)} rhs = {abs(goal_position[self.actor_training] - (curr_position + curr_action))}')
                     self.total_feedback += 1
