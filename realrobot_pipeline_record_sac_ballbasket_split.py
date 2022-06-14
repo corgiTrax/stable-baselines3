@@ -22,7 +22,7 @@ import collections
 import copy
 import time
 
-from stable_baselines3.active_tamer.active_tamerRL_sac_record_ballbasket import ActiveTamerRLSACOptimBallBasket
+from stable_baselines3.active_tamer.tamerRL_sac_record_ballbasket import TamerRLSACRecordBallBasket
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.sac.sac import SAC
@@ -113,7 +113,7 @@ class BallBasketSceneGraph:
         prev_graph = copy.deepcopy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][2], 'g': newState[0][3]}
         self.total_timesteps += 1
-        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 3 # changed
+        return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4 # changed
 
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
@@ -130,7 +130,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 def main():
     
-    with open("configs/real_robot/active_tamer_rl_sac_split.yaml", "r") as f:
+    with open("configs/real_robot/sac_split.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
 
     # if args.seed:
@@ -216,7 +216,7 @@ def main():
     while os.path.exists(config_data['human_data_save_path']):
         config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
 
-    model = ActiveTamerRLSACOptimBallBasket( # TODO - replace this model with real robot equivalent of ActiveTamerRLSACOptimBallBasket
+    model = TamerRLSACRecordmBallBasket( 
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -235,6 +235,7 @@ def main():
         render=True,
         trained_model=None,
         scene_graph=BallBasketSceneGraph(),
+        percent_feedback=config_data["percent_feedback"]
         # experiment_save_dir=config_data['human_data_save_path'],
         # credit_assignment=config_data["credit_assignment"]
     )
@@ -253,7 +254,7 @@ def main():
 
     else:
         del model
-        model = ActiveTamerRLSACOptimBallBasket.load(f'models/{config_data["load_model"]}', env=env)
+        model = TamerRLSACRecordBallBasket.load(f'models/{config_data["load_model"]}', env=env)
         print("Loaded pretrained model")
 
 

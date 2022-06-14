@@ -642,11 +642,38 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     # scene_graph_updated
                     # random.random() < curr_state_prob  
                     # unfamiliar_state
-                    ucb_rank_high
+                    ucb_rank_high and not done
                     # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
+
                     playsound("beep.wav", block=False) # play audio to signal human to give feedback
+                     
+                    # print out  oracle feedback
+                    obs = self._last_obs[0]
+                    curr_position = obs[self.actor_training]
+                    curr_action = action[0][self.actor_training] * 0.01
+                    eef_should_open = -1 if obs[0] > -0.0963 and obs[0] < 0.0963 and obs[1] > -0.0665 and obs[1] < 0.0735 and obs[2] > 0.226 and obs[2] < 0.41 else 1
+                    goal_position = {0: 0, 1: 0, 2: 0.3, 3: eef_should_open}
+                    simulated_human_reward = (
+                        2
+                        if abs(goal_position[self.actor_training] - curr_position) > abs(goal_position[self.actor_training] - (curr_position + curr_action))
+                        else -2
+                    )
+                    # if self.actor_training == 3: simulated_human_reward = 0.5 if (eef_should_open > 0 and action[0][self.actor_training] > 0) or (eef_should_open < 0 and action[0][self.actor_training] < 0) else -0.5 
+                    # if self.actor_training == 3: simulated_human_reward = 0
+                    if self.actor_training == 3:
+                        if eef_should_open > 0 and action[0][self.actor_training] > 0:
+                            simulated_human_reward = 1
+                        if eef_should_open < 0 and action[0][self.actor_training] < 0:
+                            simulated_human_reward = 10
+                        if eef_should_open > 0 and action[0][self.actor_training] < 0:
+                            simulated_human_reward = -10
+                        if eef_should_open < 0 and action[0][self.actor_training] > 0:
+                            simulated_human_reward = -1
+                    print(f'Goal position = {str(goal_position[self.actor_training])} Curr position = {str(curr_position)} curr reward = {str(simulated_human_reward)}')
+                    print(f'Action = {str(curr_action)} lhs = {abs(goal_position[self.actor_training] - curr_position)} rhs = {abs(goal_position[self.actor_training] - (curr_position + curr_action))}')
+                    print("simulated reward", simulated_human_reward)
                 
                     if human_feedback:
                         _ = human_feedback.return_human_keyboard_feedback() # clear out buffer

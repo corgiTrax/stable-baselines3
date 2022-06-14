@@ -113,7 +113,8 @@ class RealSawyerBallBasketEnv(Env):
 
         # self.hoop_xlim = np.array([0.620, 0.765]) - self.origin[0]
         self.hoop_xlim = np.array([0.604, 0.780]) - self.origin[0]
-        self.hoop_ylim = np.array([0.0890, 0.229]) - self.origin[1]
+        # self.hoop_ylim = np.array([0.0890, 0.229]) - self.origin[1]
+        self.hoop_ylim = np.array([-0.1, 0.1])
         self.hoop_zlim = 0.21 - self.origin[2] # lower limit 
 
 
@@ -121,13 +122,13 @@ class RealSawyerBallBasketEnv(Env):
         
         # check ball is released (gripper is opened) above hoop
         if self._check_is_above_hoop() and self.gripper_state == -1:
-            return 1000
+            return 100
 
         # elif self.gripper_state == 1 and not self._check_is_above_hoop():
         #     return 10
 
-        # elif not self._check_is_above_hoop() and self.gripper_state == -1:
-        #     return -1
+        elif not self._check_is_above_hoop() and self.gripper_state == -1:
+            return -10
 
         return 0
 
@@ -341,11 +342,11 @@ class RealSawyerReachingEnv(Env):
 
         # max time steps
         # self.max_steps = 500
-        self.max_steps = 125
+        self.max_steps = 250
         self.steps = 0 
 
         # scaling factor from action -> osc control command
-        self.ctrl_scale = 0.3
+        self.ctrl_scale = 0.2
 
         # world origin (table center)
         self.origin = np.array([0.7075, 0.150])
