@@ -1,0 +1,329 @@
+Current timestep = 0. State = [[-0.25122893 -0.04241896  0.10810263  1.        ]]. Action = [[0.         0.         0.14797378 1.        ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 0 is [False, True, 2, False, True]
+Human Feedback received at timestep 0 of 1
+Current timestep = 1. State = [[-0.25115365 -0.04242504  0.10811652  1.        ]]. Action = [[ 0.          0.         -0.06325364  1.        ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 1 is [False, True, 2, False, True]
+Human Feedback received at timestep 1 of 1
+Current timestep = 2. State = [[-0.24600197 -0.0461173   0.12347085  1.        ]]. Action = [[0.        0.        1.8394604 1.       ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 2 is [False, True, 2, False, True]
+Human Feedback received at timestep 2 of 1
+Current timestep = 3. State = [[-0.24690427 -0.04727318  0.15139712  1.        ]]. Action = [[ 0.         0.        -1.9858288  1.       ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 3 is [False, True, 2, False, True]
+Human Feedback received at timestep 3 of 0
+Current timestep = 4. State = [[-0.2521522  -0.04608246  0.09657915  1.        ]]. Action = [[ 0.         0.        -1.4603925  1.       ]]. Reward = [0.]
+Curr episode timestep = 4
+Scene graph at timestep 4 is [False, True, 2, False, True]
+Human Feedback received at timestep 4 of 0
+Current timestep = 5. State = [[-0.24901903 -0.04849056  0.05927325  1.        ]]. Action = [[0.        0.        1.0713902 1.       ]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 5 is [False, True, 2, False, True]
+Human Feedback received at timestep 5 of 1
+Current timestep = 6. State = [[-0.24139124 -0.05042134  0.08342078  1.        ]]. Action = [[0.       0.       1.101203 1.      ]]. Reward = [0.]
+Curr episode timestep = 6
+Scene graph at timestep 6 is [False, True, 2, False, True]
+Human Feedback received at timestep 6 of 1
+Current timestep = 7. State = [[-0.24572153 -0.04913028  0.10300154  1.        ]]. Action = [[ 0.       0.      -1.20568  1.     ]]. Reward = [0.]
+Curr episode timestep = 7
+Scene graph at timestep 7 is [False, True, 2, False, True]
+Human Feedback received at timestep 7 of 0
+Current timestep = 8. State = [[-0.25143835 -0.04796933  0.08500239  1.        ]]. Action = [[ 0.         0.        -1.3219261  1.       ]]. Reward = [0.]
+Curr episode timestep = 8
+Scene graph at timestep 8 is [False, True, 2, False, True]
+Human Feedback received at timestep 8 of 0
+Current timestep = 9. State = [[-0.24759796 -0.04852931  0.09365407  1.        ]]. Action = [[0.       0.       1.057205 1.      ]]. Reward = [0.]
+Curr episode timestep = 9
+Scene graph at timestep 9 is [False, True, 2, False, True]
+Human Feedback received at timestep 9 of 0
+Current timestep = 10. State = [[-0.24038942 -0.04988251  0.12117717  1.        ]]. Action = [[0.        0.        1.0650079 1.       ]]. Reward = [0.]
+Curr episode timestep = 10
+Scene graph at timestep 10 is [False, True, 2, False, True]
+Human Feedback received at timestep 10 of 0
+Current timestep = 11. State = [[-0.23995802 -0.05022187  0.1647376   1.        ]]. Action = [[0.        0.        1.3197865 1.       ]]. Reward = [0.]
+Curr episode timestep = 11
+Scene graph at timestep 11 is [False, True, 2, False, True]
+Human Feedback received at timestep 11 of 0
+Current timestep = 12. State = [[-0.23714903 -0.0504376   0.21993886  1.        ]]. Action = [[0.        0.        1.9584403 1.       ]]. Reward = [0.]
+Curr episode timestep = 12
+Scene graph at timestep 12 is [False, True, 2, False, True]
+Human Feedback received at timestep 12 of 0
+Current timestep = 13. State = [[-0.23935488 -0.0496317   0.2881783   1.        ]]. Action = [[0.        0.        0.6736088 1.       ]]. Reward = [0.]
+Curr episode timestep = 13
+Scene graph at timestep 13 is [False, True, 2, True, False]
+Human Feedback received at timestep 13 of 1
+Current timestep = 14. State = [[-0.23803677 -0.04930663  0.3228821   1.        ]]. Action = [[0.        0.        1.2123015 1.       ]]. Reward = [0.]
+Curr episode timestep = 14
+Scene graph at timestep 14 is [False, True, 2, True, False]
+Human Feedback received at timestep 14 of 1
+Current timestep = 15. State = [[-0.23505475 -0.04949579  0.3562291   1.        ]]. Action = [[0.        0.        1.9365561 1.       ]]. Reward = [0.]
+Curr episode timestep = 15
+Scene graph at timestep 15 is [False, True, 2, True, False]
+Human Feedback received at timestep 15 of 0
+Current timestep = 16. State = [[-0.23512928 -0.04957494  0.3543727   1.        ]]. Action = [[ 0.          0.         -0.52999735  1.        ]]. Reward = [0.]
+Curr episode timestep = 16
+Scene graph at timestep 16 is [False, True, 2, True, False]
+Human Feedback received at timestep 16 of 0
+Current timestep = 17. State = [[-0.23549876 -0.05013639  0.360395    1.        ]]. Action = [[0.        0.        0.9404123 1.       ]]. Reward = [0.]
+Curr episode timestep = 17
+Scene graph at timestep 17 is [False, True, 2, True, False]
+Human Feedback received at timestep 17 of 1
+Current timestep = 18. State = [[-0.23700774 -0.0498841   0.37048754  1.        ]]. Action = [[ 0.        0.       -0.648777  1.      ]]. Reward = [0.]
+Curr episode timestep = 18
+Scene graph at timestep 18 is [False, True, 2, True, False]
+Human Feedback received at timestep 18 of 0
+Current timestep = 19. State = [[-0.23770712 -0.04972675  0.35938144  1.        ]]. Action = [[ 0.         0.        -0.7239958  1.       ]]. Reward = [0.]
+Curr episode timestep = 19
+Scene graph at timestep 19 is [False, True, 2, True, False]
+Human Feedback received at timestep 19 of 1
+Current timestep = 20. State = [[-0.23499003 -0.04996111  0.34298748  1.        ]]. Action = [[0.        0.        1.8077736 1.       ]]. Reward = [0.]
+Curr episode timestep = 20
+Scene graph at timestep 20 is [False, True, 2, True, False]
+Human Feedback received at timestep 20 of 0
+Current timestep = 21. State = [[-0.23501755 -0.04995839  0.3429423   1.        ]]. Action = [[0.       0.       1.568301 1.      ]]. Reward = [0.]
+Curr episode timestep = 21
+Scene graph at timestep 21 is [False, True, 2, True, False]
+Human Feedback received at timestep 21 of 0
+Current timestep = 22. State = [[-0.23488441 -0.05001088  0.34891596  1.        ]]. Action = [[0.        0.        0.8686223 1.       ]]. Reward = [0.]
+Curr episode timestep = 22
+Scene graph at timestep 22 is [False, True, 2, True, False]
+Human Feedback received at timestep 22 of 0
+Current timestep = 23. State = [[-0.23515029 -0.05004493  0.35572746  1.        ]]. Action = [[0.       0.       1.489759 1.      ]]. Reward = [0.]
+Curr episode timestep = 23
+Scene graph at timestep 23 is [False, True, 2, True, False]
+Human Feedback received at timestep 23 of 0
+Current timestep = 24. State = [[-0.23515029 -0.05004493  0.35572746  1.        ]]. Action = [[0.        0.        1.4807894 1.       ]]. Reward = [0.]
+Curr episode timestep = 24
+Scene graph at timestep 24 is [False, True, 2, True, False]
+Human Feedback received at timestep 24 of 0
+Current timestep = 25. State = [[-0.23502655 -0.05007255  0.3614021   1.        ]]. Action = [[0.         0.         0.46310043 1.        ]]. Reward = [0.]
+Curr episode timestep = 25
+Scene graph at timestep 25 is [False, True, 2, True, False]
+Human Feedback received at timestep 25 of 0
+Current timestep = 26. State = [[-0.23732843 -0.04989043  0.3707977   1.        ]]. Action = [[0.        0.        1.2666287 1.       ]]. Reward = [0.]
+Curr episode timestep = 26
+Scene graph at timestep 26 is [False, True, 2, True, False]
+Human Feedback received at timestep 26 of 0
+Current timestep = 27. State = [[-0.23732843 -0.04989043  0.3707977   1.        ]]. Action = [[0.        0.        1.9139733 1.       ]]. Reward = [0.]
+Curr episode timestep = 27
+Scene graph at timestep 27 is [False, True, 2, True, False]
+Human Feedback received at timestep 27 of 0
+Current timestep = 28. State = [[-0.23871745 -0.04963183  0.36141482  1.        ]]. Action = [[ 0.         0.        -1.3942193  1.       ]]. Reward = [0.]
+Curr episode timestep = 28
+Scene graph at timestep 28 is [False, True, 2, True, False]
+Human Feedback received at timestep 28 of 1
+Current timestep = 29. State = [[-0.23356223 -0.05010695  0.34633148  1.        ]]. Action = [[0.        0.        1.0148978 1.       ]]. Reward = [0.]
+Curr episode timestep = 29
+Scene graph at timestep 29 is [False, True, 2, True, False]
+Human Feedback received at timestep 29 of 1
+Current timestep = 30. State = [[-0.23704019 -0.04955982  0.34418833  1.        ]]. Action = [[ 0.         0.        -1.4957783  1.       ]]. Reward = [0.]
+Curr episode timestep = 30
+Scene graph at timestep 30 is [False, True, 2, True, False]
+Human Feedback received at timestep 30 of 1
+Current timestep = 31. State = [[-0.23660058 -0.04977785  0.3051438   1.        ]]. Action = [[ 0.         0.        -1.3128895  1.       ]]. Reward = [0.]
+Curr episode timestep = 31
+Scene graph at timestep 31 is [False, True, 2, True, False]
+Human Feedback received at timestep 31 of 0
+Current timestep = 32. State = [[-0.2347733  -0.0501885   0.27956706  1.        ]]. Action = [[0.        0.        1.6494412 1.       ]]. Reward = [0.]
+Curr episode timestep = 32
+Scene graph at timestep 32 is [False, True, 2, True, False]
+Human Feedback received at timestep 32 of 0
+Current timestep = 33. State = [[-0.23809695 -0.04953216  0.32618952  1.        ]]. Action = [[0.        0.        1.2455533 1.       ]]. Reward = [0.]
+Curr episode timestep = 33
+Scene graph at timestep 33 is [False, True, 2, True, False]
+Human Feedback received at timestep 33 of 1
+Current timestep = 34. State = [[-0.23728515 -0.04951534  0.37303624  1.        ]]. Action = [[0.        0.        0.8323376 1.       ]]. Reward = [0.]
+Curr episode timestep = 34
+Scene graph at timestep 34 is [False, True, 2, True, False]
+Human Feedback received at timestep 34 of 0
+Current timestep = 35. State = [[-0.23577686 -0.04981544  0.39589953  1.        ]]. Action = [[ 0.          0.         -0.44909954  1.        ]]. Reward = [0.]
+Curr episode timestep = 35
+Scene graph at timestep 35 is [False, True, 2, True, False]
+Human Feedback received at timestep 35 of 0
+Current timestep = 36. State = [[-0.23587392 -0.04984523  0.3957144   1.        ]]. Action = [[0.        0.        1.5606217 1.       ]]. Reward = [0.]
+Curr episode timestep = 36
+Scene graph at timestep 36 is [False, True, 2, True, False]
+Human Feedback received at timestep 36 of 0
+Current timestep = 37. State = [[-0.23590772 -0.04988967  0.39566737  1.        ]]. Action = [[0.        0.        1.5312867 1.       ]]. Reward = [0.]
+Curr episode timestep = 37
+Scene graph at timestep 37 is [False, True, 2, True, False]
+Human Feedback received at timestep 37 of 0
+Current timestep = 38. State = [[-0.23590772 -0.04988967  0.39566737  1.        ]]. Action = [[0.        0.        1.0703387 1.       ]]. Reward = [0.]
+Curr episode timestep = 38
+Scene graph at timestep 38 is [False, True, 2, True, False]
+Human Feedback received at timestep 38 of 0
+Current timestep = 39. State = [[-0.23592466 -0.04991196  0.3956438   1.        ]]. Action = [[0.        0.        1.8361802 1.       ]]. Reward = [0.]
+Curr episode timestep = 39
+Scene graph at timestep 39 is [False, True, 2, True, False]
+Human Feedback received at timestep 39 of 0
+Current timestep = 40. State = [[-0.23592466 -0.04991196  0.3956438   1.        ]]. Action = [[0.        0.        1.1409218 1.       ]]. Reward = [0.]
+Curr episode timestep = 40
+Scene graph at timestep 40 is [False, True, 2, True, False]
+Human Feedback received at timestep 40 of 0
+Current timestep = 41. State = [[-0.23592466 -0.04991196  0.3956438   1.        ]]. Action = [[0.        0.        1.8269486 1.       ]]. Reward = [0.]
+Curr episode timestep = 41
+Scene graph at timestep 41 is [False, True, 2, True, False]
+Human Feedback received at timestep 41 of 0
+Current timestep = 42. State = [[-0.23836908 -0.05019013  0.3796647   1.        ]]. Action = [[ 0.        0.       -1.493494  1.      ]]. Reward = [0.]
+Curr episode timestep = 42
+Scene graph at timestep 42 is [False, True, 2, True, False]
+Human Feedback received at timestep 42 of 1
+Current timestep = 43. State = [[-0.23507926 -0.05023214  0.32901752  1.        ]]. Action = [[ 0.          0.         -0.64645624  1.        ]]. Reward = [0.]
+Curr episode timestep = 43
+Scene graph at timestep 43 is [False, True, 2, True, False]
+Human Feedback received at timestep 43 of 0
+Current timestep = 44. State = [[-0.2324601  -0.05050184  0.30574682  1.        ]]. Action = [[ 0.         0.        -0.6102936  1.       ]]. Reward = [0.]
+Curr episode timestep = 44
+Scene graph at timestep 44 is [False, True, 2, True, False]
+Human Feedback received at timestep 44 of 0
+Current timestep = 45. State = [[-0.23809604 -0.05013457  0.2754454   1.        ]]. Action = [[ 0.          0.         -0.81377983  1.        ]]. Reward = [0.]
+Curr episode timestep = 45
+Scene graph at timestep 45 is [False, True, 2, True, False]
+Human Feedback received at timestep 45 of 0
+Current timestep = 46. State = [[-0.23650117 -0.05063327  0.2531384   1.        ]]. Action = [[ 0.          0.         -0.08061695  1.        ]]. Reward = [0.]
+Curr episode timestep = 46
+Scene graph at timestep 46 is [False, True, 2, True, False]
+Human Feedback received at timestep 46 of 1
+Current timestep = 47. State = [[-0.23686223 -0.05045672  0.25309485  1.        ]]. Action = [[0.         0.         0.36052227 1.        ]]. Reward = [0.]
+Curr episode timestep = 47
+Scene graph at timestep 47 is [False, True, 2, True, False]
+Human Feedback received at timestep 47 of 1
+Current timestep = 48. State = [[-0.23638792 -0.05047149  0.25512922  1.        ]]. Action = [[0.         0.         0.21053743 1.        ]]. Reward = [0.]
+Curr episode timestep = 48
+Scene graph at timestep 48 is [False, True, 2, True, False]
+Human Feedback received at timestep 48 of 0
+Current timestep = 49. State = [[-0.23683405 -0.05055341  0.24760118  1.        ]]. Action = [[ 0.         0.        -1.0476398  1.       ]]. Reward = [0.]
+Curr episode timestep = 49
+Scene graph at timestep 49 is [False, True, 2, True, False]
+Human Feedback received at timestep 49 of 0
+Current timestep = 50. State = [[-0.23461325 -0.05089457  0.24050307  1.        ]]. Action = [[0.         0.         0.97897625 1.        ]]. Reward = [0.]
+Curr episode timestep = 50
+Scene graph at timestep 50 is [False, True, 2, True, False]
+Human Feedback received at timestep 50 of 1
+Current timestep = 51. State = [[-0.2620763   0.03862642  0.11607264  1.        ]]. Action = [[ 0.          0.         -0.03252411  1.        ]]. Reward = [0.]
+Curr episode timestep = 51
+Current timestep = 52. State = [[-0.26123658  0.04496943  0.09452453  1.        ]]. Action = [[ 0.         0.        -1.2915492  1.       ]]. Reward = [0.]
+Curr episode timestep = 0
+Scene graph at timestep 52 is [False, True, 2, False, True]
+Human Feedback received at timestep 52 of 0
+Current timestep = 53. State = [[-0.2643919   0.04532884  0.04846937  1.        ]]. Action = [[ 0.          0.         -0.33654213  1.        ]]. Reward = [0.]
+Curr episode timestep = 1
+Scene graph at timestep 53 is [False, True, 2, False, True]
+Human Feedback received at timestep 53 of 0
+Current timestep = 54. State = [[-0.26311567  0.04559075  0.04126578  1.        ]]. Action = [[ 0.          0.         -0.31327617  1.        ]]. Reward = [0.]
+Curr episode timestep = 2
+Scene graph at timestep 54 is [False, True, 2, False, True]
+Human Feedback received at timestep 54 of 0
+Current timestep = 55. State = [[-0.25819796  0.04534775  0.04810541  1.        ]]. Action = [[0.        0.        0.9377394 1.       ]]. Reward = [0.]
+Curr episode timestep = 3
+Scene graph at timestep 55 is [False, True, 2, False, True]
+Human Feedback received at timestep 55 of 0
+Current timestep = 56. State = [[-0.25417143  0.04704412  0.05742924  1.        ]]. Action = [[ 0.          0.         -0.32317853  1.        ]]. Reward = [0.]
+Curr episode timestep = 4
+Scene graph at timestep 56 is [False, True, 2, False, True]
+Human Feedback received at timestep 56 of 0
+Current timestep = 57. State = [[-0.2545854   0.04700634  0.05694748  1.        ]]. Action = [[ 0.         0.        -1.0057291  1.       ]]. Reward = [0.]
+Curr episode timestep = 5
+Scene graph at timestep 57 is [False, True, 2, False, True]
+Human Feedback received at timestep 57 of 0
+Current timestep = 58. State = [[-0.25200438  0.04696393  0.06965068  1.        ]]. Action = [[0.        0.        1.4071608 1.       ]]. Reward = [0.]
+Curr episode timestep = 6
+Scene graph at timestep 58 is [False, True, 2, False, True]
+Human Feedback received at timestep 58 of 0
+Current timestep = 59. State = [[-0.24813917  0.04687678  0.11129797  1.        ]]. Action = [[0.        0.        1.2711399 1.       ]]. Reward = [0.]
+Curr episode timestep = 7
+Scene graph at timestep 59 is [False, True, 2, False, True]
+Human Feedback received at timestep 59 of 0
+Current timestep = 60. State = [[-0.24834344  0.04914571  0.15767567  1.        ]]. Action = [[0.         0.         0.75735784 1.        ]]. Reward = [0.]
+Curr episode timestep = 8
+Scene graph at timestep 60 is [False, True, 2, False, True]
+Human Feedback received at timestep 60 of 0
+Current timestep = 61. State = [[-0.25187343  0.0487883   0.16616572  1.        ]]. Action = [[ 0.         0.        -1.5214714  1.       ]]. Reward = [0.]
+Curr episode timestep = 9
+Scene graph at timestep 61 is [False, True, 2, False, True]
+Human Feedback received at timestep 61 of 0
+Current timestep = 62. State = [[-0.25778645  0.0482176   0.12862219  1.        ]]. Action = [[ 0.         0.        -0.6747805  1.       ]]. Reward = [0.]
+Curr episode timestep = 10
+Scene graph at timestep 62 is [False, True, 2, False, True]
+Human Feedback received at timestep 62 of 0
+Current timestep = 63. State = [[-0.25471887  0.04826011  0.12079288  1.        ]]. Action = [[0.        0.        1.0927067 1.       ]]. Reward = [0.]
+Curr episode timestep = 11
+Scene graph at timestep 63 is [False, True, 2, False, True]
+Human Feedback received at timestep 63 of 0
+Current timestep = 64. State = [[-0.25192448  0.04858335  0.13347042  1.        ]]. Action = [[0.        0.        0.0681324 1.       ]]. Reward = [0.]
+Curr episode timestep = 12
+Scene graph at timestep 64 is [False, True, 2, False, True]
+Human Feedback received at timestep 64 of 0
+Current timestep = 65. State = [[-0.25111964  0.04859726  0.13792074  1.        ]]. Action = [[ 0.         0.        -0.0549494  1.       ]]. Reward = [0.]
+Curr episode timestep = 13
+Scene graph at timestep 65 is [False, True, 2, False, True]
+Human Feedback received at timestep 65 of 0
+Current timestep = 66. State = [[-0.2502756   0.04857136  0.14564449  1.        ]]. Action = [[0.        0.        0.6072922 1.       ]]. Reward = [0.]
+Curr episode timestep = 14
+Scene graph at timestep 66 is [False, True, 2, False, True]
+Human Feedback received at timestep 66 of 0
+Current timestep = 67. State = [[-0.25013235  0.04872418  0.15873492  1.        ]]. Action = [[ 0.          0.         -0.30608845  1.        ]]. Reward = [0.]
+Curr episode timestep = 15
+Scene graph at timestep 67 is [False, True, 2, False, True]
+Human Feedback received at timestep 67 of 0
+Current timestep = 68. State = [[-0.250182    0.04862067  0.16085874  1.        ]]. Action = [[0.         0.         0.47982597 1.        ]]. Reward = [0.]
+Curr episode timestep = 16
+Scene graph at timestep 68 is [False, True, 2, False, True]
+Human Feedback received at timestep 68 of 0
+Current timestep = 69. State = [[-0.25236768  0.04808521  0.15831186  1.        ]]. Action = [[ 0.          0.         -0.96218073  1.        ]]. Reward = [0.]
+Curr episode timestep = 17
+Scene graph at timestep 69 is [False, True, 2, False, True]
+Human Feedback received at timestep 69 of 0
+Current timestep = 70. State = [[-0.2563779   0.04770214  0.13983499  1.        ]]. Action = [[ 0.          0.         -0.56255436  1.        ]]. Reward = [0.]
+Curr episode timestep = 18
+Scene graph at timestep 70 is [False, True, 2, False, True]
+Human Feedback received at timestep 70 of 0
+Current timestep = 71. State = [[-0.2591628   0.04761263  0.11648936  1.        ]]. Action = [[ 0.         0.        -1.0397604  1.       ]]. Reward = [0.]
+Curr episode timestep = 19
+Scene graph at timestep 71 is [False, True, 2, False, True]
+Human Feedback received at timestep 71 of 0
+Current timestep = 72. State = [[-0.26404366  0.04759288  0.07821451  1.        ]]. Action = [[ 0.         0.        -0.6838534  1.       ]]. Reward = [0.]
+Curr episode timestep = 20
+Scene graph at timestep 72 is [False, True, 2, False, True]
+Human Feedback received at timestep 72 of 0
+Current timestep = 73. State = [[-0.2619071   0.04788534  0.06028431  1.        ]]. Action = [[ 0.         0.        -0.8786869  1.       ]]. Reward = [0.]
+Curr episode timestep = 21
+Scene graph at timestep 73 is [False, True, 2, False, True]
+Human Feedback received at timestep 73 of 0
+Current timestep = 74. State = [[-0.26168036  0.04791143  0.06031544  1.        ]]. Action = [[0.         0.         0.15151095 1.        ]]. Reward = [0.]
+Curr episode timestep = 22
+Scene graph at timestep 74 is [False, True, 2, False, True]
+Human Feedback received at timestep 74 of 0
+Current timestep = 75. State = [[-0.25647122  0.04800845  0.07152501  1.        ]]. Action = [[0.        0.        1.1669116 1.       ]]. Reward = [0.]
+Curr episode timestep = 23
+Scene graph at timestep 75 is [False, True, 2, False, True]
+Human Feedback received at timestep 75 of 0
+Current timestep = 76. State = [[-0.2508702  0.0485362  0.0899803  1.       ]]. Action = [[ 0.          0.         -0.07489657  1.        ]]. Reward = [0.]
+Curr episode timestep = 24
+Scene graph at timestep 76 is [False, True, 2, False, True]
+Human Feedback received at timestep 76 of 0
+Current timestep = 77. State = [[-0.24809475  0.04773707  0.10405825  1.        ]]. Action = [[0.       0.       1.482502 1.      ]]. Reward = [0.]
+Curr episode timestep = 25
+Scene graph at timestep 77 is [False, True, 2, False, True]
+Human Feedback received at timestep 77 of 0
+Current timestep = 78. State = [[-0.24993478  0.04978335  0.144269    1.        ]]. Action = [[ 0.          0.         -0.26725245  1.        ]]. Reward = [0.]
+Curr episode timestep = 26
+Scene graph at timestep 78 is [False, True, 2, False, True]
+Human Feedback received at timestep 78 of 0
+Current timestep = 79. State = [[-0.25028577  0.04981726  0.14620456  1.        ]]. Action = [[0.         0.         0.41990614 1.        ]]. Reward = [0.]
+Curr episode timestep = 27
+Scene graph at timestep 79 is [False, True, 2, False, True]
+Human Feedback received at timestep 79 of 0
+Current timestep = 80. State = [[-0.24921706  0.05003183  0.15488997  1.        ]]. Action = [[0.         0.         0.28212547 1.        ]]. Reward = [0.]
+Curr episode timestep = 28
+Scene graph at timestep 80 is [False, True, 2, False, True]
+Human Feedback received at timestep 80 of 0
+Current timestep = 81. State = [[-0.25039616  0.05005366  0.15842101  1.        ]]. Action = [[ 0.        0.       -0.644963  1.      ]]. Reward = [0.]
+Curr episode timestep = 29
+Scene graph at timestep 81 is [False, True, 2, False, True]
+Human Feedback received at timestep 81 of 0
+Current timestep = 82. State = [[-0.25138783  0.04988414  0.15638325  1.        ]]. Action = [[0.         0.         0.56053305 1.        ]]. Reward = [0.]
+Curr episode timestep = 30
+Scene graph at timestep 82 is [False, True, 2, False, True]

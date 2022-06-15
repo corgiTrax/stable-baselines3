@@ -7,7 +7,6 @@ import numpy as np
 import torch as th
 from git import Object
 from torch.nn import functional as F
-import os
 
 from stable_baselines3.active_tamer.policies import ActiveSACHPolicyBallBasket
 from stable_baselines3.common.buffers import HumanReplayBuffer
@@ -26,9 +25,10 @@ from stable_baselines3.common.vec_env import VecEnv
 import copy
 from playsound import playsound
 import time
+import os
 
 
-class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
+class TamerRLSACRecordBallBasket(OffPolicyAlgorithm):
     """
     TAMER + Soft Actor-Critic (SAC): Use trained SAC model to give feedback.
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
@@ -116,17 +116,18 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         device: Union[th.device, str] = "auto",
         save_every: int = 2500,
         _init_setup_model: bool = True,
-        model_name: str = "ActiveTamerRLSACOptimBallBasket",
+        model_name: str = "TamerRLSACRecordBallBasket",
         render: bool = False,
         q_val_threshold: float = 0.999,
         rl_threshold: float = 0.1,
         abstract_state: Object = None,
         prediction_threshold: float = 0.2,
         scene_graph: Object = None,
+        percent_feedback: float = 0.25,
         experiment_save_dir: str = "human_study/participant_default",
     ):
 
-        super(ActiveTamerRLSACOptimBallBasket, self).__init__(
+        super(TamerRLSACRecordBallBasket, self).__init__(
             policy,
             env,
             ActiveSACHPolicyBallBasket,
@@ -168,11 +169,11 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.curr_episode_timesteps = 0
         self.q_val_threshold = q_val_threshold
         self.rl_threshold = rl_threshold
-        self.scene_graph = scene_graph #[copy.deepcopy(scene_graph) for _ in range(4)]
+        self.scene_graph = scene_graph
         self.prediction_threshold = prediction_threshold
         self.total_feedback = 0
         self.model_training_index = 0
-        self.model_training_order = [2, 0, 1, 3]
+        self.model_training_order = [2, 1, 0, 3]
         self.model_training_lengths = [100, 200, 300, 1250]
         self.total_rounds = 0
         self.actor_training = self.model_training_order[self.model_training_index]
@@ -180,12 +181,13 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         if experiment_save_dir:
             os.makedirs(experiment_save_dir, exist_ok=True)
             self.feedback_file = open(os.path.join(experiment_save_dir, "feedback_file.txt"), "w")
+        self.percent_feedback = percent_feedback
 
         if _init_setup_model:
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(ActiveTamerRLSACOptimBallBasket, self)._setup_model()
+        super(TamerRLSACRecordBallBasket, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -426,7 +428,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         eval_env: Optional[GymEnv] = None,
         eval_freq: int = -1,
         n_eval_episodes: int = 5,
-        tb_log_name: str = "ActiveTamerRLSACOptimBallBasket",
+        tb_log_name: str = "TamerRLSACRecordBallBasket",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
     ) -> OffPolicyAlgorithm:
@@ -489,7 +491,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
 
         return self
     def _excluded_save_params(self) -> List[str]:
-        return super(ActiveTamerRLSACOptimBallBasket, self)._excluded_save_params() + [
+        return super(TamerRLSACRecordBallBasket, self)._excluded_save_params() + [
             "actor",
             "critic",
             "critic_target",
@@ -619,15 +621,13 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 self.logger.record("train/q_value_threshold", self.q_val_threshold)
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
-
+                self.logger.record("train/training_rewards", reward[0])
                 self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
                 )
                 self.feedback_file.write(
                     f"Curr episode timestep = {str(self.curr_episode_timesteps)}\n"
                 )
-                
-                self.logger.record("train/training_rewards", reward[0])
                 simulated_human_reward = 0
                 # print(self._last_obs[:, self.actor_training].reshape(-1, 1))
                 # print(action[:, self.actor_training].reshape(-1, 1))
@@ -640,7 +640,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     th.cat(human_critic_qval_estimate, dim=1), dim=1, keepdim=True
                 )
                 
-                scene_graph_updated, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action, self.actor_training) # changed (added self.actor_training)
+                scene_graph_updated, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action)
                 # state_prediction_err = F.mse_loss(
                 #     self.state_predictor(
                 #         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
@@ -656,14 +656,10 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     # scene_graph_updated
                     # random.random() < curr_state_prob  
                     # unfamiliar_state
-                    ucb_rank_high and not done
+                    random.random() < self.percent_feedback and not done
                     # state_prediction_err > self.prediction_threshold
                     #  state_reconstructor_err > self.prediction_threshold
                 ):
-
-                    self.feedback_file.write(
-                        f"Scene graph at timestep {str(self.num_timesteps)} is {str(self.scene_graph.curr_graph)}\n"
-                    )
 
                     playsound("beep.wav", block=False) # play audio to signal human to give feedback
                      
@@ -684,29 +680,32 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                         if eef_should_open > 0 and action[0][self.actor_training] > 0:
                             simulated_human_reward = 1
                         if eef_should_open < 0 and action[0][self.actor_training] < 0:
-                            simulated_human_reward = 1
+                            simulated_human_reward = 10
                         if eef_should_open > 0 and action[0][self.actor_training] < 0:
-                            simulated_human_reward = -1
+                            simulated_human_reward = -10
                         if eef_should_open < 0 and action[0][self.actor_training] > 0:
                             simulated_human_reward = -1
                     print(f'Goal position = {str(goal_position[self.actor_training])} Curr position = {str(curr_position)} curr reward = {str(simulated_human_reward)}')
                     print(f'Action = {str(curr_action)} lhs = {abs(goal_position[self.actor_training] - curr_position)} rhs = {abs(goal_position[self.actor_training] - (curr_position + curr_action))}')
                     print("simulated reward", simulated_human_reward)
-
-                    # comment below 2 lines out and uncomment block below to use human feedback                
-                    # self.total_feedback += 1
-                    # self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
-
+                
                     if human_feedback:
                         _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
                         curr_keyboard_feedback = (
                             human_feedback.return_human_keyboard_feedback()
                         )
+                        # simulated_human_reward = (
+                        #     1
+                        #     if self.q_val_threshold * teacher_q_val < student_q_val
+                        #     else -1
+                        # )
+                        # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
                         while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
                             time.sleep(0.01)
                             curr_keyboard_feedback = (
                                 human_feedback.return_human_keyboard_feedback()
-                            )
+                            ) # stall till you get human feedback
+                            # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
                         human_reward = curr_keyboard_feedback * 5
                         self.total_feedback += 1
                         self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
@@ -716,6 +715,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     
                     else:
                         raise "Must instantiate a human feedback object to collect human feedback."
+                    self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
 
                 print(f"Time {self.num_timesteps} ({self.curr_episode_timesteps})")
                 self.q_val_threshold += 0.00000001
