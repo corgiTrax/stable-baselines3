@@ -24,10 +24,14 @@ from perls2.envs.env import Env
 class RealSawyerBallBasketEnv(Env):
     metadata = {'render.modes':['human']}
 
-    def __init__(self, driver, random_init=True):
+    def __init__(
+        self,driver,
+        random_init=True,
+        # terminate_on_ball_drop=True,
+        max_steps=50):
 
         super().__init__(
-            config = '/home/robot/perls2/demos/reaching_config.yaml'
+            config = '/home/robot/perls2/demos/reaching_config.yaml',
         )
 
         self.action_dim = 4 # action = [dx, dy]
@@ -52,7 +56,7 @@ class RealSawyerBallBasketEnv(Env):
 
         # max time steps
         # self.max_steps = 125
-        self.max_steps = 50
+        self.max_steps = max_steps
         self.steps = 0 
 
         # scaling factor from action -> osc control command
@@ -68,6 +72,9 @@ class RealSawyerBallBasketEnv(Env):
 
         # initial position (in world frame)
         self.init_state = np.array([-0.25, 0, 0.233, 1])
+
+        # terminate when ball is dropped outside the hoop?
+        # self.terminate_on_ball_drop = terminate_on_ball_drop
 
         """
         Define:
@@ -214,7 +221,7 @@ class RealSawyerBallBasketEnv(Env):
         if reward > 0:
             # task is completed
             print("---------COMPLETED TASK!-----------")
-            playsound("success.wav", block=False)
+            # playsound("success.wav", block=False)
             done = True
 
         # if reward == 100:
@@ -225,7 +232,7 @@ class RealSawyerBallBasketEnv(Env):
 
         if self.steps > self.max_steps:
             # max steps is reached
-            done = self.steps > self.max_steps # finish if reached maximum time steps
+            done = True # finish if reached maximum time steps
 
         if self.gripper_state == -1:
             print("Gripper opened")
@@ -243,7 +250,7 @@ class RealSawyerBallBasketEnv(Env):
         self.steps += 1
 
         if self._check_is_above_hoop(): ########################
-            print("ABOVE HOOP")
+            print("========================ABOVE HOOP=============================")
         
         return observation, reward, done, info
     
@@ -261,11 +268,11 @@ class RealSawyerBallBasketEnv(Env):
         if self.get_state()[0] > self.noentry_xlim:
             # print("WAYPOINT RESET")
             waypoint = self.get_state()
-            waypoint[2] = 0.3
+            waypoint[2] = 0.25
             vec = waypoint - self.get_state()
             while abs(vec[2] > thresh):
                 print(vec)
-                self._step_to_home(vec[:3])
+                self._step_to_home(vec[:3])# + np.random.uniform(-0.2, 0.2, 3))
                 vec = waypoint - self.get_state()
 
         # move to home position

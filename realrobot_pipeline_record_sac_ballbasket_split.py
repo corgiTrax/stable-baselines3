@@ -216,7 +216,7 @@ def main():
     while os.path.exists(config_data['human_data_save_path']):
         config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
 
-    model = TamerRLSACRecordmBallBasket( 
+    model = TamerRLSACRecordBallBasket( 
         config_data["policy_name"],
         env,
         verbose=config_data["verbose"],
@@ -235,8 +235,9 @@ def main():
         render=True,
         trained_model=None,
         scene_graph=BallBasketSceneGraph(),
-        percent_feedback=config_data["percent_feedback"]
-        # experiment_save_dir=config_data['human_data_save_path'],
+        percent_feedback=config_data["percent_feedback"],
+        experiment_save_dir=config_data['human_data_save_path'],
+        rl_threshold=1.0,
         # credit_assignment=config_data["credit_assignment"]
     )
 

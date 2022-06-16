@@ -228,7 +228,8 @@ def redis_ctrl(env):
         prev_action = np.zeros(4)
 
         while True:
-            print("raw", env.driver.get_eef_xyz())
+            # print("raw", env.driver.get_eef_xyz())
+            print("world", env.get_state())
             action = r.get(ACTION_KEY)
 
             if action != prev_action:
@@ -236,6 +237,8 @@ def redis_ctrl(env):
                 obs, reward, done, info = env.step(new_action)
                 prev_action = action
 
+            if reward > 0:
+                print("target reached!!")
 
 def str2ndarray(array_str, shape):
     """
@@ -253,11 +256,15 @@ if __name__ == "__main__":
 
     np.random.seed(42)
     env = init_env(task=2, random_init=True)
-    # for i in range(5):
-    #     env.step(np.array([0.15, 0, 0.1, 0]))
-
-    for i in range(10):
+    for i in range(5):
         env.reset()
+
+    env = init_env(task=1, random_init=False)
+    # eef_xpos = env.get_state()
+    # error = eef_xpos - env.origin
+    # while abs(env.get_state()[0]) > 0.005:
+    #     env.step(np.array([0.05, 0]))
+        
 
     # env.step(np.array([0, 0, 0.2, 0]))
     # env.step(np.array([0, 0, 0.2, 0]))
@@ -268,6 +275,7 @@ if __name__ == "__main__":
     # calibrate_boundary_helper(env)
 
     # redis_ctrl(env)
+
     # for i in range(7):
     #     action = np.array([0, 0, 0.07, 0])
     #     env.step(action)
