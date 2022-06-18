@@ -314,9 +314,9 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
-    # trained_model = SAC.load(
-    #     config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
-    # )
+    trained_model = SAC.load(
+        config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
+    )
 
     while os.path.exists(config_data['human_data_save_path']):
         config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
@@ -339,7 +339,8 @@ def main():
         gradient_steps=config_data["gradient_steps"],
         seed=config_data["seed"],
         render=True,
-        trained_model=None,
+        # trained_model=None,
+        trained_model=trained_model,
         scene_graph=BallBasketSceneGraph(),
         experiment_save_dir=config_data['human_data_save_path'],
         # credit_assignment=config_data["credit_assignment"]
