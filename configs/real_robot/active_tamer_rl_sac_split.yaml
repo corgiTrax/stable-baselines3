@@ -18,13 +18,13 @@
 # trained_model: "trained-models/LunarLanderContinuous-v2.zip"
 
 gamma: 0.99
-seed: 3
+seed: 42
 tensorboard_log_dir: "log_dir/sawyer_active_task2"
 policy_name: "ActiveMlpPolicyBallBasket"
 verbose: 1
 steps: 2500
 load_model: 0  
-save_every_steps: 50000
+save_every_steps: 100
 learning_rate: 0.00075
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000
@@ -35,6 +35,6 @@ tau: 0.01
 train_freq: 1
 gradient_steps: 8
 human_data_save_path: "robot_task2_data/activeTAMER/participant_1"
-trained_model: "trained-models/BallReaching.pt"
+trained_model: "models/robot_task2/robot_active/well_trained_model_for_video/ActiveTamerRLSACOptimBallBasket_100.pt"
 percent_feedback: 1
 # load_model: "ActiveTamerRLSACOptim_2.pt"

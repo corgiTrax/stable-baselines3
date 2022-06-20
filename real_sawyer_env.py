@@ -28,7 +28,9 @@ class RealSawyerBallBasketEnv(Env):
         self,driver,
         random_init=True,
         # terminate_on_ball_drop=True,
-        max_steps=50):
+        max_steps=50,
+        pickup_ball=False,
+        ):
 
         super().__init__(
             config = '/home/robot/perls2/demos/reaching_config.yaml',
@@ -75,6 +77,9 @@ class RealSawyerBallBasketEnv(Env):
 
         # terminate when ball is dropped outside the hoop?
         # self.terminate_on_ball_drop = terminate_on_ball_drop
+
+        # pick up ball on start
+        self.pickup_ball = pickup_ball
 
         """
         Define:
@@ -224,12 +229,6 @@ class RealSawyerBallBasketEnv(Env):
             # playsound("success.wav", block=False)
             done = True
 
-        # if reward == 100:
-        #     # task is completed
-        #     print("---------COMPLETED TASK!-----------")
-        #     playsound("success.wav", block=False)
-        #     done = True
-
         if self.steps > self.max_steps:
             # max steps is reached
             done = True # finish if reached maximum time steps
@@ -268,7 +267,7 @@ class RealSawyerBallBasketEnv(Env):
         if self.get_state()[0] > self.noentry_xlim:
             # print("WAYPOINT RESET")
             waypoint = self.get_state()
-            waypoint[2] = 0.25
+            waypoint[2] = 0.235
             vec = waypoint - self.get_state()
             while abs(vec[2] > thresh):
                 print(vec)
@@ -294,9 +293,23 @@ class RealSawyerBallBasketEnv(Env):
 
         observation = self.get_state() # update observation
 
-        # close gripper
-        self.robot_interface.close_gripper()
-        self.gripper_state = 1
+        if self.pickup_ball:
+            for i in range(5): # move down
+                action = np.array([0, 0, -0.3, -1])
+                self._step_to_home(action)
+            
+            self.gripper_state = -1
+            
+            # grip ball
+            self.robot_interface.close_gripper()
+            self.gripper_state = 1
+
+            self._move_to_initial_pos()
+
+        else:
+            # close gripper 
+            self.robot_interface.close_gripper()
+            self.gripper_state = 1
 
         # random initialization
         if self.random_init:
