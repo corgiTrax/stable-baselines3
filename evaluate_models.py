@@ -29,20 +29,20 @@ def main():
     # models = sorted(
     #     glob.glob("models/TamerSACOptim_100000_using_env*"), key=lambda x: int(x.split("_")[-1].split(".")[0])
     # )
-    models = ["models/TamerSACOptim_500000_alpha_0.015_w_credit_assign.pt"]
+    models = ["trained-models/LunarLanderContinuous-v2.zip"]
     # models = ["trained-models/LunarLanderContinuous-v2.zip"]
     scores = []
     for model_path in models:
         env.reset()
-        # custom_objects = {
-        #     "learning_rate": 0.0,
-        #     "lr_schedule": lambda _: 0.0,
-        #     "clip_range": lambda _: 0.0,
-        # }
-        # curr_model = SAC.load(model_path, env, custom_objects=custom_objects)
-        curr_model = TamerSAC.load(model_path)
+        custom_objects = {
+            "learning_rate": 0.0,
+            "lr_schedule": lambda _: 0.0,
+            "clip_range": lambda _: 0.0,
+        }
+        curr_model = SAC.load(model_path, env, custom_objects=custom_objects)
+        # curr_model = TamerSAC.load(model_path)
         mean_reward, std_reward = evaluate_policy(
-            curr_model, env, n_eval_episodes=1000, render=False
+            curr_model, env, n_eval_episodes=1000, render=True
         )
         print(
             f"Current Model = {model_path} After Training: Mean reward: {mean_reward} +/- {std_reward:.2f}"

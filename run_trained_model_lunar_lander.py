@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # print('Press "H" to show the viewer control panel.')
     
     robosuite_config = {
-        "env_name": "BallBasket",
+        "env_name": "Reaching",
         "robots": "Sawyer",
         "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
     }
@@ -71,11 +71,12 @@ if __name__ == "__main__":
         render_camera="agentview",
         ignore_done=False,
         use_camera_obs=False,
+        reward_shaping=False,
         control_freq=20,
-        reward_scale=100,
+        reward_scale=10,
         hard_reset=False,
-        prehensile=False,
-    ), keys=['eef_xyz_gripper'])
+        render_gpu_device_id=0,
+    ), keys=['robot0_eef_pos_xy'])
 
     # env = Monitor(env)
     # env = DummyVecEnv([lambda: env])
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     print(env.observation_space)
     obs = env.reset()
     env.render()
-    env.viewer.set_camera(camera_id=0)
+    env.viewer.set_camera(camera_id=1)
 
     # low, high = env.action_spec
 
@@ -103,7 +104,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     trained_model = SAC.load(
-        "models/SAC_115000.pt", env, custom_objects=custom_objects, **kwargs
+        "trained-models/RobosuiteReachingNew.zip", env, custom_objects=custom_objects, **kwargs
     )
     # do visualization
     for i in range(10000):
