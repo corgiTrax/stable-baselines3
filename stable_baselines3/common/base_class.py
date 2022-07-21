@@ -51,6 +51,7 @@ from stable_baselines3.common.vec_env import (
     is_vecenv_wrapped,
     unwrap_vec_normalize,
 )
+import pdb
 
 
 def maybe_make_env(env: Union[GymEnv, str, None], verbose: int) -> Optional[GymEnv]:
@@ -795,14 +796,22 @@ class BaseAlgorithm(ABC):
             device=device,
             _init_setup_model=False,  # pytype: disable=not-instantiable,wrong-keyword-args
         )
-
+        
+       
+        del data["feedback_file"]
         # load parameters
+        # pdb.set_trace()
         model.__dict__.update(data)
+    
         model.__dict__.update(kwargs)
+
+
         model._setup_model()
+        # pdb.set_trace()
 
         # put state_dicts back in place
         model.set_parameters(params, exact_match=True, device=device)
+        
 
         # put other pytorch variables back in place
         if pytorch_variables is not None:
@@ -822,6 +831,7 @@ class BaseAlgorithm(ABC):
         # see issue #44
         if model.use_sde:
             model.policy.reset_noise()  # pytype: disable=attribute-error
+        # pdb.set_trace()
         return model
 
     def get_parameters(self) -> Dict[str, Dict]:

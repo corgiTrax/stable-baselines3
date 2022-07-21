@@ -18,13 +18,13 @@
 # trained_model: "trained-models/LunarLanderContinuous-v2.zip"
 
 gamma: 0.99
-seed: 3
+seed: 33
 tensorboard_log_dir: "log_dir/sawyer_sac_task2"
 policy_name: "ActiveMlpPolicyBallBasket"
 verbose: 1
 steps: 2500
 load_model: 0  
-save_every_steps: 50000
+save_every_steps: 100
 learning_rate: 0.00075
 # Replay Buffer Size. Ensure that it is greater than number of timesteps you want to assign human reward credit for.
 #1000000

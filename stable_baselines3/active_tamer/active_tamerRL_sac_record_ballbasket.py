@@ -26,7 +26,7 @@ from stable_baselines3.common.vec_env import VecEnv
 import copy
 from playsound import playsound
 import time
-
+import pdb
 
 class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
     """
@@ -174,13 +174,14 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         self.model_training_index = 0
         self.model_training_order = [2, 0, 1, 3]
         self.model_training_lengths = [100, 200, 300, 1250]
+        # self.model_training_lengths = [5, 200, 300, 1250]
         self.total_rounds = 0
         self.actor_training = self.model_training_order[self.model_training_index]
         self.feedback_file = None
         if experiment_save_dir:
             os.makedirs(experiment_save_dir, exist_ok=True)
             self.feedback_file = open(os.path.join(experiment_save_dir, "feedback_file.txt"), "w")
-
+        print(f"feedback file {self.feedback_file}")
         if _init_setup_model:
             self._setup_model()
 
@@ -553,10 +554,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
         callback.on_rollout_start()
         continue_training = True
 
-        if (self.num_timesteps + 1) > self.model_training_lengths[self.model_training_index] and self.model_training_index < 3:
-            self.model_training_index += 1
-            self.actor_training = self.model_training_order[self.model_training_index]
-
+        
         while should_collect_more_steps(
             train_freq, num_collected_steps, num_collected_episodes
         ):
@@ -620,6 +618,8 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 prev_obs = self._last_obs.copy()
                 new_obs, reward, done, infos = env.step(action)
 
+                print(f"feedback file {self.feedback_file}")
+
                 self.feedback_file.write(
                     f"Current timestep = {str(self.num_timesteps)}. State = {str(new_obs)}. Action = {str(action)}. Reward = {str(reward)}\n"
                 )
@@ -641,6 +641,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                 )
                 
                 scene_graph_updated, ucb_rank_high = self.scene_graph.updateGraph(new_obs, action, self.actor_training) # changed (added self.actor_training)
+                # pdb.set_trace()       
                 # state_prediction_err = F.mse_loss(
                 #     self.state_predictor(
                 #         th.from_numpy(prev_obs).to(self.device).reshape(1, -1),
@@ -671,7 +672,9 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     obs = self._last_obs[0]
                     curr_position = obs[self.actor_training]
                     curr_action = action[0][self.actor_training] * 0.01
-                    eef_should_open = -1 if obs[0] > -0.0963 and obs[0] < 0.0963 and obs[1] > -0.0665 and obs[1] < 0.0735 and obs[2] > 0.226 and obs[2] < 0.41 else 1
+                    # eef_should_open = -1 if obs[0] > -0.0963 and obs[0] < 0.0963 and obs[1] > -0.0665 and obs[1] < 0.0735 and obs[2] > 0.226 and obs[2] < 0.41 else 1
+                    eef_should_open = -1 if obs[0] > -0.095 and obs[0] < 0.095 and obs[1] > -0.095 and obs[1] < 0.095 and obs[2] > 0.226 and obs[2] < 0.41 else 1
+                    
                     goal_position = {0: 0, 1: 0, 2: 0.3, 3: eef_should_open}
                     simulated_human_reward = (
                         2
@@ -709,6 +712,7 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                             )
                         human_reward = curr_keyboard_feedback * 5
                         self.total_feedback += 1
+                        # pdb.set_trace()
                         self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
                         self.feedback_file.write(
                             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
@@ -717,10 +721,48 @@ class ActiveTamerRLSACOptimBallBasket(OffPolicyAlgorithm):
                     else:
                         raise "Must instantiate a human feedback object to collect human feedback."
 
+                    # for filming: use oracle for some steps, human feedback for other time steps
+                    # if (
+                    #     0 < self.num_timesteps < 300
+                    #     or 500 < self.num_timesteps < 600
+                    #     or 700 < self.num_timesteps < 800
+                    #     or 900 < self.num_timesteps < 1000                         
+                    # ):
+                    #     # use human feedback
+                    #     if human_feedback:
+                    #         _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
+                    #         curr_keyboard_feedback = (
+                    #             human_feedback.return_human_keyboard_feedback()
+                    #         )
+                    #         while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
+                    #             time.sleep(0.01)
+                    #             curr_keyboard_feedback = (
+                    #                 human_feedback.return_human_keyboard_feedback()
+                    #             )
+                    #         human_reward = curr_keyboard_feedback * 5
+                    #         self.total_feedback += 1
+                    #         self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
+                    #         self.feedback_file.write(
+                    #             f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                    #         )
+                        
+                    #     else:
+                    #         raise "Must instantiate a human feedback object to collect human feedback."
+
+                    # else:
+                    #     # use oracle
+                    #     self.total_feedback += 1
+                    #     self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
+                        
                 print(f"Time {self.num_timesteps} ({self.curr_episode_timesteps})")
                 self.q_val_threshold += 0.00000001
                 # self.rl_threshold += 1 / 500000
                 self.num_timesteps += 1
+                if (self.num_timesteps + 1) > self.model_training_lengths[self.model_training_index] and self.model_training_index < 3:
+                    self.model_training_index += 1
+                    print("------------------------change of training axis-------------------------------", self.model_training_index)
+                    self.actor_training = self.model_training_order[self.model_training_index]
+
                 episode_timesteps += 1
                 num_collected_steps += 1
                 self.curr_episode_timesteps += 1

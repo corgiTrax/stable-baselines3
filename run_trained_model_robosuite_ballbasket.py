@@ -103,7 +103,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     trained_model = SAC.load(
-        "trained-models/BallReaching.pt", env, custom_objects=custom_objects, **kwargs
+        "models/SAC_115000.pt", env, custom_objects=custom_objects, **kwargs
     )
     # do visualization
     for i in range(10000):

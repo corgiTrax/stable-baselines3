@@ -31,6 +31,7 @@ from stable_baselines3.common.torch_layers import (
 )
 from stable_baselines3.common.type_aliases import Schedule
 import torch
+import pdb
 
 # CAP the standard deviation of the actor
 LOG_STD_MAX = 2
@@ -1021,6 +1022,7 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         n_critics: int = 2,
         share_features_extractor: bool = True,
     ):
+        print("initialize!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
         super(ActiveSACHPolicyBallBasket, self).__init__(
             observation_space,
             action_space,
@@ -1087,13 +1089,14 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
             curr_critic_kwargs.update({"observation_space": self.obs_spaces[i], "action_space": self.act_spaces[i], "features_dim": 1})
             self.crit_kwargs.append(curr_critic_kwargs)
             
-        self.actors = [None for _ in range(self.num_obs)]
-        self.critics = [None for _ in range(self.num_obs)]
+        
+        self.actors = nn.ModuleList([None for _ in range(self.num_obs)])
+        self.critics = nn.ModuleList([None for _ in range(self.num_obs)])
         self.critic_parameters = [None for _  in range(self.num_obs)]
-        self.critic_targets = [None for _ in range(self.num_obs)]
-        self.human_critics = [None for _ in range(self.num_obs)]
+        self.critic_targets = nn.ModuleList([None for _ in range(self.num_obs)])
+        self.human_critics = nn.ModuleList([None for _ in range(self.num_obs)])
         self.human_critic_parameters = [None for _  in range(self.num_obs)]
-        self.human_critic_targets = [None for _ in range(self.num_obs)]
+        self.human_critic_targets = nn.ModuleList([None for _ in range(self.num_obs)])
         self.share_features_extractor = share_features_extractor
 
         self._build(lr_schedule)
@@ -1101,7 +1104,8 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
     def _build(self, lr_schedule: Schedule) -> None:
 
         for i in range(self.num_obs):
-            self.actors[i] = self.make_actor(actor_kwargs=self.act_kwargs[i])
+            # self.actors[i] = self.make_actor(actor_kwargs=self.act_kwargs[i])
+            self.actors[i] = self.make_actor(index=i)
             self.actors[i].optimizer = self.optimizer_class(
                 self.actors[i].parameters(), lr=lr_schedule(1), **self.optimizer_kwargs
             )
@@ -1169,6 +1173,15 @@ class ActiveSACHPolicyBallBasket(BasePolicy):
         self.actor_g.reset_noise(batch_size=batch_size)
 
     def make_actor(
+        self, index, features_extractor: Optional[BaseFeaturesExtractor] = None,
+    ) -> Actor:
+        actor_kwargs = self._update_features_extractor(
+            self.act_kwargs[index], features_extractor
+        )
+        actor_kwargs['features_dim'] = actor_kwargs['observation_space'].shape[0]
+        return Actor(**actor_kwargs).to(self.device)
+    
+    def make_actor_old(
         self, actor_kwargs, features_extractor: Optional[BaseFeaturesExtractor] = None,
     ) -> Actor:
         actor_kwargs = self._update_features_extractor(

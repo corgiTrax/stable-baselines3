@@ -104,7 +104,7 @@ def calibrate_boundary_helper(env):
         if env.reward() > 0:
             print("IN TARGET")
 
-def init_env(task=1, random_init=True):
+def init_env(task=1, random_init=True, pickup_ball=False):
     if task == 1:
 
         from demos.sawyer_osc_2d import OpSpaceLineXYZ 
@@ -211,7 +211,7 @@ def init_env(task=1, random_init=True):
 
         driver = OpSpaceLineXYZ(**kwargs)
 
-        env = RealSawyerBallBasketEnv(driver, random_init=random_init)
+        env = RealSawyerBallBasketEnv(driver, random_init=random_init, pickup_ball=pickup_ball)
 
         return env
 
@@ -255,11 +255,11 @@ def str2ndarray(array_str, shape):
 if __name__ == "__main__":
 
     np.random.seed(42)
-    env = init_env(task=2, random_init=True)
-    for i in range(5):
-        env.reset()
+    env = init_env(task=2, random_init=True, pickup_ball=False)
+    # for i in range(5):
+    #     env.reset()
 
-    env = init_env(task=1, random_init=False)
+    # env = init_env(task=1, random_init=False)
     # eef_xpos = env.get_state()
     # error = eef_xpos - env.origin
     # while abs(env.get_state()[0]) > 0.005:
@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
     # calibrate_boundary_helper(env)
 
-    # redis_ctrl(env)
+    redis_ctrl(env)
 
     # for i in range(7):
     #     action = np.array([0, 0, 0.07, 0])

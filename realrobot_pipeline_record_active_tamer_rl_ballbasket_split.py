@@ -21,6 +21,7 @@ import math
 import collections
 import copy
 import time
+import pdb
 
 from stable_baselines3.active_tamer.active_tamerRL_sac_record_ballbasket import ActiveTamerRLSACOptimBallBasket
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -40,91 +41,6 @@ import argparse
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.dummy_learning_interface import FeedbackInterface
 
-# class BallBasketSceneGraph:
-#     def __init__(self):
-#         self.agent = {'location': {'x': 0, 'y': 0, 'z': 0, 'g': 0}}
-#         self.num_feedback_given = collections.Counter()
-#         self.aRPE_average = collections.Counter()
-#         self.curr_graph = None
-#         self.total_feedback = 50000 #200000 for frequency based scene graph
-#         self.given_feedback = 0
-#         self.total_timesteps = 0
-#         self.model_training = 2 #changeUCB
-    
-#     def calculate_ucb(self, graph):
-#         return self.aRPE_average[tuple(graph)] + 0.2 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
-    
-#     def getUCBRank(self):
-#         curr_graph_ucb1 = self.calculate_ucb(self.curr_graph)
-#         rank = 0
-#         for graph in self.num_feedback_given:
-#             print(graph)
-#             if self.calculate_ucb(graph) > curr_graph_ucb1:
-#                 rank += 1
-#         print(f'Rank = {str(rank)}')
-#         return rank
-
-#     def right(self, obj_a):
-#         return obj_a['location']['x'] < -0.0963
-
-#     def center_right(self, obj_a):
-#         return obj_a['location']['x'] > -0.0963 and obj_a['location']['x'] < 0
-    
-#     def center_left(self, obj_a):
-#         return obj_a['location']['x'] > 0 and obj_a['location']['x'] < 0.0997
-
-#     def left(self, obj_a):
-#         return obj_a['location']['x'] > 0.0997
-
-    
-#     def top(self, obj_a):
-#         return obj_a['location']['y'] < -0.1
-
-#     def middle_right(self, obj_a):
-#         return obj_a['location']['y'] > -0.1 and obj_a['location']['y'] < 0
-    
-#     def middle_left(self, obj_a):
-#         return obj_a['location']['y'] > 0 and obj_a['location']['y'] < 0.1
-
-#     def bottom(self, obj_a):
-#         return obj_a['location']['y'] > 0.1
-    
-    
-#     def above(self, obj_a):
-#         return obj_a['location']['z'] > 0.2262
-    
-#     def below(self, obj_a):
-#         return obj_a['location']['z'] < 0.2262
-
-    
-#     def gripper_open(self, obj_a):
-#         return obj_a['location']['g'] < 0
-    
-#     def gripper_close(self, obj_a):
-#         return obj_a['location']['g'] > 0
-
-#     # add a state of gripper open/close
-    
-
-#     def updateRPE(self, human_feedback, human_critic_prediction):
-#         self.num_feedback_given[tuple(self.curr_graph)] += 1
-#         self.given_feedback += 1
-#         self.aRPE_average[tuple(self.curr_graph)] *= (self.num_feedback_given[tuple(self.curr_graph)] - 1)/self.num_feedback_given[tuple(self.curr_graph)]
-#         self.aRPE_average[tuple(self.curr_graph)] += abs(human_feedback - human_critic_prediction)/self.num_feedback_given[tuple(self.curr_graph)]
-
-#     def getCurrGraph(self):
-#         self.curr_graph = [self.right(self.agent), self.center_right(self.agent), self.center_left(self.agent), self.left(self.agent), self.top(self.agent), 
-#                             self.middle_right(self.agent), self.middle_left(self.agent), self.bottom(self.agent), self.above(self.agent), self.below(self.agent),
-#                             self.gripper_open(self.agent), self.gripper_close(self.agent), self.model_training] #changeUCB
-        
-#         return self.curr_graph
-        
-#     def updateGraph(self, newState, action, model_training): #changeUCB
-#         prev_graph = copy.deepcopy(self.curr_graph)
-#         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][2], 'g': newState[0][3]}
-#         self.total_timesteps += 1
-#         self.model_training = model_training #changeUCB
-#         return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 3 #changeUCB
 class BallBasketSceneGraph:
     def __init__(self):
         self.agent = {'location': {'x': 0, 'y': 0, 'z': 0, 'g': 0}}
@@ -137,6 +53,7 @@ class BallBasketSceneGraph:
         self.model_training = 2 #changeUCB
     
     def calculate_ucb(self, graph):
+        # pdb.set_trace()       
         return self.aRPE_average[tuple(graph)] + 2 * math.sqrt(2 * self.given_feedback / (self.num_feedback_given[tuple(graph)] + 1))       
     
     def getUCBRank(self):
@@ -190,10 +107,15 @@ class BallBasketSceneGraph:
     
 
     def updateRPE(self, human_feedback, human_critic_prediction):
+        
         self.num_feedback_given[tuple(self.curr_graph)] += 1
+
         self.given_feedback += 1
+        # pdb.set_trace()
         self.aRPE_average[tuple(self.curr_graph)] *= (self.num_feedback_given[tuple(self.curr_graph)] - 1)/self.num_feedback_given[tuple(self.curr_graph)]
         self.aRPE_average[tuple(self.curr_graph)] += abs(human_feedback - human_critic_prediction)/self.num_feedback_given[tuple(self.curr_graph)]
+        self.aRPE_average[tuple(self.curr_graph)] = self.aRPE_average[tuple(self.curr_graph)].detach()
+
 
     def getCurrGraph(self):
         self.curr_graph = [self.gripper_open(self.agent), self.gripper_close(self.agent), self.model_training]
@@ -213,6 +135,7 @@ class BallBasketSceneGraph:
         return self.curr_graph
         
     def updateGraph(self, newState, action, model_training): #changeUCB
+        # pdb.set_trace()
         prev_graph = copy.deepcopy(self.curr_graph)
         self.agent['location'] = {'x': newState[0][0], 'y': newState[0][1], 'z': newState[0][2], 'g': newState[0][3]}
         self.total_timesteps += 1
@@ -226,6 +149,7 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
         config_data["steps"],
         human_feedback_gui=feedback_gui,
         human_feedback=human_feedback,
+        reset_num_timesteps = False
     )
     mean_reward, std_reward = evaluate_policy(
         model, env, n_eval_episodes=20, render=True
@@ -314,9 +238,6 @@ def main():
             "lr_schedule": lambda _: 0.0,
             "clip_range": lambda _: 0.0,
         }
-    # trained_model = SAC.load(
-    #     config_data["trained_model"], env, custom_objects=custom_objects, **kwargs
-    # )
 
     while os.path.exists(config_data['human_data_save_path']):
         config_data['human_data_save_path'] = "/".join(config_data['human_data_save_path'].split("/")[:-1]) + '/participant_' + str(int(random.random() * 1000000000))
@@ -340,6 +261,7 @@ def main():
         seed=config_data["seed"],
         render=True,
         trained_model=None,
+        # trained_model=trained_model,
         scene_graph=BallBasketSceneGraph(),
         experiment_save_dir=config_data['human_data_save_path'],
         # credit_assignment=config_data["credit_assignment"]
@@ -359,9 +281,31 @@ def main():
 
     else:
         del model
-        model = ActiveTamerRLSACOptimBallBasket.load(f'models/{config_data["load_model"]}', env=env)
+        model = ActiveTamerRLSACOptimBallBasket.load(config_data["load_model"], env=env)
         print("Loaded pretrained model")
+        train_model(model, config_data, feedback_gui, human_feedback, env)
+        # do visualization
+        # obs = env.reset()
+        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # get warning to update gpu when using gpu
+        
+        # for i in range(100):
+        #     # model_action, _ = trained_model.actor.action_log_prob(torch.tensor(obs).view(1, -1).to(device))
+        #     model_action, _ = model.predict(torch.tensor(obs).view(1, -1).to(device))
+        #     model_action = torch.from_numpy(model_action)
 
+        #     obs, reward, done, _ = env.step(model_action[0].cpu().detach().numpy())
+        #     env.render()
+
+        #     print("action", model_action)
+        #     # print("observation [x, y]", obs)
+        #     print("reward", reward)
+
+        #     if done:
+        #         print("DONEEEE!!")
+        #         print(reward)
+        #         obs = env.reset()
+        #         print(obs)
+        #         # break
 
 if __name__ == "__main__":
     # msg = "Overwrite config params"
@@ -371,3 +315,4 @@ if __name__ == "__main__":
     # args = parser.parse_args()
     # main(args)
     main()
+

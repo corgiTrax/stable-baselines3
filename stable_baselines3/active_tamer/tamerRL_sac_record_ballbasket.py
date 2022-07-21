@@ -689,33 +689,68 @@ class TamerRLSACRecordBallBasket(OffPolicyAlgorithm):
                     print(f'Action = {str(curr_action)} lhs = {abs(goal_position[self.actor_training] - curr_position)} rhs = {abs(goal_position[self.actor_training] - (curr_position + curr_action))}')
                     print("simulated reward", simulated_human_reward)
                 
-                    if human_feedback:
-                        _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
-                        curr_keyboard_feedback = (
-                            human_feedback.return_human_keyboard_feedback()
-                        )
-                        # simulated_human_reward = (
-                        #     1
-                        #     if self.q_val_threshold * teacher_q_val < student_q_val
-                        #     else -1
-                        # )
-                        # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
-                        while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
-                            time.sleep(0.01)
+                    # if human_feedback:
+                    #     _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
+                    #     curr_keyboard_feedback = (
+                    #         human_feedback.return_human_keyboard_feedback()
+                    #     )
+                    #     # simulated_human_reward = (
+                    #     #     1
+                    #     #     if self.q_val_threshold * teacher_q_val < student_q_val
+                    #     #     else -1
+                    #     # )
+                    #     # print(f'Recommended Feedback at timestep {self.num_timesteps} is {str(simulated_human_reward)}')
+                    #     while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
+                    #         time.sleep(0.01)
+                    #         curr_keyboard_feedback = (
+                    #             human_feedback.return_human_keyboard_feedback()
+                    #         ) # stall till you get human feedback
+                    #         # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
+                    #     human_reward = curr_keyboard_feedback * 5
+                    #     self.total_feedback += 1
+                    #     self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
+                    #     self.feedback_file.write(
+                    #         f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                    #     )
+                    
+                    # else:
+                    #     raise "Must instantiate a human feedback object to collect human feedback."
+                    # self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
+                    # for filming: use oracle for some steps, human feedback for other time steps
+                    
+                    if ( # edit if using real human feedback for certain steps only (use simulated feedback otherwise)
+                        # 300 < self.num_timesteps < 400
+                        # 700 < self.num_timesteps < 800
+                        # or 1100 < self.num_timesteps < 1200
+                        # or 1600 < self.num_timesteps < 1700
+                        # or 2200 < self.num_timesteps < 2300
+                        self.num_timesteps > 0
+                    ):
+                        # use human feedback
+                        if human_feedback:
+                            _ = human_feedback.return_human_keyboard_feedback() # clear out buffer
                             curr_keyboard_feedback = (
                                 human_feedback.return_human_keyboard_feedback()
-                            ) # stall till you get human feedback
-                            # print(f'{str(self.num_timesteps)}   {str(curr_keyboard_feedback)}')
-                        human_reward = curr_keyboard_feedback * 5
-                        self.total_feedback += 1
-                        self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
-                        self.feedback_file.write(
-                            f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
-                        )
-                    
+                            )
+                            while curr_keyboard_feedback is None or type(curr_keyboard_feedback) != int:
+                                time.sleep(0.01)
+                                curr_keyboard_feedback = (
+                                    human_feedback.return_human_keyboard_feedback()
+                                )
+                            human_reward = curr_keyboard_feedback * 5
+                            self.total_feedback += 1
+                            self.scene_graph.updateRPE(human_reward, human_critic_qval_estimate)
+                            self.feedback_file.write(
+                                f"Human Feedback received at timestep {str(self.num_timesteps)} of {str(curr_keyboard_feedback)}\n"
+                            )
+                        
+                        else:
+                            raise "Must instantiate a human feedback object to collect human feedback."
+
                     else:
-                        raise "Must instantiate a human feedback object to collect human feedback."
-                    self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
+                        # use oracle
+                        self.total_feedback += 1
+                        self.scene_graph.updateRPE(simulated_human_reward, human_critic_qval_estimate)
 
                 print(f"Time {self.num_timesteps} ({self.curr_episode_timesteps})")
                 self.q_val_threshold += 0.00000001
