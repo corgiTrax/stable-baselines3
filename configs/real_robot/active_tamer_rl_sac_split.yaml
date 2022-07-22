@@ -37,4 +37,4 @@ gradient_steps: 8
 human_data_save_path: "robot_task2_data/activeTAMER/participant_1"
 trained_model: "models/robot_task2/robot_active/well_trained_model/ActiveTamerRLSACOptimBallBasket_1200.pt"
 percent_feedback: 1
-load_model: "models/trained/ActiveTamerRLSACOptimBallBasket_100.pt"
+load_model: "/home/robot/ayanoh/research/stable-baselines3/models/robot_task2/robot_active/subject3/ActiveTamerRLSACOptimBallBasket_2500.pt"

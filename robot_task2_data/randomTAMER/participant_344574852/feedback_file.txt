@@ -1,0 +1,30 @@
+Current timestep = 0. State = [[-0.2545893  -0.10486984  0.13389754  1.        ]]. Action = [[0.       0.       1.699228 1.      ]]. Reward = [0.]
+Curr episode timestep = 0
+Current timestep = 1. State = [[-0.247566   -0.10138979  0.1295529   1.        ]]. Action = [[ 0.          0.         -0.84003985  1.        ]]. Reward = [0.]
+Curr episode timestep = 1
+Current timestep = 2. State = [[-0.2618258  -0.10157908  0.1482173   1.        ]]. Action = [[0.       0.       1.444231 1.      ]]. Reward = [0.]
+Curr episode timestep = 2
+Current timestep = 3. State = [[-0.25837612 -0.10260775  0.16053763  1.        ]]. Action = [[0.         0.         0.00373578 1.        ]]. Reward = [0.]
+Curr episode timestep = 3
+Human Feedback received at timestep 3 of 0
+Current timestep = 4. State = [[-0.25709987 -0.10203366  0.15799062  1.        ]]. Action = [[ 0.        0.       -0.154019  1.      ]]. Reward = [0.]
+Curr episode timestep = 4
+Current timestep = 5. State = [[-0.27030718 -0.10422084  0.17992426  1.        ]]. Action = [[0.        0.        1.5279875 1.       ]]. Reward = [0.]
+Curr episode timestep = 5
+Current timestep = 6. State = [[-0.2649812  -0.10641518  0.1937011   1.        ]]. Action = [[0.        0.        1.1727643 1.       ]]. Reward = [0.]
+Curr episode timestep = 6
+Current timestep = 7. State = [[-0.26235694 -0.10854526  0.19656613  1.        ]]. Action = [[ 0.         0.        -0.0371474  1.       ]]. Reward = [0.]
+Curr episode timestep = 7
+Human Feedback received at timestep 7 of 0
+Current timestep = 8. State = [[-0.26660243 -0.11356334  0.20455897  1.        ]]. Action = [[0.        0.        0.7169025 1.       ]]. Reward = [0.]
+Curr episode timestep = 8
+Current timestep = 9. State = [[-0.27244866 -0.11481301  0.2163817   1.        ]]. Action = [[0.        0.        0.8228283 1.       ]]. Reward = [0.]
+Curr episode timestep = 9
+Current timestep = 10. State = [[-0.2717301  -0.11037633  0.22240561  1.        ]]. Action = [[ 0.         0.        -1.3392736  1.       ]]. Reward = [0.]
+Curr episode timestep = 10
+Current timestep = 11. State = [[-0.2718604  -0.10880142  0.22291851  1.        ]]. Action = [[0.        0.        1.5860646 1.       ]]. Reward = [0.]
+Curr episode timestep = 11
+Current timestep = 12. State = [[-0.27239972 -0.10764664  0.22257337  1.        ]]. Action = [[0.        0.        1.0416245 1.       ]]. Reward = [0.]
+Curr episode timestep = 12
+Current timestep = 13. State = [[-0.27290878 -0.10652792  0.22212064  1.        ]]. Action = [[0.        0.        1.0919092 1.       ]]. Reward = [0.]
+Curr episode timestep = 13

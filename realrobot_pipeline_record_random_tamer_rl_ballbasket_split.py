@@ -40,6 +40,7 @@ import argparse
 from stable_baselines3.common.human_feedback import HumanFeedback
 from stable_baselines3.common.dummy_learning_interface import FeedbackInterface
 
+
 class BallBasketSceneGraph:
     agent = {'location': {'x': 0, 'y': 0, 'z': 0, 'g': 0}}
     num_feedback_given = collections.Counter()
@@ -115,12 +116,12 @@ class BallBasketSceneGraph:
         self.total_timesteps += 1
         return self.getCurrGraph() != prev_graph, self.getUCBRank() <= 4 # changed
 
-
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(
         config_data["steps"],
         human_feedback_gui=feedback_gui,
         human_feedback=human_feedback,
+        reset_num_timesteps=False,
     )
     mean_reward, std_reward = evaluate_policy(
         model, env, n_eval_episodes=20, render=True
@@ -259,8 +260,9 @@ def main():
 
     else:
         del model
-        model = TamerRLSACRecordBallBasket.load(f'models/{config_data["load_model"]}', env=env)
+        model = TamerRLSACRecordBallBasket.load(f'{config_data["load_model"]}', env=env)
         print("Loaded pretrained model")
+        train_model(model, config_data, feedback_gui, human_feedback, env)
 
 
 if __name__ == "__main__":
