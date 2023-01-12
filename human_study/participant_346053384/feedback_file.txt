@@ -1,8 +1,0 @@
-Current timestep = 0. State = [[-0.23431441  0.22580194]]. Action = [[-0.06292832 -0.00783072  0.21038541 -0.03610903]]. Reward = [0.]
-Curr episode timestep = 0
-Scene graph at timestep 0 is None
-Current timestep = 1. State = [[-0.23640044  0.22816467]]. Action = [[ 0.02804708  0.09211323 -0.17953753 -0.24135602]]. Reward = [0.]
-Curr episode timestep = 1
-Scene graph at timestep 1 is [True, False, False, False, False, True]
-Scene graph at timestep 1 is [True, False, False, False, False, True]
-State prediction error at timestep 1 is tensor(0.0730, grad_fn=<MseLossBackward0>)

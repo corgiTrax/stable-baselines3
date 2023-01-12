@@ -26,6 +26,8 @@ import robosuite as suite
 from robosuite import wrappers
 from robosuite import load_controller_config
 
+import pdb
+
 
 def train_model(model, config_data, feedback_gui, human_feedback, env):
     model.learn(
@@ -40,32 +42,13 @@ def train_model(model, config_data, feedback_gui, human_feedback, env):
 
 
 def main(args, env):
-    with open("configs/robosuite/sac.yaml", "r") as f:
+    with open("configs/SEED/robosuite_sac_record.yaml", "r") as f:
         config_data = yaml.load(f, Loader=yaml.FullLoader)
     
     if args.seed:
         config_data['seed'] = args.seed
 
     tensorboard_log_dir = config_data["tensorboard_log_dir"]
-
-    # robosuite_config = {
-    #     "env_name": "",
-    #     "robots": "Sawyer",
-    #     "controller_configs": load_controller_config(default_controller="OSC_POSITION"),
-    # }
-
-    # env = wrappers.GymWrapper(suite.make(
-    #     **robosuite_config,
-    #     has_renderer=False,
-    #     has_offscreen_renderer=False,
-    #     render_camera="agentview",
-    #     ignore_done=False,
-    #     use_camera_obs=False,
-    #     control_freq=20,
-    #     reward_scale=100,
-    #     hard_reset=False,
-    #     prehensile=False,
-    # ), keys=['eef_xyz_gripper'])
 
     env = wrappers.GymWrapper(env, keys=["eef_xy"])
     print(env.action_space)
@@ -151,12 +134,13 @@ if __name__ == "__main__":
     env = suite.make(
         env_name="POCReaching",
         robots="Panda",
-        controller_configs=load_controller_config(default_controller="OSC_POSE"),
+        controller_configs=load_controller_config(default_controller="OSC_POSITION"),
         initialization_noise=None,
         table_full_size=(0.65, 0.8, 0.15),
         table_friction=(100, 100, 100),
         use_camera_obs=False,
         use_object_obs=True,
+        reward_scale=10.0,
         has_renderer=True,
         has_offscreen_renderer=False,
         render_camera="frontview",

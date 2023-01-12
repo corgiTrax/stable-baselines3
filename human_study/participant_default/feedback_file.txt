@@ -1,8 +1,0 @@
-Current timestep = 12. State = [[-0.24595271 -0.09863339  0.11427923  1.        ]]. Action = [[0.        0.        1.5414672 1.       ]]. Reward = [0.]
-Curr episode timestep = 12
-Current timestep = 13. State = [[-0.24748686 -0.09859316  0.13390994  1.        ]]. Action = [[ 0.         0.        -1.0864706  1.       ]]. Reward = [0.]
-Curr episode timestep = 13
-Current timestep = 14. State = [[-0.24831627 -0.09958678  0.12877782  1.        ]]. Action = [[0.        0.        1.3750868 1.       ]]. Reward = [0.]
-Curr episode timestep = 14
-Current timestep = 15. State = [[-0.24342388 -0.10035817  0.1562442   1.        ]]. Action = [[ 0.          0.         -0.06197941  1.        ]]. Reward = [0.]
-Curr episode timestep = 15
